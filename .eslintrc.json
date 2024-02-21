@@ -1,0 +1,48 @@
+{
+  "extends": ["next", "next/core-web-vitals", "prettier"],
+  "rules": {
+    "semi": [2, "never"],
+    "prefer-destructuring": [
+      "error",
+      {
+        "array": true,
+        "object": true
+      },
+      {
+        "enforceForRenamedProperties": false
+      }
+    ],
+    "no-unexpected-multiline": "error",
+    "simple-import-sort/exports": "error",
+    "simple-import-sort/imports": [
+      "error",
+      {
+        "groups": [
+          ["^react"],
+          ["^next"],
+          ["^@?\\w"],
+          ["^@ui-kit"],
+          ["^@admin-panel"],
+          ["^@layout"],
+          ["^@widgets"],
+          ["^@components"],
+          ["^@hooks"],
+          ["^@services"],
+          ["^@utils"],
+          ["^@context"],
+          ["^@constants"],
+          ["^@ts"],
+          ["^\\u0000"],
+          ["^__mocks__"],
+          ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
+          ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"]
+        ]
+      }
+    ],
+    "object-curly-spacing": ["error", "always"],
+    "unused-imports/no-unused-imports": "error",
+    "react/jsx-curly-brace-presence": "error",
+    "react/jsx-tag-spacing": ["error", { "beforeSelfClosing": "always" }]
+  },
+  "plugins": ["simple-import-sort", "unused-imports"]
+}

@@ -1,0 +1,136 @@
+@use 'sass:list';
+
+@use 'sass:math';
+
+@function hexToRGB($hex) {
+  @return red($hex), green($hex), blue($hex);
+}
+
+@function strip-unit($number) {
+  @if type-of($number) == 'number' and not unitless($number) {
+    @return math.div($number, $number * 0 + 1);
+  }
+
+  @return $number;
+}
+
+@mixin supports-safe-area-insets-env {
+  @supports (height: env(safe-area-inset-bottom)) {
+    @content;
+  }
+}
+
+@mixin supports-safe-area-insets-constants {
+  @supports (height: constant(safe-area-inset-bottom)) {
+    @content;
+  }
+}
+
+@mixin hideScrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@function pxToVw($val, $type) {
+  @if (type-of($val) == 'null') {
+    @return null;
+  }
+
+  $isConvertable: if(
+    (
+      type-of($val) == 'list' or
+        (type-of($val) == 'number' and unit($val) == 'px')
+    ),
+    true,
+    false
+  );
+
+  @if ($type == 'phone') {
+    @return if($isConvertable, phoneVw($val), $val);
+  }
+
+  @if ($type == 'tablet') {
+    @return if($isConvertable, tabletVw($val), $val);
+  }
+
+  @if ($type == 'desktop') {
+    @return if($isConvertable, desktopVw($val), $val);
+  }
+
+  @if ($type == 'largeDesktop') {
+    @return if($isConvertable, largeDesktopVw($val), $val);
+  }
+}
+
+@function vw($px, $base-vw: $breakpoint-xxl) {
+  $isList: if(type-of($px) == 'list', true, false);
+
+  @if ($isList) {
+    $result: [];
+
+    @each $item in $px {
+      $number: strip-unit($item);
+      $result: list.append($result, #{math.div($number * 100, $base-vw)}vw);
+    }
+
+    @return $result;
+  } @else {
+    $number: strip-unit($px);
+
+    @return #{math.div($number * 100, $base-vw)}vw;
+  }
+}
+
+@function phoneVw($px) {
+  @return vw($px, $breakpoint-xs);
+}
+
+@function tabletVw($px) {
+  @return vw($px, $breakpoint-md);
+}
+
+@function desktopVw($px) {
+  @return vw($px, $breakpoint-xxl);
+}
+
+@function largeDesktopVw($px) {
+  @return vw($px, $breakpoint-2xxl);
+}
+
+@function parseParams($params, $function) {
+  $result: ();
+
+  @each $item in $params {
+    @if $function == 'phone' {
+      $result: list.append($result, phoneVw($item));
+    } @else if $function == 'tablet' {
+      $result: list.append($result, tabletVw($item));
+    } @else if $function == 'desktop' {
+      $result: list.append($result, desktopVw($item));
+    } @else if $function == 'largeDesktop' {
+      $result: list.append($result, largeDesktopVw($item));
+    }
+  }
+
+  @return $result;
+}
+
+@function smartScale($val, $type) {
+  $isList: if((type-of($val) == 'list'), true, false);
+
+  @if ($isList) {
+    $result: '';
+
+    @each $item in $val {
+      $result: $result + pxToVw($item, $type) + ' ';
+    }
+
+    @return unquote($result);
+  } @else {
+    @return pxToVw($val, $type);
+  }
+}

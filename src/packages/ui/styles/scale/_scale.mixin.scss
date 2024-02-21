@@ -1,0 +1,148 @@
+@use 'sass:list';
+
+@import './variables/breakpoints';
+@import './variables/colors.module';
+@import './variables/colors';
+@import './functions';
+
+@mixin phone() {
+  @media (min-width: 0) and (max-width: #{$breakpoint-md - 1}px) {
+    @content;
+  }
+}
+
+@mixin tablet() {
+  @media (min-width: #{$breakpoint-md}px) and (max-width: #{$breakpoint-xl}px) {
+    @content;
+  }
+}
+
+@mixin desktop() {
+  @media (min-width: #{$breakpoint-xl}px) and (max-width: #{$breakpoint-xxl}px) {
+    @content;
+  }
+}
+
+@mixin mediumDesktop() {
+  @media (min-width: #{$breakpoint-xxl}px) {
+    @content;
+  }
+}
+
+@mixin largeDesktop() {
+  @media (min-width: #{$breakpoint-2xxl}px) {
+    @content;
+  }
+}
+
+/**
+  Функция для скейлинга значений
+  Сайт везде использует vw вместо пикселей
+  Если передаем массивом - переводит в vw для различных разрешений
+  Переводит в vw ТОЛЬКО ПИКСЕЛИ
+  Пример:
+    width: [24px, 32px, 48px]
+ */
+@mixin scale($params) {
+  @include phone() {
+    @each $property, $value in $params {
+      $valueArr: list.join([], $value);
+
+      #{$property}: if(
+        type-of($valueArr) and length($valueArr) > 0,
+        list.nth($valueArr, 1),
+        $value
+      );
+    }
+  }
+
+  @include tablet() {
+    @each $property, $value in $params {
+      $valueArr: list.join([], $value);
+
+      #{$property}: if(
+        type-of($valueArr) and length($valueArr) > 1,
+        list.nth($valueArr, 2),
+        $value
+      );
+    }
+  }
+
+  @include desktop() {
+    @each $property, $value in $params {
+      $valueArr: list.join([], $value);
+
+      #{$property}: if(
+        type-of($valueArr) and length($valueArr) > 2,
+        list.nth($valueArr, 3),
+        $value
+      );
+    }
+  }
+
+  @include mediumDesktop() {
+    @each $property, $value in $params {
+      $valueArr: list.join([], $value);
+
+      @if type-of($valueArr) and length($valueArr) > 3 {
+        #{$property}: list.nth($valueArr, 4);
+      } @else if type-of($valueArr) and length($valueArr) > 2 {
+        #{$property}: list.nth($valueArr, 3);
+      } @else {
+        #{$property}: $value;
+      }
+    }
+  }
+}
+
+@mixin scaleAdaptive($params) {
+  @include phone() {
+    @each $property, $value in $params {
+      $valueArr: list.join([], $value);
+
+      #{$property}: if(
+        type-of($valueArr) and length($valueArr) > 0,
+        smartScale(list.nth($valueArr, 1), 'phone'),
+        smartScale($valueArr, 'phone')
+      );
+    }
+  }
+
+  @include tablet() {
+    @each $property, $value in $params {
+      $valueArr: list.join([], $value);
+
+      #{$property}: if(
+        type-of($valueArr) and length($valueArr) > 1,
+        smartScale(list.nth($valueArr, 2), 'tablet'),
+        smartScale($valueArr, 'tablet')
+      );
+    }
+  }
+
+  @include desktop() {
+    @each $property, $value in $params {
+      $valueArr: list.join([], $value);
+
+      #{$property}: if(
+        type-of($valueArr) and length($valueArr) > 2,
+        smartScale(list.nth($valueArr, 3), 'desktop'),
+        smartScale($valueArr, 'desktop')
+      );
+    }
+  }
+
+  @include mediumDesktop() {
+    @each $property, $value in $params {
+      $valueArr: list.join([], $value);
+
+      @if type-of($valueArr) and length($valueArr) > 3 {
+        #{$property}: smartScale(list.nth($valueArr, 4), 'largeDesktop');
+      } @else if type-of($valueArr) and length($valueArr) > 2 {
+        #{$property}: smartScale(list.nth($valueArr, 3), 'largeDesktop');
+      } @else {
+        #{$property}: smartScale($value, 'largeDesktop');
+      }
+    }
+  }
+}

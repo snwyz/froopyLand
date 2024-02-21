@@ -1,0 +1,253 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "SpanningLabDelegate_",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "poolAddress",
+        "type": "address"
+      }
+    ],
+    "name": "NewPoolInitiated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "updater",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newDeployerAddress",
+        "type": "address"
+      }
+    ],
+    "name": "NormalPoolDeployerUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "updater",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newDelegateAddress",
+        "type": "address"
+      }
+    ],
+    "name": "SpanningLabDelegateUpdated",
+    "type": "event"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "NFTPoolInfoArray",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "originalContractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "derivativeContractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "currentNFTInPool",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "currentHighestOffer",
+        "type": "uint256"
+      },
+      { "internalType": "uint256", "name": "currentSubFee", "type": "uint256" },
+      { "internalType": "uint256", "name": "LicenseSupply", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "NormalPoolDeployerAddress",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "NormalPoolDeployerUpdater",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "SpanningLabDelegate",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "newWLAddress", "type": "address" }
+    ],
+    "name": "addWhiteListAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "tokenAddress", "type": "address" }
+    ],
+    "name": "createDerivativeContract",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "deployedLicenseSC",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "getContractAddress",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getDeployedLicenseAddress",
+    "outputs": [
+      { "internalType": "address[]", "name": "", "type": "address[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getNFTPoolInfo",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "originalContractAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "derivativeContractAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "currentNFTInPool",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "currentHighestOffer",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "currentSubFee",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "LicenseSupply",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct NormalPoolDNFTFactory.NFTPoolInfo[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newDeployerUpdater",
+        "type": "address"
+      }
+    ],
+    "name": "setNewDeployerUpdater",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newDelegateAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setNewSpanningLabDelegateAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newPoolDeployer",
+        "type": "address"
+      }
+    ],
+    "name": "setNormalPoolDeployerAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "whiteListMap",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

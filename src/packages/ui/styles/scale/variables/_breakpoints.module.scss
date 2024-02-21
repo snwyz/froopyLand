@@ -1,0 +1,14 @@
+@import 'breakpoints';
+
+/* stylelint-disable */
+:export {
+  breakpoint-xs: $breakpoint-xs;
+  breakpoint-sm: $breakpoint-sm;
+  breakpoint-md: $breakpoint-md;
+  breakpoint-lg: $breakpoint-lg;
+  breakpoint-xl: $breakpoint-xl;
+  breakpoint-xxl: $breakpoint-xxl;
+  breakpoint-2xxl: $breakpoint-2xxl;
+}
+
+/* stylelint-enable */

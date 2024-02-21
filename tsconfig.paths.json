@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+      "@styles": ["packages/ui/styles"],
+      "@styles/*": ["packages/ui/styles/*"],
+
+      "@components": ["packages/ui/components"],
+      "@components/*": ["packages/ui/components/*"],
+
+      "@hooks": ["packages/utils/hooks"],
+      "@hooks/*": ["packages/utils/hooks/*"],
+
+      "@modules": ["packages/modules"],
+      "@modules/*": ["packages/modules/*"],
+
+      "@utils": ["packages/utils"],
+      "@utils/*": ["packages/utils/*"],
+
+      "@ts": ["packages/types"],
+      "@ts/*": ["packages/types/*"],
+
+      "@store": ["redux"],
+      "@store/*": ["redux/*"],
+
+      "@static": ["../public/static"],
+      "@static/*": ["../public/static/*"]
+    }
+  }
+}
