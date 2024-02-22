@@ -7,17 +7,18 @@ import TabsCommon from '@components/TabsCommon'
 
 import { MarketTabs } from '@ts'
 
-import { Space, Table } from 'antd';
+import { Space, Table } from 'antd'
 
-import type { TableProps } from 'antd';
-import styled from '@emotion/styled';
+import type { TableProps } from 'antd'
 
-const ListItems = lazy(() => import('@components/ListItems'))
+import styled from '@emotion/styled'
+
+// const ListItems = lazy(() => import('@components/ListItems'))
 interface DataType {
-  key: string;
-  item: string;
-  price: number;
-  owner: string;
+  key: string
+  item: string
+  price: number
+  owner: string
   startTime: string
 }
 
@@ -52,7 +53,7 @@ const columns: TableProps<DataType>['columns'] = [
       </Space>
     ),
   },
-];
+]
 
 const data: DataType[] = [
   {
@@ -60,23 +61,23 @@ const data: DataType[] = [
     item: 'John Brown',
     price: 32,
     owner: 'John Brown',
-    startTime: '9min'
+    startTime: '9min',
   },
   {
     key: '2',
     item: 'John Brown',
     price: 32,
     owner: 'John Brown',
-    startTime: '9min'
+    startTime: '9min',
   },
   {
     key: '3',
     item: 'John Brown',
     price: 32,
     owner: 'John Brown',
-    startTime: '9min'
-  }
-];
+    startTime: '9min',
+  },
+]
 
 const StyledTable = styled(Table)`
   .ant-table {
