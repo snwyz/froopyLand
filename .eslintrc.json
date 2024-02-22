@@ -12,29 +12,6 @@
         "enforceForRenamedProperties": false
       }
     ],
-    "simple-import-sort/imports": [
-      "error",
-      {
-        "groups": [
-          ["^react"],
-          ["^next"],
-          ["^@?\\w"],
-          ["^@ui-kit"],
-          ["^@admin-panel"],
-          ["^@layout"],
-          ["^@widgets"],
-          ["^@components"],
-          ["^@hooks"],
-          ["^@services"],
-          ["^@utils"],
-          ["^@context"],
-          ["^@constants"],
-          ["^@ts"],
-          ["^\\u0000"],
-          ["^__mocks__"]
-        ]
-      }
-    ],
     "object-curly-spacing": ["error", "always"],
     "unused-imports/no-unused-imports": "error",
     "react/jsx-curly-brace-presence": "error",

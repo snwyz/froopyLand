@@ -2,10 +2,13 @@ import { ToastContainer } from 'react-toastify'
 import useVH from 'react-vh'
 
 import { ChakraProvider } from '@chakra-ui/react'
+
 import customTheme from '@styles/customTheme'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { isProd } from 'packages/constants'
+
 import { ConfigProvider, theme } from 'antd'
+
+import { isProd } from 'packages/constants'
 
 import 'react-toastify/dist/ReactToastify.css'
 import '@styles/_globals.scss'
