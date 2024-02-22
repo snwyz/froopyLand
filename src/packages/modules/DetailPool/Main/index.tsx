@@ -30,7 +30,6 @@ import { DetailItemTabs } from '@ts'
 
 import SideBarRight from '../SidebarRight'
 import TabsDetailPool from '../TabsDetailPool'
-
 import ListItems from './ListItems'
 
 type MainDetailPool = {

@@ -1,17 +1,14 @@
-import { lazy, Suspense } from 'react'
+import { Suspense } from 'react'
 
 import { Box, Spinner } from '@chakra-ui/react'
+import styled from '@emotion/styled'
+import type { TableProps } from 'antd'
+import { Space, Table } from 'antd'
 
 // import { sleep } from '@utils'
 import TabsCommon from '@components/TabsCommon'
 
 import { MarketTabs } from '@ts'
-
-import { Space, Table } from 'antd'
-
-import type { TableProps } from 'antd'
-
-import styled from '@emotion/styled'
 
 // const ListItems = lazy(() => import('@components/ListItems'))
 interface DataType {
