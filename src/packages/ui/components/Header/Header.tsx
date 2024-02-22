@@ -85,11 +85,7 @@ const NAV_ITEMS_CONNECTED_DESKTOP: Array<NavItem> = [
       //   href: '/account/my-collection',
       // },
     ],
-  },
-  {
-    label: 'My NFTs',
-    href: '/account/my-nfts?tab=unlicensed-nft',
-  },
+  }
 ]
 
 const NAV_ITEMS_CONNECTED_MOBILE: Array<NavItem> = [
