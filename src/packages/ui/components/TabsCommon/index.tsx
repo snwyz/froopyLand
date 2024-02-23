@@ -3,8 +3,8 @@ import { memo, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 
 import { Flex, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
-
 import GridAndList from '@components/GridAndList'
+
 
 type RenderTabsType = {
   id: number

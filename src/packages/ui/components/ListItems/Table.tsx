@@ -7,6 +7,7 @@ type ListTableProps = {
 }
 
 function TableList({ items }: ListTableProps) {
+  
   return (
     <>
       {items?.map((item, idx) => {

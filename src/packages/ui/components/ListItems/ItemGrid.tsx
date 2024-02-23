@@ -37,6 +37,8 @@ function ItemGrid({ item }: { item: any }) {
     onOpenApproveLicenseContractModal()
   }
 
+  console.log(item, '<==')
+  
   if (pathname === PathnameType.MARKET) {
     return (
       <Box
@@ -54,11 +56,11 @@ function ItemGrid({ item }: { item: any }) {
         <AspectRatio ratio={1 / 1}>
           <Box className="image-effect">
             <Image
-              borderRadius="15px"
-              alt=""
-              src={item.image}
-              fallbackSrc="/static/license-template/template.png"
-            />
+                borderRadius="15px"
+                alt=""
+                src={item.image}
+                fallbackSrc="/static/license-template/template.png"
+              />
           </Box>
         </AspectRatio>
         <Flex

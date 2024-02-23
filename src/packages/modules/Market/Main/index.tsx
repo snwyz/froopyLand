@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+import { Suspense, lazy, useState } from 'react'
 
 import { Box, Spinner } from '@chakra-ui/react'
 import styled from '@emotion/styled'
@@ -10,7 +10,17 @@ import TabsCommon from '@components/TabsCommon'
 
 import { MarketTabs } from '@ts'
 
-// const ListItems = lazy(() => import('@components/ListItems'))
+interface Item {
+  derivativeContractAddress: string
+  originalContractAddress: string
+  image: string
+  currentNFTInPool: string
+  LicenseSupply: string
+  name: string
+  currentHighestOffer: string
+}
+
+const ListItems = lazy(() => import('@components/ListItems'))
 interface DataType {
   key: string
   item: string
@@ -82,9 +92,23 @@ const StyledTable = styled(Table)`
   }
 `
 
+const iData = [
+  {
+    derivativeContractAddress: 'string',
+    originalContractAddress: 'string',
+    image: 'https://api.our-metaverse.xyz/ourms/4_pnghash_a660da5ab5d19878015e8a5f7a7da3c196b834eb50ac65a62f1dbf339cd96ef5_73222158.webp',
+    currentNFTInPool: 'string',
+    LicenseSupply: 'string',
+    name: 'NNNNN',
+    currentHighestOffer: '2000',
+    owner: 'Xxxx',
+    startTime: '10:29',
+  }
+]
+
 export default function Main() {
-  // const [isLoading, setIsLoading] = useState<boolean>(false)
-  // const [pools, setPools] = useState([])
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [pools, setPools] = useState([])
 
   // // Iterates all collections and returns their info.
   // const fetchAllCollectionsInfo = useCallback(async (collectionAddresses) => {
@@ -96,7 +120,7 @@ export default function Main() {
   //       info = await getNFTCollectionMetadata(address)
   //     } catch (error) {
   //       console.log(error)
-  //     }
+  //     }   
   //     return info
   //   })
   //   return Promise.all(requests)
@@ -134,17 +158,17 @@ export default function Main() {
       title: 'Game List',
       value: MarketTabs.PUBLIC,
       render: (
-        <StyledTable columns={columns} dataSource={data} pagination={false} />
-        // <ListItems
-        //   isLoading={isLoading}
-        //   items={pools}
-        //   columnsList={[
-        //     'Pool name',
-        //     'NFTs in pool',
-        //     'Current highest bid',
-        //     'Licenses supply',
-        //   ]}
-        // />
+        // <StyledTable columns={columns} dataSource={data} pagination={false} />
+        <ListItems
+          isLoading={isLoading}
+          items={iData}
+          columnsList={[
+            'NFT name',
+            'Owner',
+            'Current Price',
+            'Start time'
+          ]}
+        />
       ),
     },
   ]

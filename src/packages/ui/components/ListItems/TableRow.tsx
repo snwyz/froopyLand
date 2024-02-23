@@ -190,13 +190,12 @@ function Table({ item }: { item: any }) {
             borderBottomColor={borderBottomColor}
             borderBottom="1px solid"
             borderColor="#E8E8E8">
-            <Flex color="#00DAB3">
+            <Flex>
               <Text
                 lineHeight="16px"
                 fontSize="12px"
-                fontWeight="500"
-                textColor="#00DAB3">
-                {item.currentNFTInPool}
+                fontWeight="500">
+                {item.owner}
               </Text>
             </Flex>
           </Td>
@@ -215,7 +214,7 @@ function Table({ item }: { item: any }) {
           <Td borderBottomColor={borderBottomColor} borderBottom="1px solid">
             <Flex alignItems="center" gridGap="6px">
               <Text lineHeight="16px" fontSize="14px" color={textColor}>
-                {item.LicenseSupply}
+                {item.startTime}
               </Text>
             </Flex>
           </Td>

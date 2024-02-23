@@ -160,7 +160,7 @@ const useStore = create<MyState>((set) => ({
     }))
   },
 
-  isGridMode: true,
+  isGridMode: false,
   setIsGridMode: (value: boolean) => {
     set((state) => ({
       ...state,

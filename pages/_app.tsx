@@ -37,12 +37,6 @@ const App = ({ Component, pageProps }: any) => {
             colorLink: '#bb86fc',
             colorText: '#fff',
           },
-          components: {
-            Table: {
-              /* 这里是你的组件 token */
-              headerBg: 'transparent',
-            },
-          },
         }}>
         <DefaultLayout>
           <QueryClientProvider client={queryClient}>
