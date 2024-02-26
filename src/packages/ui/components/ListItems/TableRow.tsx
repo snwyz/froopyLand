@@ -218,6 +218,13 @@ function Table({ item }: { item: any }) {
               </Text>
             </Flex>
           </Td>
+          <Td borderBottomColor={borderBottomColor} borderBottom="1px solid">
+            <Flex alignItems="center" gridGap="6px">
+              <Text lineHeight="16px" fontSize="14px" color={textColor}>
+                {item.state}
+              </Text>
+            </Flex>
+          </Td>
         </Tr>
       </>
     )

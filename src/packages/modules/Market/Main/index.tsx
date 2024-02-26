@@ -96,13 +96,14 @@ const iData = [
   {
     derivativeContractAddress: 'string',
     originalContractAddress: 'string',
+    name: 'NNNNN',
     image: 'https://api.our-metaverse.xyz/ourms/4_pnghash_a660da5ab5d19878015e8a5f7a7da3c196b834eb50ac65a62f1dbf339cd96ef5_73222158.webp',
+    startTime: '10:29',
+    state: 'Active',
     currentNFTInPool: 'string',
     LicenseSupply: 'string',
-    name: 'NNNNN',
     currentHighestOffer: '2000',
     owner: 'Xxxx',
-    startTime: '10:29',
   }
 ]
 
@@ -164,9 +165,10 @@ export default function Main() {
           items={iData}
           columnsList={[
             'NFT name',
-            'Owner',
-            'Current Price',
-            'Start time'
+            'NFT Provider Address',
+            'Key Sold',
+            'Start time',
+            'State'
           ]}
         />
       ),
