@@ -161,6 +161,7 @@ const Header: FC = () => {
         setAddress(address)
         window.localStorage.setItem('isConnect', 'true')
         const network = await web3Provider.getNetwork()
+        
         dispatch({
           type: 'SET_WEB3_PROVIDER',
           provider,

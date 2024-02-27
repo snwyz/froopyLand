@@ -886,7 +886,7 @@ export async function getMintType(
       cacheProvider: true,
       providerOptions, // required
     })
-    const provider = await web3Modal.connect()
+    const provider = await web3Modal.connect()    
     const library = new ethers.providers.Web3Provider(provider)
     const signer = library.getSigner()
     const contract = new ethers.Contract(

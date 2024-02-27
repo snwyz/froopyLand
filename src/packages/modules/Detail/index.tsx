@@ -24,9 +24,14 @@ import {
   useNumberInput
 } from '@chakra-ui/react'
 import useCountDown from '@hooks/useCountDown'
+import { initialState, reducer, web3Modal } from 'packages/web3'
+import { useReducer } from 'react'
+import useStore from 'packages/store'
+import { ethers } from 'ethers'
 
 const Details = () => {
   const time = useCountDown('2024-02-28')
+  const { address } = useStore()
   const { days, hours, minutes, seconds } = time
 
   const { getInputProps } =
@@ -35,7 +40,16 @@ const Details = () => {
     })
 
   const input = getInputProps()
+  const [state, _] = useReducer(reducer, initialState)
+  
+  const handleApprove = async () => {
+    const provider = await web3Modal.connect()
+    const library = new ethers.providers.Web3Provider(provider)
+    const signer = library.getSigner()
+    console.log(signer, 'signer')
 
+    // const data = await unstake('0x055b3E3D48736B17C3125d2e5aAEC5868f7a3D4D')
+  }
 
   return (
     <Box className={styles.box}>
@@ -136,9 +150,8 @@ const Details = () => {
                         <Input {...input} w='200px' marginRight='20px' /><Text>ETH</Text>
                     </Flex>
                 </Stack>
-                <Button fontSize="20px" colorScheme='teal' w='400px' marginTop="20px">Claim</Button>
+                <Button fontSize="20px" colorScheme='teal' w='400px' marginTop="20px" onClick={handleApprove}>Claim</Button>
             </Box>
-            
           </CardBody>
         </Card>
       </Box>

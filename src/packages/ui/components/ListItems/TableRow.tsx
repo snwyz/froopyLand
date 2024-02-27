@@ -206,7 +206,7 @@ function Table({ item }: { item: any }) {
                 fontSize="12px"
                 fontWeight="500"
                 textColor="#00DAB3">
-                {weiToEtherString(item.currentHighestOffer)} ETH
+                {weiToEtherString(item.currentHighestOffer)}
               </Text>
             </Flex>
           </Td>
