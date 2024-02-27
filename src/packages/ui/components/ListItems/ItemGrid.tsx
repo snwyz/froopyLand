@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react'
 import ApproveLicenseContractModal from '@modules/Modals/ApproveLicenseContractModal'
 
-import { ellipseAddress, weiToEtherString } from '@utils'
+import { ellipseAddress } from '@utils'
 
 import { DetailItemTabs, PathnameType } from '@ts'
 
@@ -63,7 +63,7 @@ function ItemGrid({ item }: { item: any }) {
               />
           </Box>
         </AspectRatio>
-        <Flex
+        {/* <Flex
           p="6px 12px"
           gap="4px"
           borderRadius="20px"
@@ -77,8 +77,8 @@ function ItemGrid({ item }: { item: any }) {
           <Text fontSize="12px" color="#606062">
             items
           </Text>
-        </Flex>
-        <Flex
+        </Flex> */}
+        {/* <Flex
           position="absolute"
           top="16px"
           right="16px"
@@ -92,7 +92,7 @@ function ItemGrid({ item }: { item: any }) {
           <Text fontSize="12px" color="#2A0668">
             {item.LicenseSupply}
           </Text>
-        </Flex>
+        </Flex> */}
         <Box m="16px 8px 0px 8px">
           <Flex justifyContent="space-between" align="center">
             <Box fontWeight="700" fontSize="14px">
@@ -109,10 +109,8 @@ function ItemGrid({ item }: { item: any }) {
             fontSize="12px"
             fontWeight="500"
             color="#FFA8FE">
-            <Box>Highest bid</Box>
-            <Box fontSize="14px" mr="6px" color="#00DAB3">
-              {weiToEtherString(item.currentHighestOffer)} ETH
-            </Box>
+            <Box>Key Sold</Box>
+            <Box fontSize="14px" mr="6px" color="#00DAB3">2000</Box>
           </Flex>
         </Box>
       </Box>

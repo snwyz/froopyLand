@@ -1,0 +1,39 @@
+.box {
+    padding: 20px;
+    display: flex;
+    .nft {
+        margin-right: 20px;
+    }
+    .desc {
+        font-weight: bold;
+        font-size: 28px;
+        margin: 20px 0;
+    }
+    .name {
+        font-weight: bold;
+    }
+    .info {
+        flex: 1;
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .time {
+            display: flex;
+            align-items: center;
+            .unit {
+                font-size: 48px;
+                text-align: center;
+            }
+            .symbol {
+                font-size: 32px;
+                margin: 0 10px;
+            }
+        }
+        .container {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+        }
+    }
+}

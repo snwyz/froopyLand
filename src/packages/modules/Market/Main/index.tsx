@@ -1,9 +1,6 @@
 import { Suspense, lazy, useState } from 'react'
 
 import { Box, Spinner } from '@chakra-ui/react'
-import styled from '@emotion/styled'
-import type { TableProps } from 'antd'
-import { Space, Table } from 'antd'
 
 // import { sleep } from '@utils'
 import TabsCommon from '@components/TabsCommon'
@@ -21,89 +18,19 @@ interface Item {
 }
 
 const ListItems = lazy(() => import('@components/ListItems'))
-interface DataType {
-  key: string
-  item: string
-  price: number
-  owner: string
-  startTime: string
-}
 
-const columns: TableProps<DataType>['columns'] = [
-  {
-    title: 'Item',
-    dataIndex: 'item',
-    key: 'item',
-    render: (text) => <a>{text}</a>,
-  },
-  {
-    title: 'Current Price',
-    dataIndex: 'price',
-    key: 'price',
-  },
-  {
-    title: 'Owner',
-    dataIndex: 'owner',
-    key: 'owner',
-  },
-  {
-    title: 'Start Time',
-    dataIndex: 'startTime',
-    key: 'startTime',
-  },
-  {
-    title: 'Action',
-    key: 'action',
-    render: (_, record) => (
-      <Space size="middle">
-        <a>View Game</a>
-      </Space>
-    ),
-  },
-]
 
-const data: DataType[] = [
+export const iData = [
   {
-    key: '1',
-    item: 'John Brown',
-    price: 32,
-    owner: 'John Brown',
-    startTime: '9min',
-  },
-  {
-    key: '2',
-    item: 'John Brown',
-    price: 32,
-    owner: 'John Brown',
-    startTime: '9min',
-  },
-  {
-    key: '3',
-    item: 'John Brown',
-    price: 32,
-    owner: 'John Brown',
-    startTime: '9min',
-  },
-]
-
-const StyledTable = styled(Table)`
-  .ant-table {
-    background-color: transparent;
-  }
-`
-
-const iData = [
-  {
-    derivativeContractAddress: 'string',
+    derivativeContractAddress: '0x7bfd9a55f4c00783b5a8ea18f7735e1a405dd520',
     originalContractAddress: 'string',
     name: 'NNNNN',
     image: 'https://api.our-metaverse.xyz/ourms/4_pnghash_a660da5ab5d19878015e8a5f7a7da3c196b834eb50ac65a62f1dbf339cd96ef5_73222158.webp',
     startTime: '10:29',
     state: 'Active',
-    currentNFTInPool: 'string',
-    LicenseSupply: 'string',
     currentHighestOffer: '2000',
     owner: 'Xxxx',
+    id: 999
   }
 ]
 
