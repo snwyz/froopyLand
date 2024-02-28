@@ -11,7 +11,7 @@ const useCountDown = (deadline, onTimeout = null) => {
     const diff = moment(deadline).diff(now)
 
     if (diff <= 0) {
-      onTimeout()
+      onTimeout && onTimeout()
       return { days: 0, hours: 0, minutes: 0, seconds: 0 }
     }
 

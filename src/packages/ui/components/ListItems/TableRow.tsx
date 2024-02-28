@@ -29,12 +29,13 @@ import {
 import { useWindowSize } from '@hooks/useWindowSize'
 
 import { getTitleErrorMetamask } from '@utils'
-import { convertUrlImage, ellipseAddress, weiToEtherString } from '@utils'
+import { convertUrlImage, ellipseAddress } from '@utils'
 import { toastError } from '@utils/toast'
 
 import { MyNFTsTabs, PathnameType } from '@ts'
 
 import TableBuyAll from './TableBuyAll'
+import moment from 'moment'
 
 function Table({ item }: { item: any }) {
   const { width } = useWindowSize()
@@ -138,13 +139,19 @@ function Table({ item }: { item: any }) {
     checkApproved()
   }, [checkApproved])
 
+
+
+  const formatDate = (date) => moment(date*1000).format('YYYY-MM-DD HH:mm:ss')
+  const states = ['Not Active', 'Active', 'Ended']
+
+
   if (pathname === PathnameType.MARKET) {
     return (
       <>
         <Tr
           onClickCapture={() =>
             router.push(
-              `/${item.derivativeContractAddress}?collection=${item.originalContractAddress}`,
+              `/${item.id}`,
             )
           }
           cursor="pointer"
@@ -167,7 +174,7 @@ function Table({ item }: { item: any }) {
                   h="32px"
                   objectFit="cover"
                   alt=""
-                  src={item.image}
+                  src={item.nftImage}
                   fallbackSrc="/static/license-template/template.png"
                 />
               </Box>
@@ -178,7 +185,7 @@ function Table({ item }: { item: any }) {
                 textOverflow="ellipsis"
                 overflow="hidden"
                 whiteSpace="nowrap">
-                {item.name}
+                {item.nftName}
               </Text>
             </Flex>
           </Td>
@@ -195,7 +202,7 @@ function Table({ item }: { item: any }) {
                 lineHeight="16px"
                 fontSize="12px"
                 fontWeight="500">
-                {item.owner}
+                {item.nftAddress}
               </Text>
             </Flex>
           </Td>
@@ -206,7 +213,7 @@ function Table({ item }: { item: any }) {
                 fontSize="12px"
                 fontWeight="500"
                 textColor="#00DAB3">
-                {weiToEtherString(item.currentHighestOffer)}
+                {item.keyPrice.toNumber()}
               </Text>
             </Flex>
           </Td>
@@ -214,14 +221,14 @@ function Table({ item }: { item: any }) {
           <Td borderBottomColor={borderBottomColor} borderBottom="1px solid">
             <Flex alignItems="center" gridGap="6px">
               <Text lineHeight="16px" fontSize="14px" color={textColor}>
-                {item.startTime}
+              {formatDate(item.startTimestamp.toNumber())}
               </Text>
             </Flex>
           </Td>
           <Td borderBottomColor={borderBottomColor} borderBottom="1px solid">
             <Flex alignItems="center" gridGap="6px">
               <Text lineHeight="16px" fontSize="14px" color={textColor}>
-                {item.state}
+                {states[item.state]}
               </Text>
             </Flex>
           </Td>

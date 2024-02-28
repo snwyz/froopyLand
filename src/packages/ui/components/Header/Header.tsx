@@ -3,7 +3,6 @@ import { useCallback, useEffect, useReducer } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { Network } from '@alch/alchemy-sdk'
 import {
   ChevronDownIcon,
   ChevronRightIcon,
@@ -35,14 +34,16 @@ import {
   useToast,
 } from '@chakra-ui/react'
 import { providers } from 'ethers'
-import { isProd } from 'packages/constants'
 import { getChainData } from 'packages/lib/utilities'
 import useStore from 'packages/store'
 import { initialState, reducer, web3Modal } from 'packages/web3'
 
 import { ellipseAddress } from '@utils'
+import useFomoStore from 'packages/store/fomo'
 
-const network = isProd ? Network.ETH_MAINNET : Network.ETH_GOERLI
+// TODO 生产
+
+const network = 'X1_TEST'
 
 interface NavItem {
   label: string
@@ -62,30 +63,30 @@ const NAV_ITEMS_CONNECTED_DESKTOP: Array<NavItem> = [
     icon: '/static/header/gallery.svg',
     iconDark: '/static/header/gallery_dark.svg',
   },
-  {
-    label: 'My Account',
-    icon: '/static/header/account.svg',
-    iconDark: '/static/header/account_dark.svg',
+  // {
+  //   label: 'My Account',
+  //   icon: '/static/header/account.svg',
+  //   iconDark: '/static/header/account_dark.svg',
 
-    children: [
-      {
-        label: 'My NFTs',
-        href: '/account/my-nfts?tab=unlicensed-nft',
-      },
-      {
-        label: 'My Licenses',
-        href: '/account/buy',
-      },
-      {
-        label: 'My Offers',
-        href: '/account/sell',
-      },
-      // {
-      //   label: 'My Collection',
-      //   href: '/account/my-collection',
-      // },
-    ],
-  }
+  //   children: [
+  //     {
+  //       label: 'My NFTs',
+  //       href: '/account/my-nfts?tab=unlicensed-nft',
+  //     },
+  //     {
+  //       label: 'My Licenses',
+  //       href: '/account/buy',
+  //     },
+  //     {
+  //       label: 'My Offers',
+  //       href: '/account/sell',
+  //     },
+  //     // {
+  //     //   label: 'My Collection',
+  //     //   href: '/account/my-collection',
+  //     // },
+  //   ],
+  // }
 ]
 
 const NAV_ITEMS_CONNECTED_MOBILE: Array<NavItem> = [
@@ -95,30 +96,30 @@ const NAV_ITEMS_CONNECTED_MOBILE: Array<NavItem> = [
     icon: '/static/header/gallery.svg',
     iconDark: '/static/header/gallery_dark.svg',
   },
-  {
-    label: 'My Account',
-    icon: '/static/header/account.svg',
-    iconDark: '/static/header/account_dark.svg',
-    iconActive: '/static/header/account_active.svg',
-    children: [
-      {
-        label: 'My NFTs',
-        href: '/account/my-nfts?tab=unlicensed-nft',
-      },
-      {
-        label: 'My Licenses',
-        href: '/account?tab=buy&subTabBuy=all',
-      },
-      {
-        label: 'My Offers',
-        href: '/account?tab=sell&subTabSell=active',
-      },
-      // {
-      //   label: 'My Collection',
-      //   href: '/account?tab=sell&subTabSell=active',
-      // },
-    ],
-  },
+  // {
+  //   label: 'My Account',
+  //   icon: '/static/header/account.svg',
+  //   iconDark: '/static/header/account_dark.svg',
+  //   iconActive: '/static/header/account_active.svg',
+  //   children: [
+  //     {
+  //       label: 'My NFTs',
+  //       href: '/account/my-nfts?tab=unlicensed-nft',
+  //     },
+  //     {
+  //       label: 'My Licenses',
+  //       href: '/account?tab=buy&subTabBuy=all',
+  //     },
+  //     {
+  //       label: 'My Offers',
+  //       href: '/account?tab=sell&subTabSell=active',
+  //     },
+  //     // {
+  //     //   label: 'My Collection',
+  //     //   href: '/account?tab=sell&subTabSell=active',
+  //     // },
+  //   ],
+  // },
 ]
 
 const NAV_ITEMS_DISCONNECTED: Array<NavItem> = [
@@ -138,8 +139,10 @@ const Header: FC = () => {
   const { isOpen, onToggle } = useDisclosure()
   const router = useRouter()
   const { pathname } = router
-  const { pool, collection } = router.query
+
   const toast = useToast()
+  const fomoStore = useFomoStore()
+  
   const [state, dispatch] = useReducer(reducer, initialState)
   const { provider, web3Provider, address, chainId } = state
 
@@ -161,6 +164,8 @@ const Header: FC = () => {
         setAddress(address)
         window.localStorage.setItem('isConnect', 'true')
         const network = await web3Provider.getNetwork()
+
+        fomoStore.setGameList(web3Provider)
         
         dispatch({
           type: 'SET_WEB3_PROVIDER',
@@ -246,8 +251,9 @@ const Header: FC = () => {
 
   useEffect(() => {
     try {
+      
       if (chainId) {
-        const chainData = getChainData(chainId)
+        const chainData = getChainData(chainId)        
         const validChain = address && chainData?.network === network
         if (!validChain) {
           toast({

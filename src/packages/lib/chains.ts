@@ -33,6 +33,22 @@ const supportedChains: IChainData[] = [
       balance: '',
     },
   },
+  {
+    name: 'X1 Testnet',
+    short_name: 'x1',
+    chain: 'X1_TEST',
+    network: 'X1_TEST',
+    chain_id: 195,
+    network_id: 195,
+    rpc_url: 'https://x1-testnet.blockpi.network/v1/rpc/public',
+    native_currency: {
+      symbol: 'OKB',
+      name: 'OKB',
+      decimals: '18',
+      contractAddress: '',
+      balance: '',
+    },
+  }
 ]
 
 export default supportedChains

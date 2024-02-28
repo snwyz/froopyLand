@@ -17,7 +17,7 @@ import ApproveLicenseContractModal from '@modules/Modals/ApproveLicenseContractM
 
 import { ellipseAddress } from '@utils'
 
-import { DetailItemTabs, PathnameType } from '@ts'
+import { PathnameType } from '@ts'
 
 import { myNFTUnlicensedData } from './FakeData'
 
@@ -45,7 +45,7 @@ function ItemGrid({ item }: { item: any }) {
         cursor="pointer"
         onClickCapture={() =>
           router.push(
-            `/${item.derivativeContractAddress}?collection=${item.originalContractAddress}&tab=${DetailItemTabs.STAKED}`,
+            `/${item.id}`,
           )
         }
         border="1px solid #704BEA"
@@ -58,7 +58,7 @@ function ItemGrid({ item }: { item: any }) {
             <Image
                 borderRadius="15px"
                 alt=""
-                src={item.image}
+                src={item.nftImage}
                 fallbackSrc="/static/license-template/template.png"
               />
           </Box>

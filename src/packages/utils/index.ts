@@ -2,7 +2,21 @@ import moment, { Moment } from 'moment'
 import { LICENSE_DURATION_CONVERT } from 'packages/constants'
 import Web3 from 'web3'
 
+import { BigNumber, BigNumberish } from "@ethersproject/bignumber"
+import { formatFixed, parseFixed } from "@ethersproject/bignumber"
+
 import { ErrorMetamask } from '@ts'
+import { logger } from 'ethers/lib/ethers'
+
+const names = [
+  "wei",
+  "kwei",
+  "mwei",
+  "gwei",
+  "szabo",
+  "finney",
+  "ether",
+]
 
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
@@ -119,4 +133,32 @@ export function removeDuplicate(array): string[] {
   })
 
   return uniqueArray
+}
+
+
+export function formatUnits(value: BigNumberish, unitName?: string | BigNumberish): string {
+  if (typeof(unitName) === "string") {
+      const index = names.indexOf(unitName)
+      if (index !== -1) { unitName = 3 * index }
+  }
+  return formatFixed(value, (unitName != null) ? unitName: 18)
+}
+
+export function parseUnits(value: string, unitName?: BigNumberish): BigNumber {
+  if (typeof(value) !== "string") {
+      logger.throwArgumentError("value must be a string", "value", value)
+  }
+  if (typeof(unitName) === "string") {
+      const index = names.indexOf(unitName)
+      if (index !== -1) { unitName = 3 * index }
+  }
+  return parseFixed(value, (unitName != null) ? unitName: 18)
+}
+
+export function formatEther(wei: BigNumberish): string {
+  return formatUnits(wei, 18)
+}
+
+export function parseEther(ether: string): BigNumber {
+  return parseUnits(ether, 18)
 }

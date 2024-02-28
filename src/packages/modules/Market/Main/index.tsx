@@ -6,6 +6,7 @@ import { Box, Spinner } from '@chakra-ui/react'
 import TabsCommon from '@components/TabsCommon'
 
 import { MarketTabs } from '@ts'
+import useFomoStore from 'packages/store/fomo'
 
 interface Item {
   derivativeContractAddress: string
@@ -36,49 +37,7 @@ export const iData = [
 
 export default function Main() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [pools, setPools] = useState([])
-
-  // // Iterates all collections and returns their info.
-  // const fetchAllCollectionsInfo = useCallback(async (collectionAddresses) => {
-  //   const requests = collectionAddresses.map(async (address, index) => {
-  //     const DELAY = 200
-  //     await sleep(index * DELAY)
-  //     let info
-  //     try {
-  //       info = await getNFTCollectionMetadata(address)
-  //     } catch (error) {
-  //       console.log(error)
-  //     }   
-  //     return info
-  //   })
-  //   return Promise.all(requests)
-  //   //Waiting for all the requests to get resolved.
-  // }, [])
-
-  // const newGetALlNFTAndLicense = useCallback(async () => {
-  //   try {
-  //     setIsLoading(true)
-  //     const factoryContract = getFactoryContract()
-  //     const pools = await factoryContract.methods.getNFTPoolInfo().call()
-  //     const collectionsInfo = await fetchAllCollectionsInfo(
-  //       pools.map((pool) => pool.originalContractAddress),
-  //     )
-  //     setPools(
-  //       pools.map((pool, index) => ({
-  //         ...pool,
-  //         ...collectionsInfo[index],
-  //       })),
-  //     )
-  //   } catch (error) {
-  //     console.error(error)
-  //   } finally {
-  //     setIsLoading(false)
-  //   }
-  // }, [fetchAllCollectionsInfo])
-
-  // useEffect(() => {
-  //   newGetALlNFTAndLicense()
-  // }, [newGetALlNFTAndLicense])
+  const { gameList } = useFomoStore()
 
   const renderTabs = [
     {
@@ -86,14 +45,13 @@ export default function Main() {
       title: 'Game List',
       value: MarketTabs.PUBLIC,
       render: (
-        // <StyledTable columns={columns} dataSource={data} pagination={false} />
         <ListItems
           isLoading={isLoading}
-          items={iData}
+          items={gameList}
           columnsList={[
             'NFT name',
             'NFT Provider Address',
-            'Key Sold',
+            'Key Price',
             'Start time',
             'State'
           ]}

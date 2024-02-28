@@ -1,9 +1,7 @@
 import { memo, useMemo } from 'react'
-import ReactPaginate from 'react-paginate'
 
 import {
   Box,
-  Flex,
   SimpleGrid,
   Spinner,
   useBreakpointValue,
@@ -129,7 +127,7 @@ function ListItems({
         />
       )}
 
-      <Flex my="30px" justify="flex-end" mr="40px">
+      {/* <Flex my="30px" justify="flex-end" mr="40px">
         <ReactPaginate
           forcePage={currentPage}
           breakLabel="..."
@@ -142,7 +140,7 @@ function ListItems({
           containerClassName="pagination_dark"
           activeClassName="active_dark"
         />
-      </Flex>
+      </Flex> */}
     </Box>
   )
 }
