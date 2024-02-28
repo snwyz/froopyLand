@@ -1,9 +1,8 @@
-import { Suspense, lazy, useState } from 'react'
+import { lazy, useState } from 'react'
 
-import { Box, Spinner } from '@chakra-ui/react'
-
+import { Box, Image, Button, Text, Flex, SimpleGrid } from '@chakra-ui/react'
+import ItemGrid from 'packages/ui/components/ListItems/ItemGrid'
 // import { sleep } from '@utils'
-import TabsCommon from '@components/TabsCommon'
 
 import { MarketTabs } from '@ts'
 import useFomoStore from 'packages/store/fomo'
@@ -62,11 +61,63 @@ export default function Main() {
 
   return (
     <Box alignItems="center" mb="50px">
-      <Box>
-        
+      <Box padding='0 42px' height='514px' position='relative'>
+        <Box>
+          <Box mt='60px'>
+            <Image marginBottom='40px' objectFit='cover' src='./static/market/slogen.png' alt="slogen" w={{ base: '1118px'  }} height="171px" />
+            <Image marginBottom='54px' objectFit='cover' src='./static/market/price-list.png' alt="logo" w='1034px' h='123px' />
+            <Button fontSize='24px' fontWeight='bold' w="280px" color='#000' h='66px' backgroundColor='#00DAB3'>Start a Auction</Button>
+          </Box>
+          <Image position='absolute' top={0} right='42px' objectFit='cover' src='./static/market/bg-logo.png' alt="logo" w='630px' h='490px' />
+        </Box>
+      </Box>
+      <Box h='1px' backgroundColor="rgba(112, 75, 234, 0.5)"></Box>
+
+      <Box padding='0 42px' marginTop="90px">
+        <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Ongoing Auctions</Text>(6)</Flex>
+        <Box h='1px' backgroundColor="rgba(112, 75, 234, 0.5)"></Box>
+      </Box>
+      <Box padding='0 42px'>
+        <SimpleGrid
+          mt='20px'
+          columns={[1, 2, 3, 4, 5, 6]}
+          spacing="20px">
+          {gameList.concat([...gameList])?.map((item, idx) => {
+            return <ItemGrid item={item} key={idx} />
+          })}
+        </SimpleGrid>
       </Box>
 
-      <Suspense
+      <Box padding='0 42px' marginTop="55px">
+        <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Upcoming Auctions</Text>(6) - Queuing</Flex>
+        <Box h='1px' backgroundColor="rgba(112, 75, 234, 0.5)"></Box>
+      </Box>
+      <Box padding='0 42px'>
+        <SimpleGrid
+          mt='20px'
+          columns={[1, 2, 3, 4, 5, 6]}
+          spacing="20px">
+          {gameList.concat([...gameList])?.map((item, idx) => {
+            return <ItemGrid item={item} key={idx} />
+          })}
+        </SimpleGrid>
+      </Box>
+
+      <Box padding='0 42px' marginTop="55px">
+        <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Finished Auctions(6)</Text></Flex>
+        <Box h='1px' backgroundColor="rgba(112, 75, 234, 0.5)"></Box>
+      </Box>
+      <Box padding='0 42px'>
+        <SimpleGrid
+          mt='20px'
+          columns={[1, 2, 3, 4, 5, 6]}
+          spacing="20px">
+          {gameList.concat([...gameList])?.map((item, idx) => {
+            return <ItemGrid item={item} key={idx} />
+          })}
+        </SimpleGrid>
+      </Box>
+      {/* <Suspense
         fallback={
           <Box mt="300px">
             <Spinner
@@ -83,7 +134,7 @@ export default function Main() {
           initTab={MarketTabs.PUBLIC}
           renderTabs={renderTabs}
         />
-      </Suspense>
+      </Suspense> */}
     </Box>
   )
 }

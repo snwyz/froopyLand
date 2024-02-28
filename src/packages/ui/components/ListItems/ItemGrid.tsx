@@ -43,11 +43,7 @@ function ItemGrid({ item }: { item: any }) {
     return (
       <Box
         cursor="pointer"
-        onClickCapture={() =>
-          router.push(
-            `/${item.id}`,
-          )
-        }
+        onClickCapture={() => router.push(`/${item.id}`)}
         border="1px solid #704BEA"
         borderRadius="20px"
         p="10px"
@@ -56,61 +52,85 @@ function ItemGrid({ item }: { item: any }) {
         <AspectRatio ratio={1 / 1}>
           <Box className="image-effect">
             <Image
-                borderRadius="15px"
-                alt=""
-                src={item.nftImage}
-                fallbackSrc="/static/license-template/template.png"
-              />
+              borderRadius="15px"
+              alt=""
+              src={item.nftImage}
+              fallbackSrc="/static/license-template/template.png"
+            />
           </Box>
         </AspectRatio>
-        {/* <Flex
+        <Flex
           p="6px 12px"
-          gap="4px"
           borderRadius="20px"
           position="absolute"
           top="16px"
           left="16px"
-          bgColor="facebook.100">
-          <Text fontSize="12px" color="#2A0668">
-            {item.currentNFTInPool}
+          bgColor="#00DAB3">
+          <Text fontSize="12px" fontWeight={600} color="#2A0668">
+            Ends in 29 min 34 sec
           </Text>
-          <Text fontSize="12px" color="#606062">
-            items
-          </Text>
-        </Flex> */}
-        {/* <Flex
+        </Flex>
+        <Flex
           position="absolute"
           top="16px"
           right="16px"
           p="6px 12px"
           gap="4px"
           borderRadius="20px"
-          bgColor="facebook.100">
-          <Text fontSize="12px" color="#606062">
-            Supply
-          </Text>
+          bgColor="rgba(255, 255, 255, 0.5)">
           <Text fontSize="12px" color="#2A0668">
-            {item.LicenseSupply}
+            106 Bidders
           </Text>
-        </Flex> */}
+        </Flex>
         <Box m="16px 8px 0px 8px">
           <Flex justifyContent="space-between" align="center">
-            <Box fontWeight="700" fontSize="14px">
-              {item?.name?.length > 25
+            <Box fontWeight="700" fontSize="14px" lineHeight="16px" m="0 0 6px">
+              My Little Piggie
+              {/* {item?.name?.length > 25
                 ? `${item?.name.substring(0, 25)}...`
-                : item?.name}
+                : item?.name} */}
             </Box>
             {/* <Image cursor="pointer" alt="" src="./static/market/iconStar.svg" /> */}
           </Flex>
           <Flex
-            m="6px 0px"
-            justifyContent="space-between"
-            align="center"
-            fontSize="12px"
-            fontWeight="500"
-            color="#FFA8FE">
-            <Box>Key Sold</Box>
-            <Box fontSize="14px" mr="6px" color="#00DAB3">2000</Box>
+            gap={{ base: '20px', md: '30px' }}
+            w={{ base: '100%', lg: '100%' }}>
+            <Flex flexDir="column">
+              <Box
+                w={{ lg: '100%' }}
+                fontSize="12px"
+                fontWeight="500"
+                lineHeight="18px"
+                color="#FFA8FE">
+                Total Keys Sold
+              </Box>
+              <Box
+                w={{ lg: '100%' }}
+                lineHeight="20px"
+                fontWeight={900}
+                fontSize={{ base: '14px', md: '14px' }}
+                color="#00DAB3">
+                50 ETH
+              </Box>
+            </Flex>
+            <Flex flexDir="column">
+              <Box
+                w={{ lg: '100%' }}
+                fontSize="12px"
+                fontWeight="500"
+                lineHeight="18px"
+                color="#FFA8FE">
+                Final Winner Prize
+              </Box>
+              <Box
+                w={{ lg: '100%' }}
+                lineHeight="20px"
+                fontWeight={900}
+                fontSize={{ base: '14px', md: '14px' }}
+                color="#00DAB3">
+                50 ETH
+              </Box>
+            </Flex>
           </Flex>
         </Box>
       </Box>
