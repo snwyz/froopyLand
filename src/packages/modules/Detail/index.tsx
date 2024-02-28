@@ -27,30 +27,51 @@ import { ethers } from 'ethers'
 import { useRouter } from 'next/router'
 import useFomoStore from 'packages/store/fomo'
 import moment from 'moment'
-import { useEffect, useMemo, useState } from 'react'
+import { memo, useEffect, useMemo, useState } from 'react'
 import FroopyABI from 'packages/abis/demo/FroopyLand.json'
 import { toastSuccess } from '@utils/toast'
 
 
 const Details = () => {
   const router = useRouter()
-  const { gameList } = useFomoStore()
+  const { gameList, setGameList } = useFomoStore()
   
   const { pool: id } = router.query
 
-  const [detail, setDetail] = useState(gameList[0])
+  const [claims, setClaims] = useState(0)
+  const [keys, setKeys] = useState(0)
+  const [claimLoading, setClaimLoading] = useState(false)
+  const [buyLoading, setBuyLoading] = useState(false)
 
   useEffect(() => {
-    const { pool: id } = router.query
-    setDetail(gameList[`${id}`])
-    console.log(detail, '<===47')
-    
+    fetchGameState()
   }, [id, gameList, router.query])
 
-  const localTimeFormatted = useMemo(() => {
-    if (!detail?.state) {
-      return null
+  const detail = useMemo(() => gameList[`${id}`], [id, gameList])
+
+  const fetchGameState = async () => {
+
+    const provider = await web3Modal.connect()
+    const library = new ethers.providers.Web3Provider(provider)
+    const signer = library.getSigner()
+    const contract = new ethers.Contract('0x49b775262e272bED00B6Cf0d07a5083a7eeFe19E', FroopyABI, signer)
+    const address = await signer.getAddress()
+    
+    try {
+      const [[unclaimBonus], [keyAmount]]  = await contract.getPlayerStateOfGameIds(address, [id])
+      setClaims(unclaimBonus.toNumber())
+      setKeys(keyAmount.toNumber())
+    } catch (error) {
+      console.log(error, '<=-===fetchGameState')
     }
+  }
+
+  const memoPercent = useMemo(() => {
+    if (!detail?.totalKeyMinted) return 0
+    return ((keys / detail.totalKeyMinted.toNumber()) * 100).toFixed(2)
+  }, [detail, keys])
+
+  const localTimeFormatted = useMemo(() => {
     const date =  detail.state === 0 ? detail['startTimestamp'].toNumber() : detail['endTime']
     return moment(date*1000).format('YYYY-MM-DD HH:mm:ss')
   }, [detail])
@@ -62,17 +83,19 @@ const Details = () => {
     const library = new ethers.providers.Web3Provider(provider)
     const signer = library.getSigner()
     const contract = new ethers.Contract('0x49b775262e272bED00B6Cf0d07a5083a7eeFe19E', FroopyABI, signer)
-    const address = await signer.getAddress()
-    
+    setBuyLoading(true)
     try {
       const tx = await contract.purchaseKeyOfGameId(id, {
-        value: ethers.utils.parseUnits(`${detail.keyPrice}`, "wei"),
+        value: ethers.utils.parseUnits(`${detail.keyPrice.toNumber()}`, "wei"),
         gasLimit: BigInt(500000)
       })
-      const receipt = await tx.wait()
-      console.log(receipt, 'receipt')
+      await tx.wait()
+      await setGameList(library)
+      toastSuccess('Buy success')
     } catch (error) {
-      console.log(error, '<=-===222')
+      console.log(error, 'buyKey')
+    } finally {
+      setBuyLoading(false)
     }
   }
 
@@ -82,20 +105,23 @@ const Details = () => {
     const signer = library.getSigner()
     const contract = new ethers.Contract('0x49b775262e272bED00B6Cf0d07a5083a7eeFe19E', FroopyABI, signer)
     const address = await signer.getAddress()
-
+    setClaimLoading(true)
     try {
       const tx = await contract.claimBonus([id], address)
       await tx.wait()
+      await setGameList(library)
       toastSuccess('Claim success')
     } catch (error) {
-      console.log(error, '<=-===222')
+      console.log(error, 'claim')
+    } finally {
+      setClaimLoading(false)
     }
   }
 
   const { days, hours, minutes, seconds } = time
 
   if (!detail?.nftName) return null
-  
+
   return (
     <>
       <Flex w='100px' cursor='pointer' alignItems='center' padding='0 20px' onClick={() => router.back()}><ArrowBackIcon mr='10px' /><Text fontSize='20px'>Back</Text></Flex>
@@ -138,7 +164,7 @@ const Details = () => {
             <CardBody>
               <Stack divider={<StackDivider />} spacing="4">
                 <Box>
-                  <Heading size="md">Sale ends at</Heading>
+                  <Heading size="md">Sale {detail.state === 0 ? 'start' : 'end'} at</Heading>
                   {
                     // 2 已经结束
                     detail.state === 2 && (
@@ -177,11 +203,11 @@ const Details = () => {
                 <StatGroup>
                   <Stat>
                     <StatLabel>UnClaim Bonus</StatLabel>
-                    <StatNumber>29,000</StatNumber>
+                    <StatNumber>{claims}</StatNumber>
                   </Stat>
                   <Stat>
                     <StatLabel>Key Num</StatLabel>
-                    <StatNumber>29,000</StatNumber>
+                    <StatNumber>{keys}</StatNumber>
                   </Stat>
                 </StatGroup>
               </Box>
@@ -192,14 +218,14 @@ const Details = () => {
                       alignItems={{ xl: 'center' }}
                       justifyContent='space-between'
                       py={{ base: '5px', lg: 'none' }}>
-                      <Text fontSize="20px" fontWeight="500" textColor="#fff">51.2% Keys</Text>
+                      <Text fontSize="20px" fontWeight="500" textColor="#fff">{memoPercent}% Key Held by Player</Text>
                   </Flex>
-                  <Progress colorScheme="green" borderRadius='5px' marginTop='8px' size='sm' value={20} />
+                  <Progress colorScheme="green" borderRadius='5px' marginTop='8px' size='sm' value={memoPercent} />
               </Box>
               <Box marginTop='20px' color='#fff' padding='0'>
-                  <Flex marginTop='20px'>Current Price: <Text marginLeft='10px' fontWeight='600'>{detail.keyPrice.toNumber()}</Text></Flex>
-                  <Button fontSize="20px" colorScheme='teal' w='200px' marginRight='20px' marginTop="40px" onClick={buyKey}>Buy Key</Button>
-                  <Button fontSize="20px" colorScheme='teal' w='200px' marginTop="40px"  onClick={claim}>Claim Bonus</Button>
+                  <Flex marginTop='20px'>Current Price (ether): <Text marginLeft='10px' fontWeight='600'>{ethers.utils.formatEther(detail.keyPrice.toNumber())}</Text></Flex>
+                  <Button fontSize="20px" colorScheme='teal' w='200px' marginRight='20px' marginTop="40px" onClick={buyKey} isLoading={buyLoading}>Buy Key</Button>
+                  <Button fontSize="20px" colorScheme='teal' w='200px' marginTop="40px" isLoading={claimLoading} onClick={claim}>Claim Bonus</Button>
               </Box>
             </CardBody>
           </Card>
@@ -210,4 +236,4 @@ const Details = () => {
   )
 }
 
-export default Details
+export default memo(Details)

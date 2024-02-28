@@ -51,7 +51,7 @@ export default function Main() {
           columnsList={[
             'NFT name',
             'NFT Provider Address',
-            'Key Price',
+            'Key Price (Ether)',
             'Start time',
             'State'
           ]}

@@ -36,6 +36,7 @@ import { MyNFTsTabs, PathnameType } from '@ts'
 
 import TableBuyAll from './TableBuyAll'
 import moment from 'moment'
+import { ethers } from 'ethers'
 
 function Table({ item }: { item: any }) {
   const { width } = useWindowSize()
@@ -213,7 +214,7 @@ function Table({ item }: { item: any }) {
                 fontSize="12px"
                 fontWeight="500"
                 textColor="#00DAB3">
-                {item.keyPrice.toNumber()}
+                {ethers.utils.formatEther(item.keyPrice.toNumber())}
               </Text>
             </Flex>
           </Td>
