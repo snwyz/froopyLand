@@ -220,7 +220,7 @@ const Details = () => {
                       py={{ base: '5px', lg: 'none' }}>
                       <Text fontSize="20px" fontWeight="500" textColor="#fff">{memoPercent}% Key Held by Player</Text>
                   </Flex>
-                  <Progress colorScheme="green" borderRadius='5px' marginTop='8px' size='sm' value={memoPercent} />
+                  <Progress colorScheme="green" borderRadius='5px' marginTop='8px' size='sm' value={Number(memoPercent)} />
               </Box>
               <Box marginTop='20px' color='#fff' padding='0'>
                   <Flex marginTop='20px'>Current Price (ether): <Text marginLeft='10px' fontWeight='600'>{ethers.utils.formatEther(detail.keyPrice.toNumber())}</Text></Flex>
