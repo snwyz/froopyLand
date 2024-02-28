@@ -72,6 +72,7 @@ const Details = () => {
   }, [detail, keys])
 
   const localTimeFormatted = useMemo(() => {
+    if (!detail) return null
     const date =  detail.state === 0 ? detail['startTimestamp'].toNumber() : detail['endTime']
     return moment(date*1000).format('YYYY-MM-DD HH:mm:ss')
   }, [detail])
@@ -120,7 +121,7 @@ const Details = () => {
 
   const { days, hours, minutes, seconds } = time
 
-  if (!detail?.nftName) return null
+  if (!detail) return null
 
   return (
     <>

@@ -62,6 +62,10 @@ export default function Main() {
 
   return (
     <Box alignItems="center" mb="50px">
+      <Box>
+        
+      </Box>
+
       <Suspense
         fallback={
           <Box mt="300px">
