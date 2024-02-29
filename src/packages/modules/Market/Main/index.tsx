@@ -92,7 +92,7 @@ export default function Main() {
       <Box h='1px' backgroundColor="rgba(112, 75, 234, 0.5)"></Box>
 
       <Box padding='0 42px' marginTop="90px">
-        <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Ongoing Auctions</Text>(6)</Flex>
+        <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Ongoing Auctions</Text>({ongoingList.length})</Flex>
         <Box h='1px' backgroundColor="rgba(112, 75, 234, 0.5)"></Box>
       </Box>
       <Box padding='0 42px'>
@@ -107,7 +107,7 @@ export default function Main() {
       </Box>
 
       <Box padding='0 42px' marginTop="55px">
-        <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Upcoming Auctions</Text>(6) - Queuing</Flex>
+        <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Upcoming Auctions</Text>({upcomingList.length}) - Queuing</Flex>
         <Box h='1px' backgroundColor="rgba(112, 75, 234, 0.5)"></Box>
       </Box>
       <Box padding='0 42px'>
@@ -122,7 +122,7 @@ export default function Main() {
       </Box>
 
       <Box padding='0 42px' marginTop="55px">
-        <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Finished Auctions(6)</Text></Flex>
+        <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Finished Auctions</Text>({finishedList.length})</Flex>
         <Box h='1px' backgroundColor="rgba(112, 75, 234, 0.5)"></Box>
       </Box>
       <Box padding='0 42px'>
