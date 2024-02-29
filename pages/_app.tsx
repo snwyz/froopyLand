@@ -6,7 +6,6 @@ import { ChakraProvider } from '@chakra-ui/react'
 import customTheme from '@styles/customTheme'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
-import { ConfigProvider, theme } from 'antd'
 
 import { isProd } from 'packages/constants'
 
@@ -29,22 +28,12 @@ const App = ({ Component, pageProps }: any) => {
 
   return (
     <ChakraProvider theme={customTheme}>
-      <ConfigProvider
-        theme={{
-          // 1. 单独使用暗色算法
-          algorithm: [theme.darkAlgorithm],
-          token: {
-            colorLink: '#bb86fc',
-            colorText: '#fff',
-          },
-        }}>
         <DefaultLayout>
           <QueryClientProvider client={queryClient}>
             <Component {...pageProps} />
           </QueryClientProvider>
         </DefaultLayout>
         <ToastContainer autoClose={3000} theme="colored" />
-      </ConfigProvider>
     </ChakraProvider>
   )
 }

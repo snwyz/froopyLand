@@ -3,22 +3,14 @@ import {
   Box,
   Image,
   List,
-  ListItem,
   Link,
-  Card,
-  CardHeader,
-  CardBody,
   Heading,
-  Stack,
-  StackDivider,
-  Stat,
-  StatLabel,
-  StatNumber,
-  StatGroup,
   Flex,
   Text,
   Progress,
-  Button
+  Button,
+  Grid,
+  Input
 } from '@chakra-ui/react'
 import { ArrowBackIcon } from '@chakra-ui/icons'
 import useCountDown from '@hooks/useCountDown'
@@ -30,14 +22,22 @@ import moment from 'moment'
 import { memo, useEffect, useMemo, useState } from 'react'
 import FroopyABI from 'packages/abis/demo/FroopyLand.json'
 import { toastSuccess } from '@utils/toast'
+import useStore from 'packages/store'
+import { ellipseAddress, weiToEtherString } from '@utils'
 
+
+export enum State {
+  Upcoming = 0,
+  Ongoing = 1,
+  Finished = 2,
+}
 
 const Details = () => {
   const router = useRouter()
   const { gameList, setGameList } = useFomoStore()
   
   const { pool: id } = router.query
-
+  const { address } = useStore()
   const [claims, setClaims] = useState(0)
   const [keys, setKeys] = useState(0)
   const [claimLoading, setClaimLoading] = useState(false)
@@ -50,7 +50,6 @@ const Details = () => {
   const detail = useMemo(() => gameList[`${id}`], [id, gameList])
 
   const fetchGameState = async () => {
-
     const provider = await web3Modal.connect()
     const library = new ethers.providers.Web3Provider(provider)
     const signer = library.getSigner()
@@ -67,13 +66,13 @@ const Details = () => {
   }
 
   const memoPercent = useMemo(() => {
-    if (!detail?.totalKeyMinted) return 0
+    if (!detail?.totalKeyMinted || keys === 0) return 0
     return ((keys / detail.totalKeyMinted.toNumber()) * 100).toFixed(2)
   }, [detail, keys])
 
   const localTimeFormatted = useMemo(() => {
     if (!detail) return null
-    const date =  detail.state === 0 ? detail['startTimestamp'].toNumber() : detail['endTime']
+    const date =  detail.state === State.Upcoming ? detail['startTimestamp'].toNumber() : detail['endTime']
     return moment(date*1000).format('YYYY-MM-DD HH:mm:ss')
   }, [detail])
 
@@ -121,119 +120,488 @@ const Details = () => {
 
   const { days, hours, minutes, seconds } = time
 
+  const CountDown = () => (
+    <div className={styles.time}>
+      <div className={styles.unit}>{days || '0'}</div>
+      <div className={styles.symbol}>Days</div>
+      <div className={styles.unit}>{hours || '0'}</div>
+      <div className={styles.symbol}>Hrs</div>
+      <div className={styles.unit}>{minutes || '0'}</div>
+      <div className={styles.symbol}>Mins</div>
+      <div className={styles.unit}>{seconds || '0'}</div>
+      <div className={styles.symbol}>Secs</div>
+    </div>
+  )
+
+
   if (!detail) return null
+  
 
   return (
     <>
-      <Flex w='100px' cursor='pointer' alignItems='center' padding='0 20px' onClick={() => router.back()}><ArrowBackIcon mr='10px' /><Text fontSize='20px'>Back</Text></Flex>
-      <Box className={styles.box}>
-        <Box className={styles.nft}>
-          <Box>
-            <Image
-              w="720px"
-              h="720px"
-              objectFit="cover"
-              borderRadius="8px"
-              alt=""
-              src={detail?.nftImage}
-              fallbackSrc="/static/license-template/template.png"
-            />
+      <Flex
+        w="120px"
+        m="0 0 16px"
+        h="52px"
+        cursor="pointer"
+        alignItems="center"
+        padding="0 42px"
+        onClick={() => router.back()}>
+        <ArrowBackIcon mr="10px" />
+        <Text fontSize="20px">Back</Text>
+      </Flex>
+      {
+        detail.state === State.Finished && (
+          <Box
+            m="0 auto;"
+            borderRadius="20px 20px 0px 0px"
+            background="linear-gradient(180deg, #764AF2 0%, #9A4DEE 201.25%)"
+            fontSize="28px"
+            w={{ lg: '1280px', md: '1120px' }}
+            h="80px"
+            textAlign="center"
+            lineHeight="80px">
+            You won the final prize！
           </Box>
-          <Text className={styles.desc}>Description</Text>
+        )
+      }
+      <Box
+        borderRadius={
+          detail.state === State.Finished ? '0 0 20px 20px' : '20px'
+        }
+        w={{ lg: '1280px', md: '1120px' }}
+        className={styles.box}>
+        <Box className={styles.nft}>
+          <Image
+            w="500px"
+            h="500px"
+            objectFit="cover"
+            borderRadius="15px"
+            alt=""
+            src={detail?.nftImage}
+            fallbackSrc="/static/license-template/template.png"
+          />
+          <Text className={styles.desc}>{detail.nftName}</Text>
           <List spacing={3}>
-            <ListItem>
-              <span className={styles.name}>NFT Name：</span>
-              {detail.nftName}
-            </ListItem>
-            <ListItem>
-              <span className={styles.name}>NFT Address：</span>
-              <Link color="#00DAB3">{detail.nftAddress}</Link>
-            </ListItem>
-            <ListItem>
-              <span className={styles.name}>NFT ID：</span>
-              {detail.nftId.toNumber()}
-            </ListItem>
+            <Flex alignItems="center">
+              <Text className={styles.name}>NFT Address：</Text>
+              <Link fontWeight={600} color="#00DAB3">
+                {detail.nftAddress}
+              </Link>
+            </Flex>
+            <Flex alignItems="center">
+              <Text className={styles.name}>NFT ID：</Text>
+              <Text fontWeight={600}>{detail.nftId.toNumber()}</Text>
+            </Flex>
+            <Flex alignItems="center">
+              <Text className={styles.name}>Auction Duration：</Text>
+              <Text fontWeight={600}>
+                {moment(detail.startTimestamp.toNumber() * 1000).format('hA')}{' '}
+                {moment(detail.startTimestamp.toNumber() * 1000).format(
+                  'MMM DD',
+                )}{' '}
+                - {moment(detail.endTime * 1000).format('hA')}{' '}
+                {moment(detail.endTime * 1000).format('MMM DD')}
+              </Text>
+            </Flex>
+          </List>
+          <Text
+            fontWeight={600}
+            m="40px 0 20px"
+            fontSize="20px"
+            lineHeight="20px">
+            Auction Rules
+          </Text>
+          <List spacing={3}>
+            <Flex>
+              <Text color="#FFA8FE" fontSize="16px" lineHeight="20px" w="172px">
+                Final Winner prize：
+              </Text>
+              <Text w="290px" fontSize="16px" lineHeight="24px">
+                The last key holder gets 20% of the total mint fee. The prize
+                can be claimed after the game gets over.
+              </Text>
+            </Flex>
+            <Flex>
+              <Text color="#FFA8FE" fontSize="16px" lineHeight="20px" w="172px">
+                Key Holder Dividends：
+              </Text>
+              <Text w="290px" fontSize="16px" lineHeight="24px">
+                Key holders share 20% of following mint fee depends on held key
+                share. The dividends can be claimed during and after the game.
+              </Text>
+            </Flex>
+            <Flex>
+              <Text color="#FFA8FE" fontSize="16px" lineHeight="20px" w="172px">
+                NFT Provider Dividends：
+              </Text>
+              <Text w="290px" fontSize="16px" lineHeight="24px">
+                The NFT provider shares 50% of the total mint fee. The dividends
+                can be claimed after the game.{' '}
+              </Text>
+            </Flex>
           </List>
         </Box>
         <Box className={styles.info}>
-          <Card
-            color="#fff"
-            boxShadow="0 1px 3px 0 rgb(255, 255, 255),0 1px 2px 0 rgb(255, 255, 255)">
-            <CardHeader>
-              <Heading size="lg">Game Info</Heading>
-            </CardHeader>
-            <CardBody>
-              <Stack divider={<StackDivider />} spacing="4">
-                <Box>
-                  <Heading size="md">Sale {detail.state === 0 ? 'start' : 'end'} at</Heading>
-                  {
-                    // 2 已经结束
-                    detail.state === 2 && (
-                      <div className={styles.time}>已结束</div>
-                    )
-                  }
-                 {
-                  [0, 1].includes(detail.state) && (
-                    <div className={styles.time}>
-                      <div className={styles.unit}>{days || '0'}</div>
-                      <div className={styles.symbol}>天</div>
-                      <div className={styles.unit}>{hours || '0'}</div>
-                      <div className={styles.symbol}>时</div>
-                      <div className={styles.unit}>{minutes || '0'}</div>
-                      <div className={styles.symbol}>分</div>
-                      <div className={styles.unit}>{seconds || '0'}</div>
-                      <div className={styles.symbol}>秒</div>
-                    </div>
-                  )
-                 }
-                </Box>
-              </Stack>
-            </CardBody>
-          </Card>
-          <Card
-            marginTop='20px'
-            paddingBottom='20px'
-            color="#fff"
-            boxShadow="0 1px 3px 0 rgb(255, 255, 255),0 1px 2px 0 rgb(255, 255, 255)">
-            <CardHeader>
-              <Heading size="lg">Player information</Heading>
-            </CardHeader>
-            <CardBody>
-              <Box>
-                <Heading size="md" marginBottom='10px'>Sale information</Heading>
-                <StatGroup>
-                  <Stat>
-                    <StatLabel>UnClaim Bonus</StatLabel>
-                    <StatNumber>{claims}</StatNumber>
-                  </Stat>
-                  <Stat>
-                    <StatLabel>Key Num</StatLabel>
-                    <StatNumber>{keys}</StatNumber>
-                  </Stat>
-                </StatGroup>
+          <Heading fontSize="24px" lineHeight="36px" fontWeight={700} mb="16px">
+            {detail.state === State.Ongoing
+              ? 'Auction Count Down'
+              : detail.state === State.Upcoming
+              ? 'Opening Count Down'
+              : 'Auction Status'}
+          </Heading>
+          <Box
+            borderRadius="20px"
+            p="16px 0 16px 32px"
+            bgColor="rgba(118, 74, 242, 0.5)"
+            border="1px solid rgba(112, 75, 234, 1)">
+            {[State.Ongoing, State.Upcoming].includes(detail.state) && (
+              <CountDown />
+            )}
+            {State.Finished === detail.state && (
+              <Text fontSize="24px" lineHeight="36px">
+                Auction ends {moment(detail.endTime * 1000).format('MMMM DD')}{' '}
+                at {moment(detail.endTime * 1000).format('h:mm A')}
+              </Text>
+            )}
+          </Box>
+
+          <Heading
+            mt="36px"
+            fontSize="24px"
+            lineHeight="36px"
+            fontWeight={700}
+            mb="16px">
+            Bonus Pool
+          </Heading>
+          <Grid
+            gap="32px"
+            borderRadius="20px"
+            p="32px"
+            gridTemplateColumns="1fr 1fr"
+            bgColor="rgba(118, 74, 242, 0.5)"
+            border="1px solid rgba(112, 75, 234, 1)">
+            <Flex flexDir="column">
+              <Box
+                w={{ lg: '100%' }}
+                fontSize="16px"
+                lineHeight="24px"
+                color="#FFA8FE">
+                Total Keys Minted
               </Box>
-              <Box marginTop='20px'>
-                  <Flex
-                      flexDirection={{ base: 'column', lg: 'row' }}
-                      gap={{ base: '10px', lg: '30px', xl: '110px' }}
-                      alignItems={{ xl: 'center' }}
-                      justifyContent='space-between'
-                      py={{ base: '5px', lg: 'none' }}>
-                      <Text fontSize="20px" fontWeight="500" textColor="#fff">{memoPercent}% Key Held by Player</Text>
-                  </Flex>
-                  <Progress colorScheme="green" borderRadius='5px' marginTop='8px' size='sm' value={Number(memoPercent)} />
+              <Flex alignItems="baseline">
+                <Text
+                  mr="8px"
+                  fontWeight={900}
+                  color="#00DAB3"
+                  fontSize="40px"
+                  lineHeight="60px">
+                  {detail.totalKeyMinted.toString() || '--'}
+                </Text>
+                <Text fontWeight={700} fontSize="16px" lineHeight="24px">
+                  KEYS
+                </Text>
+              </Flex>
+            </Flex>
+            <Flex flexDir="column">
+              <Box
+                w={{ lg: '100%' }}
+                fontSize="16px"
+                lineHeight="24px"
+                color="#FFA8FE">
+                Total Mint Fee
               </Box>
-              <Box marginTop='20px' color='#fff' padding='0'>
-                  <Flex marginTop='20px'>Current Price (ether): <Text marginLeft='10px' fontWeight='600'>{ethers.utils.formatEther(detail.keyPrice.toNumber())}</Text></Flex>
-                  <Button fontSize="20px" colorScheme='teal' w='200px' marginRight='20px' marginTop="40px" onClick={buyKey} isLoading={buyLoading}>Buy Key</Button>
-                  <Button fontSize="20px" colorScheme='teal' w='200px' marginTop="40px" isLoading={claimLoading} onClick={claim}>Claim Bonus</Button>
+              <Flex>
+                <Flex>
+                  <Image
+                    mr="4px"
+                    src="./static/market/eth.svg"
+                    alt="ethereum"
+                    color="#fff"></Image>
+                  <Text
+                    mr="8px"
+                    fontWeight={900}
+                    color="#00DAB3"
+                    fontSize="40px"
+                    lineHeight="60px">
+                    {weiToEtherString(detail.salesRevenue.toString()) || '--'}
+                  </Text>
+                </Flex>
+                <Text
+                  fontWeight={700}
+                  alignSelf="flex-end"
+                  fontSize="16px"
+                  lineHeight="40px">
+                  ETH
+                </Text>
+              </Flex>
+            </Flex>
+            <Flex flexDir="column">
+              <Box
+                w={{ lg: '100%' }}
+                fontSize="16px"
+                lineHeight="24px"
+                color="#FFA8FE">
+                Final Winner Prize
               </Box>
-            </CardBody>
-          </Card>
+              <Flex>
+                <Flex>
+                  <Image
+                    mr="4px"
+                    src="./static/market/eth.svg"
+                    alt="ethereum"
+                    color="#fff"></Image>
+                  {/* detail.salesRevenue.toNumber()* 0.2  最后一个买入Key的人分红 20% */}
+                  <Text
+                    mr="8px"
+                    fontWeight={900}
+                    color="#00DAB3"
+                    fontSize="40px"
+                    lineHeight="60px">
+                    {weiToEtherString(
+                      `${detail.salesRevenue.toNumber() * 0.2}`,
+                    ) || '--'}
+                  </Text>
+                </Flex>
+                <Text
+                  fontWeight={700}
+                  alignSelf="flex-end"
+                  fontSize="16px"
+                  lineHeight="40px">
+                  ETH
+                </Text>
+              </Flex>
+            </Flex>
+            <Flex flexDir="column">
+              <Box
+                w={{ lg: '100%' }}
+                fontSize="16px"
+                lineHeight="24px"
+                color="#FFA8FE">
+                Final Key Holder
+              </Box>
+              <Flex mt="20px">
+                <Text color="#00DAB3" fontSize="16px" lineHeight="20px">
+                  {ellipseAddress(address)}
+                </Text>
+              </Flex>
+            </Flex>
+          </Grid>
+
+          <Heading
+            mt="36px"
+            fontSize="24px"
+            lineHeight="36px"
+            fontWeight={700}
+            mb="16px">
+            My Keys, Dividends & Prize
+          </Heading>
+          <Box
+            padding="32px"
+            borderRadius="20px"
+            border="1px solid rgba(112, 75, 234, 1)">
+            <Text fontSize="20px" lineHeight="30px" fontWeight={700} mb="16px">
+              My Owned Keys
+            </Text>
+            <Progress
+              colorScheme="primary"
+              borderRadius="5px"
+              bgColor="rgba(42, 6, 104, 0.7)"
+              size="sm"
+              value={Number(memoPercent)}
+            />
+            <Flex mt="20px" alignItems="center">
+              <Flex mr="32px" alignItems="baseline">
+                <Text
+                  fontSize="24px"
+                  lineHeight="36px"
+                  color="#00DAB3"
+                  fontWeight={700}>
+                  {keys || '--'}
+                </Text>
+                <Text ml="8px" color="#fff" fontSize="16px" lineHeight="24px">
+                  Keys
+                </Text>
+              </Flex>
+              <Flex
+                mr="32px"
+                alignItems="baseline"
+                fontSize="24px"
+                lineHeight="36px"
+                color="#00DAB3"
+                fontWeight={700}>
+                <Text
+                  fontSize="24px"
+                  lineHeight="36px"
+                  color="#00DAB3"
+                  fontWeight={700}>
+                  {memoPercent || '--'}
+                </Text>
+                <Text ml="8px" color="#fff" fontSize="16px" lineHeight="24px">
+                  {' '}
+                  of Total Keys Minted
+                </Text>
+              </Flex>
+            </Flex>
+
+            {detail.state !== State.Finished && (
+              <>
+                <Text
+                  mt="36px"
+                  mb="12px"
+                  fontSize="20px"
+                  lineHeight="30px"
+                  fontWeight={700}>
+                  Mint Key
+                </Text>
+                <Flex>
+                  <Input
+                    w="272px"
+                    h="52px"
+                    borderColor="#704BEA"
+                    readOnly
+                    value="1 Key"
+                  />
+                  <Button
+                    fontSize="20px"
+                    colorScheme="primary"
+                    w="272px"
+                    h="52px"
+                    ml="24px"
+                    onClick={buyKey}
+                    fontWeight="700"
+                    color="#000"
+                    disabled={[State.Finished, State.Upcoming].includes(
+                      detail.state,
+                    )}
+                    isLoading={buyLoading}>
+                    Mint Key
+                  </Button>
+                </Flex>
+                <Text fontSize="14px" lineHeight="20px" mt="12px">
+                  Mint Fee：
+                  <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
+                    {weiToEtherString(detail.keyPrice.toString())}
+                  </span>
+                  ETH/KEY
+                </Text>
+              </>
+            )}
+
+            <Flex mt="36px" mb="12px" justifyContent="space-between">
+              <Text fontSize="20px" lineHeight="30px" fontWeight={700}>
+                My Key Holder Dividends
+              </Text>
+              <Text fontSize="16px" lineHeight="24px">
+                Total：
+                <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
+                  {weiToEtherString(detail.salesRevenue.toString()) || '--'}
+                </span>
+                ETH
+              </Text>
+            </Flex>
+            <Flex>
+              <Input
+                w="272px"
+                h="52px"
+                bgColor="rgba(112, 75, 234, 0.5)"
+                border="none"
+                readOnly
+                value={`Unclaimed: ${
+                  weiToEtherString(claims.toString()) || '--'
+                } ETH`}
+              />
+              <Button
+                fontSize="20px"
+                colorScheme="primary"
+                w="272px"
+                h="52px"
+                ml="24px"
+                onClick={claim}
+                fontWeight="700"
+                color="#000"
+                disabled={detail.state === State.Upcoming}
+                isLoading={claimLoading}>
+                Claim
+              </Button>
+            </Flex>
+
+            <Flex mt="36px" mb="12px" justifyContent="space-between">
+              <Text fontSize="20px" lineHeight="30px" fontWeight={700}>
+                My NFT Provider Dividends
+              </Text>
+              <Text fontSize="16px" lineHeight="24px">
+                Total：
+                <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
+                  10
+                </span>
+                ETH
+              </Text>
+            </Flex>
+            <Flex>
+              <Input
+                w="272px"
+                h="52px"
+                bgColor="rgba(112, 75, 234, 0.5)"
+                border="none"
+                readOnly
+                value="Unclaimed: 1.23 ETH"
+              />
+              <Button
+                fontSize="20px"
+                colorScheme="primary"
+                w="272px"
+                h="52px"
+                ml="24px"
+                disabled={[State.Upcoming, State.Ongoing].includes(
+                  detail.state,
+                )}
+                fontWeight="700"
+                color="#000">
+                Claim
+              </Button>
+            </Flex>
+
+            {detail.state === State.Finished && (
+              <>
+                <Flex mt="36px" mb="12px" justifyContent="space-between">
+                  <Text fontSize="20px" lineHeight="30px" fontWeight={700}>
+                    My Final Winner Prize
+                  </Text>
+                  <Text fontSize="16px" lineHeight="24px">
+                    Total：
+                    <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
+                      100
+                    </span>
+                    ETH
+                  </Text>
+                </Flex>
+                <Flex>
+                  <Input
+                    w="272px"
+                    h="52px"
+                    bgColor="rgba(112, 75, 234, 0.5)"
+                    border="none"
+                    readOnly
+                    value="Unclaimed: 1.23 ETH"
+                  />
+                  <Button
+                    fontSize="20px"
+                    colorScheme="primary"
+                    w="272px"
+                    h="52px"
+                    ml="24px"
+                    fontWeight="700"
+                    color="#000">
+                    Claim
+                  </Button>
+                </Flex>
+              </>
+            )}
+          </Box>
         </Box>
       </Box>
     </>
-
   )
 }
 

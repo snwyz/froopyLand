@@ -92,7 +92,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
         <Box m="16px 8px 0px 8px">
           <Flex justifyContent="space-between" align="center">
             <Box fontWeight="700" fontSize="14px" lineHeight="16px" m="0 0 6px">
-              My Little Piggie
+              {item.nftName}
               {/* {item?.name?.length > 25
                 ? `${item?.name.substring(0, 25)}...`
                 : item?.name} */}
@@ -109,7 +109,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
                 fontWeight="500"
                 lineHeight="18px"
                 color="#FFA8FE">
-                Total Keys Sold
+                Total Keys Minted
               </Box>
               <Box
                 w={{ lg: '100%' }}
