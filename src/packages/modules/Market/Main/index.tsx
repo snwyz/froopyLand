@@ -1,10 +1,9 @@
-import { lazy, useState } from 'react'
+import { lazy, useEffect, useState } from 'react'
 
 import { Box, Image, Button, Text, Flex, SimpleGrid } from '@chakra-ui/react'
 import ItemGrid from 'packages/ui/components/ListItems/ItemGrid'
 // import { sleep } from '@utils'
 
-import { MarketTabs } from '@ts'
 import useFomoStore from 'packages/store/fomo'
 
 interface Item {
@@ -36,28 +35,47 @@ export const iData = [
 
 export default function Main() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const { gameList } = useFomoStore()
+  const [upcomingList, setUpcomingList] = useState([])
+  const [ongoingList, setOngoingList] = useState([])
+  const [finishedList, setFinishedList] = useState([])
 
-  const renderTabs = [
-    {
-      id: 0,
-      title: 'Game List',
-      value: MarketTabs.PUBLIC,
-      render: (
-        <ListItems
-          isLoading={isLoading}
-          items={gameList}
-          columnsList={[
-            'NFT name',
-            'NFT Provider Address',
-            'Key Price (Ether)',
-            'Start time',
-            'State'
-          ]}
-        />
-      ),
-    },
-  ]
+  const { gameList } = useFomoStore()
+  // upcoming 0 ongoingList 1 finishedList 2
+
+  const renderList = () => {
+    const upcomingList = gameList.filter(v => v.state === 0)
+    const ongoingList = gameList.filter(v => v.state === 1)
+    const finishedList = gameList.filter(v => v.state === 2)
+    
+    setUpcomingList(upcomingList)
+    setOngoingList(ongoingList)
+    setFinishedList(finishedList)
+  }
+
+  useEffect(() => {
+    renderList()
+  }, [gameList])
+
+  // const renderTabs = [
+  //   {
+  //     id: 0,
+  //     title: 'Game List',
+  //     value: MarketTabs.PUBLIC,
+  //     render: (
+  //       <ListItems
+  //         isLoading={isLoading}
+  //         items={gameList}
+  //         columnsList={[
+  //           'NFT name',
+  //           'NFT Provider Address',
+  //           'Key Price (Ether)',
+  //           'Start time',
+  //           'State'
+  //         ]}
+  //       />
+  //     ),
+  //   },
+  // ]
 
   return (
     <Box alignItems="center" mb="50px">
@@ -82,8 +100,8 @@ export default function Main() {
           mt='20px'
           columns={[1, 2, 3, 4, 5, 6]}
           spacing="20px">
-          {gameList.concat([...gameList])?.map((item, idx) => {
-            return <ItemGrid item={item} key={idx} />
+          {ongoingList?.map((item, idx) => {
+            return <ItemGrid gridName='ongoingList' item={item} key={idx} />
           })}
         </SimpleGrid>
       </Box>
@@ -97,8 +115,8 @@ export default function Main() {
           mt='20px'
           columns={[1, 2, 3, 4, 5, 6]}
           spacing="20px">
-          {gameList.concat([...gameList])?.map((item, idx) => {
-            return <ItemGrid item={item} key={idx} />
+          {upcomingList?.map((item, idx) => {
+            return <ItemGrid gridName='upcomingList' item={item} key={idx} />
           })}
         </SimpleGrid>
       </Box>
@@ -112,8 +130,8 @@ export default function Main() {
           mt='20px'
           columns={[1, 2, 3, 4, 5, 6]}
           spacing="20px">
-          {gameList.concat([...gameList])?.map((item, idx) => {
-            return <ItemGrid item={item} key={idx} />
+          {finishedList?.map((item, idx) => {
+            return <ItemGrid gridName='finishedList' item={item} key={idx} />
           })}
         </SimpleGrid>
       </Box>

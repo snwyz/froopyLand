@@ -4,8 +4,8 @@ import Head from 'next/head'
 
 import { Box } from '@chakra-ui/react'
 
-import DetailPool from '@modules/DetailPool'
-// import Details from '@modules/Detail'
+// import DetailPool from '@modules/DetailPool'
+import Details from '@modules/Detail'
 
 
 
@@ -19,7 +19,7 @@ const DetailPage: FC = () => {
       </Head>
 
       <Box p={0}>
-        <DetailPool />
+        <Details />
       </Box>
     </>
   )

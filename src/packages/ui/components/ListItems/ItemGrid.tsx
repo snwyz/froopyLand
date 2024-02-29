@@ -21,7 +21,7 @@ import { PathnameType } from '@ts'
 
 import { myNFTUnlicensedData } from './FakeData'
 
-function ItemGrid({ item }: { item: any }) {
+function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
   const router = useRouter()
   const { pathname } = router
   const [isDetail, setIsGetDetail] = useState()
@@ -65,23 +65,30 @@ function ItemGrid({ item }: { item: any }) {
           position="absolute"
           top="16px"
           left="16px"
-          bgColor="#00DAB3">
+          bgColor={gridName === 'ongoingList' ? '#00DAB3' : 'rgba(255, 255, 255, 0.5)'}>
           <Text fontSize="12px" fontWeight={600} color="#2A0668">
-            Ends in 29 min 34 sec
+          {
+            gridName === 'upcomingList' ? 'Start in 23 hr 29 min 34 sec' : gridName === 'ongoingList' ? 'Ends in 29 min 34 sec' : 'Finished'
+          }
           </Text>
         </Flex>
-        <Flex
-          position="absolute"
-          top="16px"
-          right="16px"
-          p="6px 12px"
-          gap="4px"
-          borderRadius="20px"
-          bgColor="rgba(255, 255, 255, 0.5)">
-          <Text fontSize="12px" color="#2A0668">
-            106 Bidders
-          </Text>
-        </Flex>
+        {
+            gridName !== 'upcomingList' && (
+              <Flex
+                position="absolute"
+                top="16px"
+                right="16px"
+                p="6px 12px"
+                gap="4px"
+                borderRadius="20px"
+                bgColor="rgba(255, 255, 255, 0.5)">
+                <Text fontSize="12px" color="#2A0668">
+                      106 Bidders
+                </Text>
+              </Flex>
+            )
+          }
+        
         <Box m="16px 8px 0px 8px">
           <Flex justifyContent="space-between" align="center">
             <Box fontWeight="700" fontSize="14px" lineHeight="16px" m="0 0 6px">
