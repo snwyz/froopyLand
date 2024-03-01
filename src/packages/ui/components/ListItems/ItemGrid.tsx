@@ -149,7 +149,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
                 fontWeight={900}
                 fontSize={{ base: '14px', md: '14px' }}
                 color="#00DAB3">
-                {item?.totalKeyMinted?.toNumber() || '--'}
+                {item.state === 0 ? '--' : item?.totalKeyMinted?.toNumber() || '--'}
               </Box>
             </Flex>
             <Flex flexDir="column">
