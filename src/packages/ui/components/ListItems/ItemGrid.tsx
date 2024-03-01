@@ -167,7 +167,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
                 fontWeight={900}
                 fontSize={{ base: '14px', md: '14px' }}
                 color="#00DAB3">
-                {item.isClone ? (item?.totalKeyMinted?.toNumber() * 0.001 * 0.2).toFixed(3) : weiToEtherString(
+                {item.state === 0 ? '--' : item.isClone ? (item?.totalKeyMinted?.toNumber() * 0.001 * 0.2).toFixed(3) : weiToEtherString(
                       `${item.salesRevenue.mul(2).div(10)}`,
                     ) || '--'} ETH
               </Box>

@@ -74,7 +74,7 @@ const useFomoStore = create(immer<IState>(((set) => ({
                 endTime: generateTimestamp(),
                 startTimestamp: generateTimestamp(),
                 isClone: true,
-                totalKeyMinted,
+                totalKeyMinted: state === 0 ? null:totalKeyMinted,
                 state,
                 nftName: faker.internet.userName() + '-F',
                 nftImage: imageUrls[faker.number.int({ min: 0, max: 5 })]

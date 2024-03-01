@@ -319,7 +319,7 @@ const Details = () => {
                   color="#00DAB3"
                   fontSize="40px"
                   lineHeight="60px">
-                  {detail.isClone ? COUNT : detail.totalKeyMinted.toString() || '--'}
+                  {detail.state === 0 ? '--' : detail.isClone ? COUNT : detail.totalKeyMinted.toString() || '--'}
                 </Text>
                 <Text fontWeight={700} fontSize="16px" lineHeight="24px">
                   KEYS
@@ -347,7 +347,7 @@ const Details = () => {
                     color="#00DAB3"
                     fontSize="40px"
                     lineHeight="60px">
-                    {detail.isClone ? (COUNT * 0.001).toFixed(3) : weiToEtherString(detail.salesRevenue.toString()) || '--'}
+                    {detail.state === 0 ? '--' : detail.isClone ? (COUNT * 0.001).toFixed(3) : weiToEtherString(detail.salesRevenue.toString()) || '--'}
                   </Text>
                 </Flex>
                 <Text
@@ -381,7 +381,7 @@ const Details = () => {
                     color="#00DAB3"
                     fontSize="40px"
                     lineHeight="60px">
-                    {detail.isClone ? (COUNT * 0.001 * 0.2).toFixed(5) : weiToEtherString(
+                    {detail.state === 0 ? '--' : detail.isClone ? (COUNT * 0.001 * 0.2).toFixed(5) : weiToEtherString(
                       `${detail.salesRevenue.mul(2).div(10)}`,
                     ) || '--'}
                   </Text>
@@ -405,7 +405,7 @@ const Details = () => {
               </Box>
               <Flex mt="20px">
                 <Text color="#00DAB3" fontSize="16px" lineHeight="20px">
-                  {ellipseAddress(detail.lastPlayer)}
+                  {detail.state === 0 ? '--': ellipseAddress(detail.lastPlayer)}
                 </Text>
               </Flex>
             </Flex>
@@ -440,7 +440,7 @@ const Details = () => {
                   lineHeight="36px"
                   color="#00DAB3"
                   fontWeight={700}>
-                  {keys || '--'}
+                  {detail.state === 0 ? '--' : (keys || '--')}
                 </Text>
                 <Text ml="8px" color="#fff" fontSize="16px" lineHeight="24px">
                   Keys
@@ -458,7 +458,7 @@ const Details = () => {
                   lineHeight="36px"
                   color="#00DAB3"
                   fontWeight={700}>
-                  {memoPercent || '--'}%
+                  {detail.state === 0 ? '--': memoPercent || '--'}%
                 </Text>
                 <Text ml="8px" color="#fff" fontSize="16px" lineHeight="24px">
                   {' '}
@@ -504,7 +504,7 @@ const Details = () => {
                 <Text fontSize="14px" lineHeight="20px" mt="12px">
                   Mint Fee：
                   <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
-                    {weiToEtherString(detail.keyPrice.toString())}
+                    {detail.state === 0 ? '--': weiToEtherString(detail.keyPrice.toString())}
                   </span>
                   ETH/KEY
                 </Text>
@@ -518,7 +518,7 @@ const Details = () => {
               <Text fontSize="16px" lineHeight="24px">
                 Total：
                 <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
-                  {detail.isClone ? (COUNT * 0.001*0.2).toFixed(3): weiToEtherString(detail.salesRevenue.toString()) || '--'}
+                  {detail.state === 0 ? '--': detail.isClone ? (COUNT * 0.001*0.2).toFixed(3): weiToEtherString(detail.salesRevenue.toString()) || '--'}
                 </span>
                 ETH
               </Text>
@@ -531,7 +531,7 @@ const Details = () => {
                 border="none"
                 readOnly
                 value={`Unclaimed: ${
-                  weiToEtherString(claims.toString()) || '--'
+                  detail.state === 0 ? '--': weiToEtherString(claims.toString()) || '--'
                 } ETH`}
               />
               <Button
@@ -556,7 +556,7 @@ const Details = () => {
               <Text fontSize="16px" lineHeight="24px">
                 Total：
                 <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
-                  10
+                {detail.state === 0 ? '--': 10}
                 </span>
                 ETH
               </Text>
@@ -568,7 +568,7 @@ const Details = () => {
                 bgColor="rgba(112, 75, 234, 0.5)"
                 border="none"
                 readOnly
-                value="Unclaimed: 1.23 ETH"
+                value={`Unclaimed: ${detail.state === 0 ? '--': '1.23'}ETH`}
               />
               <Button
                 fontSize="20px"
@@ -594,7 +594,7 @@ const Details = () => {
                   <Text fontSize="16px" lineHeight="24px">
                     Total：
                     <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
-                      {(COUNT * 0.001 * 0.2).toFixed(3) }
+                      {detail.state === 0 ? '--': (COUNT * 0.001 * 0.2).toFixed(3) }
                     </span>
                     ETH
                   </Text>
