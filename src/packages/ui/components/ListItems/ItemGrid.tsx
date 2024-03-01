@@ -50,8 +50,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
         border="1px solid #704BEA"
         borderRadius="20px"
         p="10px"
-        position="relative"
-        onClick={() => router}>
+        position="relative">
         <AspectRatio ratio={1 / 1}>
           <Box className="image-effect">
             <Image
@@ -120,7 +119,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
                 fontWeight={900}
                 fontSize={{ base: '14px', md: '14px' }}
                 color="#00DAB3">
-                50 ETH
+                {item.totalKeyMinted.toString()}
               </Box>
             </Flex>
             <Flex flexDir="column">
@@ -138,7 +137,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
                 fontWeight={900}
                 fontSize={{ base: '14px', md: '14px' }}
                 color="#00DAB3">
-                50 ETH
+                5 ETH
               </Box>
             </Flex>
           </Flex>
