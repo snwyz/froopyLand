@@ -67,7 +67,11 @@ const Details = () => {
 
   const memoPercent = useMemo(() => {
     if (!detail?.totalKeyMinted || keys === 0) return 0
-    return ((keys / detail.totalKeyMinted.toNumber()) * 100).toFixed(2)
+  
+    const percentage = (keys / detail.totalKeyMinted.toNumber()) * 100
+    const formattedPercent = Number(percentage.toFixed(2)).toString().replace(/(\.\d*?[1-9])0+$|\.0*$/, '$1')
+  
+    return formattedPercent
   }, [detail, keys])
 
   const localTimeFormatted = useMemo(() => {
@@ -359,7 +363,7 @@ const Details = () => {
                     fontSize="40px"
                     lineHeight="60px">
                     {weiToEtherString(
-                      `${detail.salesRevenue.toNumber() * 0.2}`,
+                      `${detail.salesRevenue.mul(2).div(10)}`,
                     ) || '--'}
                   </Text>
                 </Flex>
@@ -435,7 +439,7 @@ const Details = () => {
                   lineHeight="36px"
                   color="#00DAB3"
                   fontWeight={700}>
-                  {memoPercent || '--'}
+                  {memoPercent || '--'}%
                 </Text>
                 <Text ml="8px" color="#fff" fontSize="16px" lineHeight="24px">
                   {' '}

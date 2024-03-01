@@ -51,11 +51,19 @@ export default function Main() {
     return Array.from({ length: len }, (_) => {
       const clonedItem = { ...list[0] }
       delete clonedItem.id 
-      
+      const imageUrls = [
+        'https://i.seadn.io/s/raw/files/1c27508d0d3016e1d18e63b81c861c81.png?auto=format&dpr=1&w=1000',
+        'https://i.seadn.io/gcs/files/1877dff2c72f4e338d7c1200c925e718.png?auto=format&dpr=1&w=1000',
+        'https://i.seadn.io/gcs/files/bff9ff793f644326c6bb8891803d1fbd.png?auto=format&dpr=1&w=1000',
+        'https://i.seadn.io/s/raw/files/7c50c8ce58d8976aaf8d9097a5568e20.png?auto=format&dpr=1&w=1000',
+        'https://i.seadn.io/s/raw/files/f404c42f90ab3d63d5f7d43eeb97d583.png?auto=format&dpr=1&w=1000',
+        'https://i.seadn.io/s/raw/files/3bf515fc55478ba57bf56ada5a02031a.png?auto=format&dpr=1&w=1000'
+      ]
       return {
         ...clonedItem,
         endTime: generateTimestamp(),
-        startTimestamp: generateTimestamp()
+        startTimestamp: generateTimestamp(),
+        nftImage: imageUrls[faker.number.int({ min: 0, max: 5 })]
       }
     })
   }
