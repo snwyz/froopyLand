@@ -24,6 +24,7 @@ import FroopyABI from 'packages/abis/demo/FroopyLand.json'
 import { toastSuccess } from '@utils/toast'
 import useStore from 'packages/store'
 import { ellipseAddress, weiToEtherString } from '@utils'
+import { faker } from '@faker-js/faker'
 
 
 export enum State {
@@ -32,24 +33,40 @@ export enum State {
   Finished = 2,
 }
 
+const COUNT = faker.number.int({ min: 101, max: 1000 })
+
+
 const Details = () => {
   const router = useRouter()
   const { gameList, setGameList } = useFomoStore()
   
-  const { pool: id } = router.query
+  const { pool: id, state } = router.query
   const { address } = useStore()
   const [claims, setClaims] = useState(0)
   const [keys, setKeys] = useState(0)
   const [claimLoading, setClaimLoading] = useState(false)
   const [buyLoading, setBuyLoading] = useState(false)
 
+
   useEffect(() => {
     fetchGameState()
   }, [id, gameList, router.query])
 
-  const detail = useMemo(() => gameList[`${id}`], [id, gameList])
+  const detail = useMemo(() => {
+    if (Number(id) > 5) {
+      return gameList.find(item => item?.isClone && item.state == state)
+    }
+    
+    return gameList.find(item => item.id == id)
+  }, [id, gameList])
 
   const fetchGameState = async () => {
+
+    if (detail?.isClone) {
+      setKeys(COUNT)
+      return
+    }
+
     const provider = await web3Modal.connect()
     const library = new ethers.providers.Web3Provider(provider)
     const signer = library.getSigner()
@@ -68,7 +85,7 @@ const Details = () => {
   const memoPercent = useMemo(() => {
     if (!detail?.totalKeyMinted || keys === 0) return 0
   
-    const percentage = (keys / detail.totalKeyMinted.toNumber()) * 100
+    const percentage = (keys / (detail.isClone ? COUNT : detail.totalKeyMinted.toNumber())) * 100
     const formattedPercent = Number(percentage.toFixed(2)).toString().replace(/(\.\d*?[1-9])0+$|\.0*$/, '$1')
   
     return formattedPercent
@@ -83,6 +100,7 @@ const Details = () => {
   const time = useCountDown(localTimeFormatted)
 
   const buyKey = async () => {
+    if (detail.isClone) return
     const provider = await web3Modal.connect()
     const library = new ethers.providers.Web3Provider(provider)
     const signer = library.getSigner()
@@ -104,6 +122,7 @@ const Details = () => {
   }
 
   const claim = async () => {
+    if (detail.isClone) return
     const provider = await web3Modal.connect()
     const library = new ethers.providers.Web3Provider(provider)
     const signer = library.getSigner()
@@ -139,8 +158,8 @@ const Details = () => {
 
 
   if (!detail) return null
-  
 
+  
   return (
     <>
       <Flex
@@ -300,7 +319,7 @@ const Details = () => {
                   color="#00DAB3"
                   fontSize="40px"
                   lineHeight="60px">
-                  {detail.totalKeyMinted.toString() || '--'}
+                  {detail.isClone ? COUNT : detail.totalKeyMinted.toString() || '--'}
                 </Text>
                 <Text fontWeight={700} fontSize="16px" lineHeight="24px">
                   KEYS
@@ -328,7 +347,7 @@ const Details = () => {
                     color="#00DAB3"
                     fontSize="40px"
                     lineHeight="60px">
-                    {weiToEtherString(detail.salesRevenue.toString()) || '--'}
+                    {detail.isClone ? (COUNT * 0.001).toFixed(3) : weiToEtherString(detail.salesRevenue.toString()) || '--'}
                   </Text>
                 </Flex>
                 <Text
@@ -362,7 +381,7 @@ const Details = () => {
                     color="#00DAB3"
                     fontSize="40px"
                     lineHeight="60px">
-                    {weiToEtherString(
+                    {detail.isClone ? (COUNT * 0.001 * 0.2).toFixed(5) : weiToEtherString(
                       `${detail.salesRevenue.mul(2).div(10)}`,
                     ) || '--'}
                   </Text>
@@ -386,7 +405,7 @@ const Details = () => {
               </Box>
               <Flex mt="20px">
                 <Text color="#00DAB3" fontSize="16px" lineHeight="20px">
-                  {ellipseAddress(address)}
+                  {ellipseAddress(detail.lastPlayer)}
                 </Text>
               </Flex>
             </Flex>
@@ -499,7 +518,7 @@ const Details = () => {
               <Text fontSize="16px" lineHeight="24px">
                 Total：
                 <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
-                  {weiToEtherString(detail.salesRevenue.toString()) || '--'}
+                  {detail.isClone ? (COUNT * 0.001*0.2).toFixed(3): weiToEtherString(detail.salesRevenue.toString()) || '--'}
                 </span>
                 ETH
               </Text>
@@ -575,7 +594,7 @@ const Details = () => {
                   <Text fontSize="16px" lineHeight="24px">
                     Total：
                     <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
-                      100
+                      {(COUNT * 0.001 * 0.2).toFixed(3) }
                     </span>
                     ETH
                   </Text>

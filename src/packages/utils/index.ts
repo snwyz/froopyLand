@@ -24,9 +24,9 @@ export function timeFromNow(end: Moment, withoutSuffix = true) {
   return moment(end).fromNow(withoutSuffix)
 }
 
-export function weiToEtherString(wei: string) {
+export function weiToEtherString(wei: string, unit?: string) {
   const roundUpDigits = 3
-  const ether: any = Web3.utils.fromWei(wei, 'ether')
+  const ether: any = Web3.utils.fromWei(wei, 'Gwei')
   const roundedEther =
     Math.ceil(ether * Math.pow(10, roundUpDigits)) /
     (Math.pow(10, roundUpDigits) * 1.0)

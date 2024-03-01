@@ -23,6 +23,21 @@ interface Item {
 // const ListItems = lazy(() => import('@components/ListItems'))
 
 
+export const generateTimestamp = () => {
+  const randomDays = faker.number.int({ min: 1, max: 9 }) // 生成 1 到 9 之间的随机整数
+  const randomHours = faker.number.int({ min: 0, max: 23 }) // 生成 0 到 23 之间的随机整数
+  const randomMinutes = faker.number.int({ min: 0, max: 59 }) // 生成 0 到 59 之间的随机整数
+  const randomSeconds = faker.number.int({ min: 0, max: 59 }) // 生成 0 到 59 之间的随机整数
+
+  const futureDate = moment()
+    .add(randomDays, 'days')
+    .hour(randomHours)
+    .minute(randomMinutes)
+    .second(randomSeconds)
+
+  return futureDate.valueOf() / 1000 // 将毫秒级时间戳转换为秒级时间戳
+}
+
 
 export default function Main() {
 
@@ -32,22 +47,6 @@ export default function Main() {
 
   const { gameList } = useFomoStore()
 
-
-  const generateTimestamp = () => {
-    const randomDays = faker.number.int({ min: 1, max: 9 }) // 生成 1 到 9 之间的随机整数
-    const randomHours = faker.number.int({ min: 0, max: 23 }) // 生成 0 到 23 之间的随机整数
-    const randomMinutes = faker.number.int({ min: 0, max: 59 }) // 生成 0 到 59 之间的随机整数
-    const randomSeconds = faker.number.int({ min: 0, max: 59 }) // 生成 0 到 59 之间的随机整数
-  
-    const futureDate = moment()
-      .add(randomDays, 'days')
-      .hour(randomHours)
-      .minute(randomMinutes)
-      .second(randomSeconds)
-  
-    return futureDate.valueOf() / 1000 // 将毫秒级时间戳转换为秒级时间戳
-  }
-
   const generateMockData = (list) => {
     const num = 6
     const len = num - list.length
@@ -55,6 +54,7 @@ export default function Main() {
     return Array.from({ length: len }, (_) => {
       const clonedItem = { ...list[0] }
       delete clonedItem.id 
+      delete clonedItem.state
       const imageUrls = [
         'https://i.seadn.io/s/raw/files/1c27508d0d3016e1d18e63b81c861c81.png?auto=format&dpr=1&w=1000',
         'https://i.seadn.io/gcs/files/1877dff2c72f4e338d7c1200c925e718.png?auto=format&dpr=1&w=1000',
@@ -63,10 +63,14 @@ export default function Main() {
         'https://i.seadn.io/s/raw/files/f404c42f90ab3d63d5f7d43eeb97d583.png?auto=format&dpr=1&w=1000',
         'https://i.seadn.io/s/raw/files/3bf515fc55478ba57bf56ada5a02031a.png?auto=format&dpr=1&w=1000'
       ]
+      
       return {
         ...clonedItem,
+        id: 0,
         endTime: generateTimestamp(),
         startTimestamp: generateTimestamp(),
+        isClone: true,
+        nftName: faker.internet.userName() + '-F',
         nftImage: imageUrls[faker.number.int({ min: 0, max: 5 })]
       }
     })

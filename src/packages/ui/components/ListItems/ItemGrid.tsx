@@ -15,15 +15,18 @@ import {
 } from '@chakra-ui/react'
 import ApproveLicenseContractModal from '@modules/Modals/ApproveLicenseContractModal'
 
-import { ellipseAddress } from '@utils'
+import { ellipseAddress, weiToEtherString } from '@utils'
 
 import { PathnameType } from '@ts'
 
 import { myNFTUnlicensedData } from './FakeData'
-import { toastWarning } from '@utils/toast'
 import { State } from '@modules/Detail'
 import moment from 'moment'
 import useCountDown from '@hooks/useCountDown'
+import { faker } from '@faker-js/faker'
+
+const COUNT = faker.number.int({ min: 101, max: 1000 })
+
 
 function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
   const router = useRouter()
@@ -63,15 +66,15 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
       return <>Finished</>
     }
   }
-  
+
+  const [bidder, setBidder] = useState(faker.number.int({ min: 1, max: 20 }))
   
   if (pathname === PathnameType.MARKET) {
     return (
       <Box
         cursor="pointer"
         onClickCapture={() => {
-          if (!item.id) return toastWarning('under development')
-          router.push(`/${item.id}`)
+          router.push(`/${item.id}?state=${item.state}`)
         }}
         border="1px solid #704BEA"
         borderRadius="20px"
@@ -112,7 +115,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
                 borderRadius="20px"
                 bgColor="rgba(255, 255, 255, 0.5)">
                 <Text fontSize="12px" color="#2A0668">
-                      106 Bidders
+                {bidder} Bidders
                 </Text>
               </Flex>
             )
@@ -164,7 +167,9 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
                 fontWeight={900}
                 fontSize={{ base: '14px', md: '14px' }}
                 color="#00DAB3">
-                5 ETH
+                {item.isClone ? (COUNT * 0.001 * 0.2).toFixed(3) : weiToEtherString(
+                      `${item.salesRevenue.mul(2).div(10)}`,
+                    ) || '--'} ETH
               </Box>
             </Flex>
           </Flex>

@@ -3,6 +3,7 @@ import { ethers } from 'ethers'
 import create from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import FroopyABI from 'packages/abis/demo/FroopyLand.json'
+import { generateTimestamp } from '@modules/Market/Main'
 
 
 interface IState {
@@ -54,10 +55,47 @@ const useFomoStore = create(immer<IState>(((set) => ({
               })
             }
           }
+
+          const generateMockData = (list, state) => {
+            const num = 6
+            const len = num - list.length
+            if (len <= 0) return []
+            return Array.from({ length: len }, (_) => {
+              const clonedItem = { ...list[0] }
+              delete clonedItem.state
+              delete clonedItem.id
+              // const total = faker.number.int({ min: 100, max: 500 })
+
+              // const totalKeyMinted = ethers.BigNumber.from(total.toString())
+              // const salesRevenue = totalKeyMinted.mul(clonedItem.price)
+              return {
+                ...clonedItem,
+                id: faker.number.int(),
+                endTime: generateTimestamp(),
+                startTimestamp: generateTimestamp(),
+                isClone: true,
+                state,
+                nftName: faker.internet.userName() + '-F',
+                nftImage: imageUrls[faker.number.int({ min: 0, max: 5 })]
+              }
+            })
+          }
+        
+          const renderList = () => {
+            const upcomingList = gameList.filter(v => v.state === 0)
+            const ongoingList = gameList.filter(v => v.state === 1)
+            const finishedList = gameList.filter(v => v.state === 2)
+
+            return [
+              ...upcomingList.concat(generateMockData(upcomingList, 0)), 
+              ...ongoingList.concat(generateMockData(ongoingList, 1)), 
+              ...finishedList.concat(generateMockData(finishedList, 2))
+            ]
+          }
+          const data = renderList()
           set({
-            gameList
+            gameList: data,
           })
-          console.log(gameList, '<===59')
         } catch (error) {
           console.error('Error initializing contract:', error.message)
         }
