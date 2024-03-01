@@ -13,7 +13,7 @@ export default function NoData() {
         textAlign="center"
         mt="10px"
       >
-        Empty data
+        Loading data...
       </Text>
     </Box>
   )

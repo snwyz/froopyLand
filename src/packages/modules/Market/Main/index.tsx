@@ -1,10 +1,11 @@
-import { lazy, useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 
-import { Box, Image, Button, Text, Flex, SimpleGrid } from '@chakra-ui/react'
+import { Box, Image, Button, Text, Flex, SimpleGrid, Spinner } from '@chakra-ui/react'
 import ItemGrid from 'packages/ui/components/ListItems/ItemGrid'
 // import { sleep } from '@utils'
 
 import useFomoStore from 'packages/store/fomo'
+import NoData from '@components/NoData'
 
 interface Item {
   derivativeContractAddress: string
@@ -16,25 +17,12 @@ interface Item {
   currentHighestOffer: string
 }
 
-const ListItems = lazy(() => import('@components/ListItems'))
+// const ListItems = lazy(() => import('@components/ListItems'))
 
 
-export const iData = [
-  {
-    derivativeContractAddress: '0x7bfd9a55f4c00783b5a8ea18f7735e1a405dd520',
-    originalContractAddress: 'string',
-    name: 'NNNNN',
-    image: 'https://api.our-metaverse.xyz/ourms/4_pnghash_a660da5ab5d19878015e8a5f7a7da3c196b834eb50ac65a62f1dbf339cd96ef5_73222158.webp',
-    startTime: '10:29',
-    state: 'Active',
-    currentHighestOffer: '2000',
-    owner: 'Xxxx',
-    id: 999
-  }
-]
 
 export default function Main() {
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+
   const [upcomingList, setUpcomingList] = useState([])
   const [ongoingList, setOngoingList] = useState([])
   const [finishedList, setFinishedList] = useState([])
@@ -42,15 +30,29 @@ export default function Main() {
   const { gameList } = useFomoStore()
   // upcoming 0 ongoingList 1 finishedList 2
 
+
+
+  const generateMockData = (list, len) => {
+    return Array.from({ length: len }, (_) => {
+      const clonedItem = { ...list[0] }
+      delete clonedItem.id 
+      return {
+        ...clonedItem,
+      }
+    })
+  }
+
   const renderList = () => {
     const upcomingList = gameList.filter(v => v.state === 0)
     const ongoingList = gameList.filter(v => v.state === 1)
     const finishedList = gameList.filter(v => v.state === 2)
     
-    setUpcomingList(upcomingList)
-    setOngoingList(ongoingList)
-    setFinishedList(finishedList)
+    setUpcomingList(upcomingList.concat(generateMockData(upcomingList, 4)))
+    setOngoingList(ongoingList.concat(generateMockData(ongoingList, 5)))
+    setFinishedList(finishedList.concat(generateMockData(finishedList, 3)))
   }
+
+
 
   useEffect(() => {
     renderList()
@@ -77,6 +79,60 @@ export default function Main() {
   //   },
   // ]
 
+  const RenderList = () => {
+    if (gameList.length === 0) return <NoData />
+    return (
+      <>
+        <Box padding='0 42px' marginTop="90px">
+          <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Ongoing Auctions</Text>({ongoingList.length})</Flex>
+          <Box h='1px' backgroundColor="rgba(112, 75, 234, 0.5)"></Box>
+        </Box>
+        <Box padding='0 42px'>
+          <SimpleGrid
+            mt='20px'
+            columns={[1, 2, 3, 4, 5, 6]}
+            spacing="20px">
+            {ongoingList?.map((item, idx) => {
+              return <ItemGrid gridName='ongoingList' item={item} key={idx} />
+            })}
+          </SimpleGrid>
+        </Box>
+  
+        <Box padding='0 42px' marginTop="55px">
+          <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Upcoming Auctions</Text>({upcomingList.length}) - Queuing</Flex>
+          <Box h='1px' backgroundColor="rgba(112, 75, 234, 0.5)"></Box>
+        </Box>
+        <Box padding='0 42px'>
+          <SimpleGrid
+            mt='20px'
+            columns={[1, 2, 3, 4, 5, 6]}
+            spacing="20px">
+            {upcomingList?.map((item, idx) => {
+              return <ItemGrid gridName='upcomingList' item={item} key={idx} />
+            })}
+          </SimpleGrid>
+        </Box>
+  
+        <Box padding='0 42px' marginTop="55px">
+          <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Finished Auctions</Text>({finishedList.length})</Flex>
+          <Box h='1px' backgroundColor="rgba(112, 75, 234, 0.5)"></Box>
+        </Box>
+        <Box padding='0 42px'>
+          <SimpleGrid
+            mt='20px'
+            columns={[1, 2, 3, 4, 5, 6]}
+            spacing="20px">
+            {finishedList?.map((item, idx) => {
+              return <ItemGrid gridName='finishedList' item={item} key={idx} />
+            })}
+          </SimpleGrid>
+        </Box>
+      </>
+    )
+  }
+  
+
+
   return (
     <Box alignItems="center" mb="50px">
       <Box padding='0 42px' height='514px' position='relative'>
@@ -90,52 +146,7 @@ export default function Main() {
         </Box>
       </Box>
       <Box h='1px' backgroundColor="rgba(112, 75, 234, 0.5)"></Box>
-
-      <Box padding='0 42px' marginTop="90px">
-        <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Ongoing Auctions</Text>({ongoingList.length})</Flex>
-        <Box h='1px' backgroundColor="rgba(112, 75, 234, 0.5)"></Box>
-      </Box>
-      <Box padding='0 42px'>
-        <SimpleGrid
-          mt='20px'
-          columns={[1, 2, 3, 4, 5, 6]}
-          spacing="20px">
-          {ongoingList?.map((item, idx) => {
-            return <ItemGrid gridName='ongoingList' item={item} key={idx} />
-          })}
-        </SimpleGrid>
-      </Box>
-
-      <Box padding='0 42px' marginTop="55px">
-        <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Upcoming Auctions</Text>({upcomingList.length}) - Queuing</Flex>
-        <Box h='1px' backgroundColor="rgba(112, 75, 234, 0.5)"></Box>
-      </Box>
-      <Box padding='0 42px'>
-        <SimpleGrid
-          mt='20px'
-          columns={[1, 2, 3, 4, 5, 6]}
-          spacing="20px">
-          {upcomingList?.map((item, idx) => {
-            return <ItemGrid gridName='upcomingList' item={item} key={idx} />
-          })}
-        </SimpleGrid>
-      </Box>
-
-      <Box padding='0 42px' marginTop="55px">
-        <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Finished Auctions</Text>({finishedList.length})</Flex>
-        <Box h='1px' backgroundColor="rgba(112, 75, 234, 0.5)"></Box>
-      </Box>
-      <Box padding='0 42px'>
-        <SimpleGrid
-          mt='20px'
-          columns={[1, 2, 3, 4, 5, 6]}
-          spacing="20px">
-          {finishedList?.map((item, idx) => {
-            return <ItemGrid gridName='finishedList' item={item} key={idx} />
-          })}
-        </SimpleGrid>
-      </Box>
-      {/* <Suspense
+      <Suspense
         fallback={
           <Box mt="300px">
             <Spinner
@@ -147,12 +158,8 @@ export default function Main() {
             />
           </Box>
         }>
-        <TabsCommon
-          variant="mainTabs"
-          initTab={MarketTabs.PUBLIC}
-          renderTabs={renderTabs}
-        />
-      </Suspense> */}
+        <RenderList />
+      </Suspense>
     </Box>
   )
 }

@@ -20,6 +20,7 @@ import { ellipseAddress } from '@utils'
 import { PathnameType } from '@ts'
 
 import { myNFTUnlicensedData } from './FakeData'
+import { toastWarning } from '@utils/toast'
 
 function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
   const router = useRouter()
@@ -37,13 +38,15 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
     onOpenApproveLicenseContractModal()
   }
 
-  console.log(item, '<==')
   
   if (pathname === PathnameType.MARKET) {
     return (
       <Box
         cursor="pointer"
-        onClickCapture={() => router.push(`/${item.id}`)}
+        onClickCapture={() => {
+          if (!item.id) return toastWarning('under development')
+          router.push(`/${item.id}`)
+        }}
         border="1px solid #704BEA"
         borderRadius="20px"
         p="10px"
