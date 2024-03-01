@@ -5,7 +5,6 @@ import {
   initializeAlchemy,
   Network,
 } from '@alch/alchemy-sdk'
-import WalletConnectProvider from '@walletconnect/web3-provider'
 import { Alchemy } from 'alchemy-sdk'
 import axios from 'axios'
 import { ethers } from 'ethers'
@@ -21,7 +20,7 @@ import {
   generateTimeString,
   sleep,
 } from 'packages/utils'
-import Web3Modal from 'web3modal'
+import Web3Modal, { IProviderOptions } from 'web3modal'
 
 import { NftDeployInfoType } from '@ts'
 
@@ -49,13 +48,20 @@ export const WeiToEther = (weiValue) =>
 export const EtherToWei = (ethers) => web3.utils.toWei(String(ethers), 'ether')
 export const hexToDecimal = (hex) => parseInt(hex, 16)
 
-export const providerOptions = {
-  walletconnect: {
-    package: WalletConnectProvider, // required
-    options: {
-      infuraId: INFURA_KEY, // required
+export const providerOptions: Partial<IProviderOptions> = {
+  injected: {
+    display: {
+      logo: 'https://metamask.io/img/metamask-fox.svg',
+      name: 'MetaMask',
     },
+    package: 'metamask',
   },
+  // walletconnect: {
+  //   package: WalletConnectProvider, // required
+  //   options: {
+  //     infuraId: INFURA_KEY, // required
+  //   },
+  // },
   // 'custom-walletlink': {
   //   display: {
   //     logo: 'https://play-lh.googleusercontent.com/PjoJoG27miSglVBXoXrxBSLveV6e3EeBPpNY55aiUUBM9Q1RCETKCOqdOkX2ZydqVf0',
