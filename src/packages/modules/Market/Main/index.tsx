@@ -8,6 +8,7 @@ import useFomoStore from 'packages/store/fomo'
 import NoData from '@components/NoData'
 import { faker } from '@faker-js/faker'
 import moment from 'moment'
+import { toastWarning } from '@utils/toast'
 
 interface Item {
   derivativeContractAddress: string
@@ -47,7 +48,10 @@ export default function Main() {
     return futureDate.valueOf() / 1000 // 将毫秒级时间戳转换为秒级时间戳
   }
 
-  const generateMockData = (list, len) => {
+  const generateMockData = (list) => {
+    const num = 6
+    const len = num - list.length
+    if (len <= 0) return []
     return Array.from({ length: len }, (_) => {
       const clonedItem = { ...list[0] }
       delete clonedItem.id 
@@ -73,9 +77,9 @@ export default function Main() {
     const ongoingList = gameList.filter(v => v.state === 1)
     const finishedList = gameList.filter(v => v.state === 2)
     
-    setUpcomingList(upcomingList.concat(generateMockData(upcomingList, 4)))
-    setOngoingList(ongoingList.concat(generateMockData(ongoingList, 5)))
-    setFinishedList(finishedList.concat(generateMockData(finishedList, 3)))
+    setUpcomingList(upcomingList.concat(generateMockData(upcomingList)))
+    setOngoingList(ongoingList.concat(generateMockData(ongoingList)))
+    setFinishedList(finishedList.concat(generateMockData(finishedList)))
   }
 
 
@@ -166,7 +170,7 @@ export default function Main() {
           <Box mt='60px'>
             <Image marginBottom='40px' objectFit='cover' src='./static/market/slogen.png' alt="slogen" w={{ base: '1118px'  }} height="171px" />
             <Image marginBottom='54px' objectFit='cover' src='./static/market/price-list.png' alt="logo" w='1034px' h='123px' />
-            <Button fontSize='24px' fontWeight='bold' w="280px" color='#000' h='66px' backgroundColor='#00DAB3'>Start a Auction</Button>
+            <Button fontSize='24px' fontWeight='bold' w="280px" color='#000' h='66px' backgroundColor='#00DAB3' onClick={() => toastWarning('under development')}>Start a Auction</Button>
           </Box>
           <Image position='absolute' top={0} right='42px' objectFit='cover' src='./static/market/bg-logo.png' alt="logo" w='630px' h='490px' />
         </Box>
