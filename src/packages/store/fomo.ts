@@ -64,9 +64,9 @@ const useFomoStore = create(immer<IState>(((set) => ({
               const clonedItem = { ...list[0] }
               delete clonedItem.state
               delete clonedItem.id
-              // const total = faker.number.int({ min: 100, max: 500 })
+              const total = faker.number.int({ min: 100, max: 500 })
 
-              // const totalKeyMinted = ethers.BigNumber.from(total.toString())
+              const totalKeyMinted = ethers.BigNumber.from(total.toString())
               // const salesRevenue = totalKeyMinted.mul(clonedItem.price)
               return {
                 ...clonedItem,
@@ -74,6 +74,7 @@ const useFomoStore = create(immer<IState>(((set) => ({
                 endTime: generateTimestamp(),
                 startTimestamp: generateTimestamp(),
                 isClone: true,
+                totalKeyMinted,
                 state,
                 nftName: faker.internet.userName() + '-F',
                 nftImage: imageUrls[faker.number.int({ min: 0, max: 5 })]
