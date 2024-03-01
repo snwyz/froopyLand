@@ -6,6 +6,8 @@ import ItemGrid from 'packages/ui/components/ListItems/ItemGrid'
 
 import useFomoStore from 'packages/store/fomo'
 import NoData from '@components/NoData'
+import { faker } from '@faker-js/faker'
+import moment from 'moment'
 
 interface Item {
   derivativeContractAddress: string
@@ -28,16 +30,32 @@ export default function Main() {
   const [finishedList, setFinishedList] = useState([])
 
   const { gameList } = useFomoStore()
-  // upcoming 0 ongoingList 1 finishedList 2
 
 
+  const generateTimestamp = () => {
+    const randomDays = faker.number.int({ min: 1, max: 9 }) // 生成 1 到 9 之间的随机整数
+    const randomHours = faker.number.int({ min: 0, max: 23 }) // 生成 0 到 23 之间的随机整数
+    const randomMinutes = faker.number.int({ min: 0, max: 59 }) // 生成 0 到 59 之间的随机整数
+    const randomSeconds = faker.number.int({ min: 0, max: 59 }) // 生成 0 到 59 之间的随机整数
+  
+    const futureDate = moment()
+      .add(randomDays, 'days')
+      .hour(randomHours)
+      .minute(randomMinutes)
+      .second(randomSeconds)
+  
+    return futureDate.valueOf() / 1000 // 将毫秒级时间戳转换为秒级时间戳
+  }
 
   const generateMockData = (list, len) => {
     return Array.from({ length: len }, (_) => {
       const clonedItem = { ...list[0] }
       delete clonedItem.id 
+      
       return {
         ...clonedItem,
+        endTime: generateTimestamp(),
+        startTimestamp: generateTimestamp()
       }
     })
   }
@@ -79,7 +97,7 @@ export default function Main() {
   //   },
   // ]
 
-  const RenderList = () => {
+  const List = () => {
     if (gameList.length === 0) return <NoData />
     return (
       <>
@@ -158,7 +176,7 @@ export default function Main() {
             />
           </Box>
         }>
-        <RenderList />
+        <List />
       </Suspense>
     </Box>
   )

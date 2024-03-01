@@ -43,7 +43,8 @@ const useFomoStore = create(immer<IState>(((set) => ({
                 nftImage: imageUrls[id],
                 nftName: faker.internet.userName(),
                 state,
-                endTime: endTime.toNumber()
+                endTime: endTime.toNumber(),
+                startTimestamp: tx.startTimestamp.toNumber()
               })
             } catch (error) {
               console.error(`Error fetching data for game ID ${id}:`, error)

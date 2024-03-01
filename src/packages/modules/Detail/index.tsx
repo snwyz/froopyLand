@@ -72,7 +72,7 @@ const Details = () => {
 
   const localTimeFormatted = useMemo(() => {
     if (!detail) return null
-    const date =  detail.state === State.Upcoming ? detail['startTimestamp'].toNumber() : detail['endTime']
+    const date =  detail.state === State.Upcoming ? detail['startTimestamp'] : detail['endTime']
     return moment(date*1000).format('YYYY-MM-DD HH:mm:ss')
   }, [detail])
 
@@ -196,8 +196,8 @@ const Details = () => {
             <Flex alignItems="center">
               <Text className={styles.name}>Auction Duration：</Text>
               <Text fontWeight={600}>
-                {moment(detail.startTimestamp.toNumber() * 1000).format('hA')}{' '}
-                {moment(detail.startTimestamp.toNumber() * 1000).format(
+                {moment(detail.startTimestamp * 1000).format('hA')}{' '}
+                {moment(detail.startTimestamp * 1000).format(
                   'MMM DD',
                 )}{' '}
                 - {moment(detail.endTime * 1000).format('hA')}{' '}

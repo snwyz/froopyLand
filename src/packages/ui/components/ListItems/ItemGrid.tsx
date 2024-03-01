@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
@@ -21,6 +21,9 @@ import { PathnameType } from '@ts'
 
 import { myNFTUnlicensedData } from './FakeData'
 import { toastWarning } from '@utils/toast'
+import { State } from '@modules/Detail'
+import moment from 'moment'
+import useCountDown from '@hooks/useCountDown'
 
 function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
   const router = useRouter()
@@ -38,6 +41,29 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
     onOpenApproveLicenseContractModal()
   }
 
+
+  const localTimeFormatted = useMemo(() => {
+    const date =  item.state === State.Upcoming ? item['startTimestamp'] : item['endTime']
+    return moment(date*1000).format('YYYY-MM-DD HH:mm:ss')
+  }, [item])
+
+  const time = useCountDown(localTimeFormatted)
+
+  const RenderCount = () => {
+    const formattedTime = useMemo(() => {
+      const timeString = `${time.days > 0 ? `${time.days}days ` : ''}${time.hours > 0 ? `${time.hours}hrs ` : ''}${time.minutes}mins ${time.seconds}secs`
+      return `${timeString}`.trim()
+    }, [time])
+  
+    if (item.state === State.Upcoming) {
+      return <span>Start in {formattedTime}</span>
+    } else if (item.state === State.Ongoing) {
+      return <span>End in {formattedTime}</span>
+    } else {
+      return <>Finished</>
+    }
+  }
+  
   
   if (pathname === PathnameType.MARKET) {
     return (
@@ -69,9 +95,10 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
           left="16px"
           bgColor={gridName === 'ongoingList' ? '#00DAB3' : 'rgba(255, 255, 255, 0.5)'}>
           <Text fontSize="12px" fontWeight={600} color="#2A0668">
-          {
+            <RenderCount></RenderCount>
+          {/* {
             gridName === 'upcomingList' ? 'Start in 23 hr 29 min 34 sec' : gridName === 'ongoingList' ? 'Ends in 29 min 34 sec' : 'Finished'
-          }
+          } */}
           </Text>
         </Flex>
         {
@@ -119,7 +146,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
                 fontWeight={900}
                 fontSize={{ base: '14px', md: '14px' }}
                 color="#00DAB3">
-                {item.totalKeyMinted.toString()}
+                {item?.totalKeyMinted?.toNumber() || '--'}
               </Box>
             </Flex>
             <Flex flexDir="column">
