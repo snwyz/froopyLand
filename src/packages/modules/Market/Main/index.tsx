@@ -70,7 +70,7 @@ export default function Main() {
         endTime: generateTimestamp(),
         startTimestamp: generateTimestamp(),
         isClone: true,
-        nftName: faker.internet.userName() + '-F',
+        nftName: faker.internet.userName() + '-' + faker.number.int({ min: 1, max: 100 }),
         nftImage: imageUrls[faker.number.int({ min: 0, max: 5 })]
       }
     })
