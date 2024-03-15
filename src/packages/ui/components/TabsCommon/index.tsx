@@ -3,7 +3,6 @@ import { memo, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 
 import { Flex, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
-import GridAndList from '@components/GridAndList'
 
 
 type RenderTabsType = {
@@ -48,13 +47,13 @@ function TabsCommon({
     if (renderTabs.length > 1) {
       const selectedTab = renderTabs[index]?.value || initTab
       setSelectedTab(selectedTab)
-      if (index === 0) {
-        router.push(`?tab=${initTab}`, undefined, {
-          shallow: true,
-        })
-      } else {
-        router.push(`?tab=${selectedTab}`, undefined, { shallow: true })
-      }
+      // if (index === 0) {
+      //   router.push(`?tab=${initTab}`, undefined, {
+      //     shallow: true,
+      //   })
+      // } else {
+      //   router.push(`?tab=${selectedTab}`, undefined, { shallow: true })
+      // }
     }
   }
 
@@ -64,13 +63,13 @@ function TabsCommon({
       index={renderTabs.findIndex((it) => it.value === selectedTab)}
       onChange={onChangeTab}>
       <TabList
-        px={{ base: '20px', md: '30px' }}
-        pt="20px"
         sx={{
           scrollbarWidth: 'none',
+          borderColor: '#704BEA80',
+          color: 'rgba(255,255,255, .8)',
           '::-webkit-scrollbar': {
             display: 'none',
-          },
+          }
         }}>
         <Flex w="100%" justify="space-between" align="center">
           <Flex align="center" gap="10px">
@@ -80,6 +79,7 @@ function TabsCommon({
                 px={0}
                 key={item.title}
                 whiteSpace="nowrap"
+                _selected={{ color: '#fff', borderBottomColor: '#fff' }}
                 fontSize={
                   fontSizeTable
                     ? { base: '12px', md: '12px' }
@@ -89,7 +89,7 @@ function TabsCommon({
               </Tab>
             ))}
           </Flex>
-          {!checkAccountPage && gridAndListMode && <GridAndList />}
+          {/* {!checkAccountPage && gridAndListMode && <GridAndList />} */}
         </Flex>
       </TabList>
 

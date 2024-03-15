@@ -46,7 +46,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
 
 
   const localTimeFormatted = useMemo(() => {
-    const date =  item.state === State.Upcoming ? item['startTimestamp'] : item['endTime']
+    const date =  item?.state === State.Upcoming ? item?.['startTimestamp'] : item?.['endTime']
     return moment(date*1000).format('YYYY-MM-DD HH:mm:ss')
   }, [item])
 
@@ -358,28 +358,110 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
     )
   }
   return (
-    <Box border="1px solid #704BEA" borderRadius="20px" p="10px">
-      <AspectRatio ratio={1 / 1}>
-        <Box borderRadius="15px">
-          <Image
-            alt=""
-            src="/static/fake/detail.svg"
-            w="100%"
-            objectFit="cover"
-            fallbackSrc="/static/license-template/template.png"
-          />
-        </Box>
-      </AspectRatio>
-      <Box ml="4px" mt="12px">
-        <Box fontWeight="700" fontSize="14px">
-          My Little Piggie 1777
-        </Box>
-        <Flex fontSize="12px" fontWeight="400">
-          <Box>Owner :</Box>
-          <Box>0xd2...d04kf0a</Box>
-        </Flex>
+    <Box
+    cursor="pointer"
+    onClickCapture={() => {
+      router.push(`/${item.id}?state=${item.state}`)
+    }}
+    border="1px solid #704BEA"
+    borderRadius="20px"
+    p="10px"
+    position="relative">
+    <AspectRatio ratio={1 / 1}>
+      <Box className="image-effect">
+        <Image
+          borderRadius="15px"
+          alt=""
+          src={item.nftImage}
+          fallbackSrc="/static/license-template/template.png"
+        />
       </Box>
+    </AspectRatio>
+    <Flex
+      p="6px 12px"
+      borderRadius="20px"
+      position="absolute"
+      top="16px"
+      left="16px"
+      bgColor={gridName === 'ongoingList' ? '#00DAB3' : 'rgba(255, 255, 255, 0.5)'}>
+      <Text fontSize="12px" fontWeight={600} color="#2A0668">
+        <RenderCount></RenderCount>
+      {/* {
+        gridName === 'upcomingList' ? 'Start in 23 hr 29 min 34 sec' : gridName === 'ongoingList' ? 'Ends in 29 min 34 sec' : 'Finished'
+      } */}
+      </Text>
+    </Flex>
+    {
+        gridName !== 'upcomingList' && (
+          <Flex
+            position="absolute"
+            top="16px"
+            right="16px"
+            p="6px 12px"
+            gap="4px"
+            borderRadius="20px"
+            bgColor="rgba(255, 255, 255, 0.5)">
+            <Text fontSize="12px" color="#2A0668">
+            {bidder} Bidders
+            </Text>
+          </Flex>
+        )
+      }
+    
+    <Box m="16px 8px 0px 8px">
+      <Flex justifyContent="space-between" align="center">
+        <Box fontWeight="700" fontSize="14px" lineHeight="16px" m="0 0 6px">
+          {item.nftName}
+          {/* {item?.name?.length > 25
+            ? `${item?.name.substring(0, 25)}...`
+            : item?.name} */}
+        </Box>
+        {/* <Image cursor="pointer" alt="" src="./static/market/iconStar.svg" /> */}
+      </Flex>
+      <Flex
+        gap={{ base: '20px', md: '30px' }}
+        w={{ base: '100%', lg: '100%' }}>
+        <Flex flexDir="column">
+          <Box
+            w={{ lg: '100%' }}
+            fontSize="12px"
+            fontWeight="500"
+            lineHeight="18px"
+            color="#FFA8FE">
+            Total Keys Minted
+          </Box>
+          <Box
+            w={{ lg: '100%' }}
+            lineHeight="20px"
+            fontWeight={900}
+            fontSize={{ base: '14px', md: '14px' }}
+            color="#00DAB3">
+            {item.state === 0 ? '--' : item?.totalKeyMinted?.toNumber() || '--'}
+          </Box>
+        </Flex>
+        <Flex flexDir="column">
+          <Box
+            w={{ lg: '100%' }}
+            fontSize="12px"
+            fontWeight="500"
+            lineHeight="18px"
+            color="#FFA8FE">
+            Final Winner Prize
+          </Box>
+          <Box
+            w={{ lg: '100%' }}
+            lineHeight="20px"
+            fontWeight={900}
+            fontSize={{ base: '14px', md: '14px' }}
+            color="#00DAB3">
+            {item.state === 0 ? '--' : item.isClone ? (item?.totalKeyMinted?.toNumber() * 0.001 * 0.2).toFixed(3) : weiToEtherString(
+                  `${item.salesRevenue.mul(2).div(10)}`,
+                ) || '--'} ETH
+          </Box>
+        </Flex>
+      </Flex>
     </Box>
+  </Box>
   )
 }
 

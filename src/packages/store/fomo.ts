@@ -9,12 +9,18 @@ import { generateTimestamp } from '@modules/Market/Main'
 interface IState {
     loading: boolean
     gameList: any[]
+    upcomingList: any[]
+    ongoingList: any[]
+    finishedList: any[]
     setGameList: (web3Provider: ethers.providers.Web3Provider) => void
 }
 
 
 const useFomoStore = create(immer<IState>(((set) => ({
     gameList: [],
+    upcomingList: [],
+    ongoingList: [],
+    finishedList: [],
     loading: false,
     async setGameList (web3Provider: ethers.providers.Web3Provider) {
         try {
@@ -82,11 +88,11 @@ const useFomoStore = create(immer<IState>(((set) => ({
             })
           }
         
-          const renderList = () => {
-            const upcomingList = gameList.filter(v => v.state === 0)
-            const ongoingList = gameList.filter(v => v.state === 1)
-            const finishedList = gameList.filter(v => v.state === 2)
+          const upcomingList = gameList.filter(v => v.state === 0)
+          const ongoingList = gameList.filter(v => v.state === 1)
+          const finishedList = gameList.filter(v => v.state === 2)
 
+          const renderList = () => {
             return [
               ...upcomingList.concat(generateMockData(upcomingList, 0)), 
               ...ongoingList.concat(generateMockData(ongoingList, 1)), 
@@ -96,6 +102,9 @@ const useFomoStore = create(immer<IState>(((set) => ({
           const data = renderList()
           set({
             gameList: data,
+            upcomingList,
+            ongoingList,
+            finishedList,
           })
         } catch (error) {
           console.error('Error initializing contract:', error.message)

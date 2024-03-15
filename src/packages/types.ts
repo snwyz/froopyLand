@@ -301,3 +301,11 @@ export enum PathnameType {
   SELL = '/account/sell',
   MY_COLLECTION = '/account/my-collection',
 }
+
+
+export enum PathProfileType {
+  PROFILE = '/profile',
+  AUCTIONS = '/profile/auctions',
+  PARTICIPATION = '/profile/participation',
+
+}

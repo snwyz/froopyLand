@@ -63,6 +63,12 @@ const NAV_ITEMS_CONNECTED_DESKTOP: Array<NavItem> = [
     icon: '/static/header/gallery.svg',
     iconDark: '/static/header/gallery_dark.svg',
   },
+  {
+    label: 'My Profile',
+    href: '/profile',
+    icon: '/static/header/account.svg',
+    iconDark: '/static/header/account_dark.svg',
+  },
   // {
   //   label: 'My Account',
   //   icon: '/static/header/account.svg',
@@ -488,7 +494,13 @@ const DesktopNav = () => {
   const NAV_ITEMS = address
     ? NAV_ITEMS_CONNECTED_DESKTOP
     : NAV_ITEMS_DISCONNECTED
-
+    
+  const isSubPath = (pathname, href) => {
+    // 使用正则表达式构建匹配规则
+    const regex = new RegExp(`^${href}(\/|$)`)
+    // 使用 test() 方法检查 pathname 是否匹配规则
+    return regex.test(pathname)
+  }
   return (
     <Stack direction="row" spacing={4} align="center">
       {/* {colorMode === 'light' ? (
@@ -516,28 +528,11 @@ const DesktopNav = () => {
                 minW={navItem.label === 'My NFTs' ? '120px' : '120px'}
                 textAlign="center"
                 color={
-                  (pathname === navItem.href && navItem.label !== 'My NFTs') ||
-                    (navItem.children &&
-                      pathname.includes('/account') &&
-                      navItem.label !== 'My NFTs')
-                    ? '#00DAB3'
-                    : 'white'
+                  isSubPath(pathname, navItem.href) ? '#00DAB3': 'white'
                 }
                 lineHeight="64px"
                 paddingTop="3px">
-                {navItem.label === 'My NFTs' ? (
-                  <Flex
-                    borderRadius="25px"
-                    border="1px solid white"
-                    h="44px"
-                    px="20px"
-                    justify="center"
-                    align="center">
-                    {navItem.label}
-                  </Flex>
-                ) : (
-                  navItem.label
-                )}
+                {navItem.label}
               </Box>
             </PopoverTrigger>
 

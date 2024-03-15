@@ -35,6 +35,12 @@ const submitOffer = definePartsStyle({
   },
 })
 
+const redeemModal = definePartsStyle({
+  dialog: {
+    padding: '32px 40px 40px',
+  },
+})
+
 const upgradeModal = definePartsStyle({
   dialog: {
     padding: '40px 30px',
@@ -42,6 +48,6 @@ const upgradeModal = definePartsStyle({
 })
 
 export const modalTheme = defineMultiStyleConfig({
-  variants: { offer, submitOffer, upgradeModal, offerSuccess },
+  variants: { offer, submitOffer, upgradeModal, offerSuccess, redeemModal },
   baseStyle,
 })
