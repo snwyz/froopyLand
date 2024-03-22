@@ -25,6 +25,7 @@ import { toastSuccess } from '@utils/toast'
 import useStore from 'packages/store'
 import { ellipseAddress, weiToEtherString } from '@utils'
 import { faker } from '@faker-js/faker'
+import PurchaseNFTModal from './PurchaseNFTModal'
 
 
 export enum State {
@@ -188,442 +189,470 @@ const Details = () => {
           </Box>
         )
       }
-      <Box
+        <Box
         borderRadius={
           detail.state === State.Finished ? '0 0 20px 20px' : '20px'
         }
+        p="48px"
         w={{ lg: '1280px', md: '1120px' }}
         className={styles.box}>
-        <Box className={styles.nft}>
-          <Image
-            w="500px"
-            h="500px"
-            objectFit="cover"
-            borderRadius="15px"
-            alt=""
-            src={detail?.nftImage}
-            fallbackSrc="/static/license-template/template.png"
-          />
-          <Text className={styles.desc}>{detail.nftName}</Text>
-          <List spacing={3}>
-            <Flex alignItems="center">
-              <Text className={styles.name}>NFT Address：</Text>
-              <Link fontWeight={600} color="#00DAB3">
-                {detail.nftAddress}
-              </Link>
+        {/* <Flex align="center" justify="center" border="1px solid rgba(112, 75, 234, 1)" w="100%" borderRadius="20px" p="24px 32px" mb="20px">
+          <Image mr="12px" src='/static/common/finished.svg' alt='f' w="24px" h="24px"></Image>
+          <Text fontSize="24px" color="#9A7CFF">NFT sold</Text>
+        </Flex> */}
+        <Flex border="1px solid rgba(112, 75, 234, 1)" w="100%" borderRadius="20px" p="24px 32px" mb="20px">
+            <Flex fontSize="14px" color="#fff" flex={1} mr="40px" align="center">
+              You have priority to purchase the NFT within  <Text display="inline-block" color="#00DAB3">12 Hrs  29 Mins  34 Secs</Text>  cause you are the Top Key Holder of this auction.
             </Flex>
-            <Flex alignItems="center">
-              <Text className={styles.name}>NFT ID：</Text>
-              <Text fontWeight={600}>{detail.nftId.toNumber()}</Text>
-            </Flex>
-            <Flex alignItems="center">
-              <Text className={styles.name}>Auction Duration：</Text>
-              <Text fontWeight={600}>
-                {moment(detail.startTimestamp * 1000).format('hA')}{' '}
-                {moment(detail.startTimestamp * 1000).format(
-                  'MMM DD',
-                )}{' '}
-                - {moment(detail.endTime * 1000).format('hA')}{' '}
-                {moment(detail.endTime * 1000).format('MMM DD')}
-              </Text>
-            </Flex>
-          </List>
-          <Text
-            fontWeight={600}
-            m="40px 0 20px"
-            fontSize="20px"
-            lineHeight="20px">
-            Auction Rules
-          </Text>
-          <List spacing={3}>
-            <Flex>
-              <Text color="#FFA8FE" fontSize="16px" lineHeight="20px" w="172px">
-                Final Winner prize：
-              </Text>
-              <Text w="290px" fontSize="16px" lineHeight="24px">
-                The last key holder gets 20% of the total mint fee. The prize
-                can be claimed after the game gets over.
-              </Text>
-            </Flex>
-            <Flex>
-              <Text color="#FFA8FE" fontSize="16px" lineHeight="20px" w="172px">
-                Key Holder Dividends：
-              </Text>
-              <Text w="290px" fontSize="16px" lineHeight="24px">
-                Key holders share 20% of following mint fee depends on held key
-                share. The dividends can be claimed during and after the game.
-              </Text>
-            </Flex>
-            <Flex>
-              <Text color="#FFA8FE" fontSize="16px" lineHeight="20px" w="172px">
-                NFT Provider Dividends：
-              </Text>
-              <Text w="290px" fontSize="16px" lineHeight="24px">
-                The NFT provider shares 50% of the total mint fee. The dividends
-                can be claimed after the game.{' '}
-              </Text>
-            </Flex>
-          </List>
-        </Box>
-        <Box className={styles.info}>
-          <Heading fontSize="24px" lineHeight="36px" fontWeight={700} mb="16px">
-            {detail.state === State.Ongoing
-              ? 'Auction Count Down'
-              : detail.state === State.Upcoming
-              ? 'Opening Count Down'
-              : 'Auction Status'}
-          </Heading>
-          <Box
-            borderRadius="20px"
-            p="16px 0 16px 32px"
-            bgColor="rgba(118, 74, 242, 0.5)"
-            border="1px solid rgba(112, 75, 234, 1)">
-            {[State.Ongoing, State.Upcoming].includes(detail.state) && (
-              <CountDown />
-            )}
-            {State.Finished === detail.state && (
-              <Text fontSize="24px" lineHeight="36px">
-                Auction ends {moment(detail.endTime * 1000).format('MMMM DD')}{' '}
-                at {moment(detail.endTime * 1000).format('h:mm A')}
-              </Text>
-            )}
-          </Box>
+            {/* <Flex fontSize="14px" color="#fff" flex={1} mr="40px" align="center">
+              <Text fontSize="16px" color="#FFA8FE" mr="20px">NFT Price:</Text>
+              <Text fontSize="16px">2500 $FL Token</Text>
+            </Flex> */}
 
-          <Heading
-            mt="36px"
-            fontSize="24px"
-            lineHeight="36px"
-            fontWeight={700}
-            mb="16px">
-            Bonus Pool
-          </Heading>
-          <Grid
-            gap="32px"
-            borderRadius="20px"
-            p="32px"
-            gridTemplateColumns="1fr 1fr"
-            bgColor="rgba(118, 74, 242, 0.5)"
-            border="1px solid rgba(112, 75, 234, 1)">
-            <Flex flexDir="column">
-              <Box
-                w={{ lg: '100%' }}
-                fontSize="16px"
-                lineHeight="24px"
-                color="#FFA8FE">
-                Total Keys Minted
-              </Box>
-              <Flex alignItems="baseline">
-                <Text
-                  mr="8px"
-                  fontWeight={900}
-                  color="#00DAB3"
-                  fontSize="40px"
-                  lineHeight="60px">
-                  {detail.state === 0 ? '--' : detail.isClone ? COUNT : detail.totalKeyMinted.toString() || '--'}
-                </Text>
-                <Text fontWeight={700} fontSize="16px" lineHeight="24px">
-                  KEYS
-                </Text>
-              </Flex>
-            </Flex>
-            <Flex flexDir="column">
-              <Box
-                w={{ lg: '100%' }}
-                fontSize="16px"
-                lineHeight="24px"
-                color="#FFA8FE">
-                Total Mint Fee
-              </Box>
-              <Flex>
-                <Flex>
-                  <Image
-                    mr="4px"
-                    src="./static/market/eth.svg"
-                    alt="ethereum"
-                    color="#fff"></Image>
-                  <Text
-                    mr="8px"
-                    fontWeight={900}
-                    color="#00DAB3"
-                    fontSize="40px"
-                    lineHeight="60px">
-                    {detail.state === 0 ? '--' : detail.isClone ? (COUNT * 0.001).toFixed(3) : weiToEtherString(detail.salesRevenue.toString()) || '--'}
-                  </Text>
-                </Flex>
-                <Text
-                  fontWeight={700}
-                  alignSelf="flex-end"
-                  fontSize="16px"
-                  lineHeight="40px">
-                  ETH
-                </Text>
-              </Flex>
-            </Flex>
-            <Flex flexDir="column">
-              <Box
-                w={{ lg: '100%' }}
-                fontSize="16px"
-                lineHeight="24px"
-                color="#FFA8FE">
-                Final Winner Prize
-              </Box>
-              <Flex>
-                <Flex>
-                  <Image
-                    mr="4px"
-                    src="./static/market/eth.svg"
-                    alt="ethereum"
-                    color="#fff"></Image>
-                  {/* detail.salesRevenue.toNumber()* 0.2  最后一个买入Key的人分红 20% */}
-                  <Text
-                    mr="8px"
-                    fontWeight={900}
-                    color="#00DAB3"
-                    fontSize="40px"
-                    lineHeight="60px">
-                    {detail.state === 0 ? '--' : detail.isClone ? (COUNT * 0.001 * 0.2).toFixed(5) : weiToEtherString(
-                      `${detail.salesRevenue.mul(2).div(10)}`,
-                    ) || '--'}
-                  </Text>
-                </Flex>
-                <Text
-                  fontWeight={700}
-                  alignSelf="flex-end"
-                  fontSize="16px"
-                  lineHeight="40px">
-                  ETH
-                </Text>
-              </Flex>
-            </Flex>
-            <Flex flexDir="column">
-              <Box
-                w={{ lg: '100%' }}
-                fontSize="16px"
-                lineHeight="24px"
-                color="#FFA8FE">
-                Final Key Holder
-              </Box>
-              <Flex mt="20px">
-                <Text color="#00DAB3" fontSize="16px" lineHeight="20px">
-                  {detail.state === 0 ? '--': ellipseAddress(detail.lastPlayer)}
-                </Text>
-              </Flex>
-            </Flex>
-          </Grid>
-
-          <Heading
-            mt="36px"
-            fontSize="24px"
-            lineHeight="36px"
-            fontWeight={700}
-            mb="16px">
-            My Keys, Dividends & Prize
-          </Heading>
-          <Box
-            padding="32px"
-            borderRadius="20px"
-            border="1px solid rgba(112, 75, 234, 1)">
-            <Text fontSize="20px" lineHeight="30px" fontWeight={700} mb="16px">
-              My Owned Keys
-            </Text>
-            <Progress
-              colorScheme="primary"
-              borderRadius="5px"
-              bgColor="rgba(42, 6, 104, 0.7)"
-              size="sm"
-              value={Number(memoPercent)}
-            />
-            <Flex mt="20px" alignItems="center">
-              <Flex mr="32px" alignItems="baseline">
-                <Text
-                  fontSize="24px"
-                  lineHeight="36px"
-                  color="#00DAB3"
-                  fontWeight={700}>
-                  {detail.state === 0 ? '--' : (keys || '--')}
-                </Text>
-                <Text ml="8px" color="#fff" fontSize="16px" lineHeight="24px">
-                  Keys
-                </Text>
-              </Flex>
-              <Flex
-                mr="32px"
-                alignItems="baseline"
-                fontSize="24px"
-                lineHeight="36px"
-                color="#00DAB3"
-                fontWeight={700}>
-                <Text
-                  fontSize="24px"
-                  lineHeight="36px"
-                  color="#00DAB3"
-                  fontWeight={700}>
-                  {detail.state === 0 ? '--': memoPercent || '--'}%
-                </Text>
-                <Text ml="8px" color="#fff" fontSize="16px" lineHeight="24px">
-                  {' '}
-                  of Total Keys Minted
-                </Text>
-              </Flex>
-            </Flex>
-
-            {detail.state !== State.Finished && (
-              <>
-                <Text
-                  mt="36px"
-                  mb="12px"
-                  fontSize="20px"
-                  lineHeight="30px"
-                  fontWeight={700}>
-                  Mint Key
-                </Text>
-                <Flex>
-                  <Input
-                    w="272px"
-                    h="52px"
-                    borderColor="#704BEA"
-                    readOnly
-                    value="1 Key"
-                  />
-                  <Button
-                    fontSize="20px"
-                    colorScheme="primary"
-                    w="272px"
-                    h="52px"
-                    ml="24px"
-                    onClick={buyKey}
-                    fontWeight="700"
-                    color="#000"
-                    disabled={[State.Finished, State.Upcoming].includes(
-                      detail.state,
-                    )}
-                    isLoading={buyLoading}>
-                    Mint Key
-                  </Button>
-                </Flex>
-                <Text fontSize="14px" lineHeight="20px" mt="12px">
-                  Mint Fee：
-                  <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
-                    {detail.state === 0 ? '--': weiToEtherString(detail.keyPrice.toString())}
-                  </span>
-                  ETH/KEY
-                </Text>
-              </>
-            )}
-
-            <Flex mt="36px" mb="12px" justifyContent="space-between">
-              <Text fontSize="20px" lineHeight="30px" fontWeight={700}>
-                My Key Holder Dividends
-              </Text>
-              <Text fontSize="16px" lineHeight="24px">
-                Total：
-                <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
-                  {detail.state === 0 ? '--': detail.isClone ? (COUNT * 0.001*0.2).toFixed(3): weiToEtherString(detail.salesRevenue.toString()) || '--'}
-                </span>
-                ETH
-              </Text>
-            </Flex>
-            <Flex>
-              <Input
-                w="272px"
-                h="52px"
-                bgColor="rgba(112, 75, 234, 0.5)"
-                border="none"
-                readOnly
-                value={`Unclaimed: ${
-                  detail.state === 0 ? '--': weiToEtherString(claims.toString()) || '--'
-                } ETH`}
-              />
-              <Button
+            <Button
                 fontSize="20px"
                 colorScheme="primary"
                 w="272px"
                 h="52px"
                 ml="24px"
-                onClick={claim}
-                fontWeight="700"
-                color="#000"
-                disabled={detail.state === State.Upcoming}
-                isLoading={claimLoading}>
-                Claim
-              </Button>
-            </Flex>
-
-            <Flex mt="36px" mb="12px" justifyContent="space-between">
-              <Text fontSize="20px" lineHeight="30px" fontWeight={700}>
-                My NFT Provider Dividends
-              </Text>
-              <Text fontSize="16px" lineHeight="24px">
-                Total：
-                <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
-                {detail.state === 0 ? '--': 10}
-                </span>
-                ETH
-              </Text>
-            </Flex>
-            <Flex>
-              <Input
-                w="272px"
-                h="52px"
-                bgColor="rgba(112, 75, 234, 0.5)"
-                border="none"
-                readOnly
-                value={`Unclaimed: ${detail.state === 0 ? '--': '1.23'}ETH`}
-              />
-              <Button
-                fontSize="20px"
-                colorScheme="primary"
-                w="272px"
-                h="52px"
-                ml="24px"
-                disabled={[State.Upcoming, State.Ongoing].includes(
-                  detail.state,
-                )}
                 fontWeight="700"
                 color="#000">
-                Claim
+                Purchase NFT
               </Button>
-            </Flex>
+        </Flex>
+        <Flex>
+          <Box className={styles.nft}>
+            <Image
+              w="500px"
+              h="500px"
+              objectFit="cover"
+              borderRadius="15px"
+              alt=""
+              src={detail?.nftImage}
+              fallbackSrc="/static/license-template/template.png"
+            />
+            <Text className={styles.desc}>{detail.nftName}</Text>
+            <List spacing={3}>
+              <Flex alignItems="center">
+                <Text className={styles.name}>NFT Address：</Text>
+                <Link fontWeight={600} color="#00DAB3">
+                  {detail.nftAddress}
+                </Link>
+              </Flex>
+              <Flex alignItems="center">
+                <Text className={styles.name}>NFT ID：</Text>
+                <Text fontWeight={600}>{detail.nftId.toNumber()}</Text>
+              </Flex>
+              <Flex alignItems="center">
+                <Text className={styles.name}>Auction Duration：</Text>
+                <Text fontWeight={600}>
+                  {moment(detail.startTimestamp * 1000).format('hA')}{' '}
+                  {moment(detail.startTimestamp * 1000).format(
+                    'MMM DD',
+                  )}{' '}
+                  - {moment(detail.endTime * 1000).format('hA')}{' '}
+                  {moment(detail.endTime * 1000).format('MMM DD')}
+                </Text>
+              </Flex>
+            </List>
+            <Text
+              fontWeight={600}
+              m="40px 0 20px"
+              fontSize="20px"
+              lineHeight="20px">
+              Auction Rules
+            </Text>
+            <List spacing={3}>
+              <Flex>
+                <Text color="#FFA8FE" fontSize="16px" lineHeight="20px" w="172px">
+                  Final Winner prize：
+                </Text>
+                <Text w="290px" fontSize="16px" lineHeight="24px">
+                  The last key holder gets 20% of the total mint fee. The prize
+                  can be claimed after the game gets over.
+                </Text>
+              </Flex>
+              <Flex>
+                <Text color="#FFA8FE" fontSize="16px" lineHeight="20px" w="172px">
+                  Key Holder Dividends：
+                </Text>
+                <Text w="290px" fontSize="16px" lineHeight="24px">
+                  Key holders share 20% of following mint fee depends on held key
+                  share. The dividends can be claimed during and after the game.
+                </Text>
+              </Flex>
+              <Flex>
+                <Text color="#FFA8FE" fontSize="16px" lineHeight="20px" w="172px">
+                  NFT Provider Dividends：
+                </Text>
+                <Text w="290px" fontSize="16px" lineHeight="24px">
+                  The NFT provider shares 50% of the total mint fee. The dividends
+                  can be claimed after the game.{' '}
+                </Text>
+              </Flex>
+            </List>
+          </Box>
+          <Box className={styles.info}>
+            <Heading fontSize="24px" lineHeight="36px" fontWeight={700} mb="16px">
+              {detail.state === State.Ongoing
+                ? 'Auction Count Down'
+                : detail.state === State.Upcoming
+                ? 'Opening Count Down'
+                : 'Auction Status'}
+            </Heading>
+            <Box
+              borderRadius="20px"
+              p="16px 0 16px 32px"
+              bgColor="rgba(118, 74, 242, 0.5)"
+              border="1px solid rgba(112, 75, 234, 1)">
+              {[State.Ongoing, State.Upcoming].includes(detail.state) && (
+                <CountDown />
+              )}
+              {State.Finished === detail.state && (
+                <Text fontSize="24px" lineHeight="36px">
+                  Auction ends {moment(detail.endTime * 1000).format('MMMM DD')}{' '}
+                  at {moment(detail.endTime * 1000).format('h:mm A')}
+                </Text>
+              )}
+            </Box>
 
-            {detail.state === State.Finished && (
-              <>
-                <Flex mt="36px" mb="12px" justifyContent="space-between">
-                  <Text fontSize="20px" lineHeight="30px" fontWeight={700}>
-                    My Final Winner Prize
+            <Heading
+              mt="36px"
+              fontSize="24px"
+              lineHeight="36px"
+              fontWeight={700}
+              mb="16px">
+              Bonus Pool
+            </Heading>
+            <Grid
+              gap="32px"
+              borderRadius="20px"
+              p="32px"
+              gridTemplateColumns="1fr 1fr"
+              bgColor="rgba(118, 74, 242, 0.5)"
+              border="1px solid rgba(112, 75, 234, 1)">
+              <Flex flexDir="column">
+                <Box
+                  w={{ lg: '100%' }}
+                  fontSize="16px"
+                  lineHeight="24px"
+                  color="#FFA8FE">
+                  Total Keys Minted
+                </Box>
+                <Flex alignItems="baseline">
+                  <Text
+                    mr="8px"
+                    fontWeight={900}
+                    color="#00DAB3"
+                    fontSize="40px"
+                    lineHeight="60px">
+                    {detail.state === 0 ? '--' : detail.isClone ? COUNT : detail.totalKeyMinted.toString() || '--'}
                   </Text>
-                  <Text fontSize="16px" lineHeight="24px">
-                    Total：
-                    <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
-                      {detail.state === 0 ? '--': (COUNT * 0.001 * 0.2).toFixed(3) }
-                    </span>
+                  <Text fontWeight={700} fontSize="16px" lineHeight="24px">
+                    KEYS
+                  </Text>
+                </Flex>
+              </Flex>
+              <Flex flexDir="column">
+                <Box
+                  w={{ lg: '100%' }}
+                  fontSize="16px"
+                  lineHeight="24px"
+                  color="#FFA8FE">
+                  Total Mint Fee
+                </Box>
+                <Flex>
+                  <Flex>
+                    <Image
+                      mr="4px"
+                      src="./static/market/eth.svg"
+                      alt="ethereum"
+                      color="#fff"></Image>
+                    <Text
+                      mr="8px"
+                      fontWeight={900}
+                      color="#00DAB3"
+                      fontSize="40px"
+                      lineHeight="60px">
+                      {detail.state === 0 ? '--' : detail.isClone ? (COUNT * 0.001).toFixed(3) : weiToEtherString(detail.salesRevenue.toString()) || '--'}
+                    </Text>
+                  </Flex>
+                  <Text
+                    fontWeight={700}
+                    alignSelf="flex-end"
+                    fontSize="16px"
+                    lineHeight="40px">
                     ETH
                   </Text>
                 </Flex>
+              </Flex>
+              <Flex flexDir="column">
+                <Box
+                  w={{ lg: '100%' }}
+                  fontSize="16px"
+                  lineHeight="24px"
+                  color="#FFA8FE">
+                  Final Winner Prize
+                </Box>
                 <Flex>
-                  <Input
-                    w="272px"
-                    h="52px"
-                    bgColor="rgba(112, 75, 234, 0.5)"
-                    border="none"
-                    readOnly
-                    value="Unclaimed: 1.23 ETH"
-                  />
-                  <Button
-                    fontSize="20px"
-                    colorScheme="primary"
-                    w="272px"
-                    h="52px"
-                    ml="24px"
-                    fontWeight="700"
-                    color="#000">
-                    Claim
-                  </Button>
+                  <Flex>
+                    <Image
+                      mr="4px"
+                      src="./static/market/eth.svg"
+                      alt="ethereum"
+                      color="#fff"></Image>
+                    {/* detail.salesRevenue.toNumber()* 0.2  最后一个买入Key的人分红 20% */}
+                    <Text
+                      mr="8px"
+                      fontWeight={900}
+                      color="#00DAB3"
+                      fontSize="40px"
+                      lineHeight="60px">
+                      {detail.state === 0 ? '--' : detail.isClone ? (COUNT * 0.001 * 0.2).toFixed(5) : weiToEtherString(
+                        `${detail.salesRevenue.mul(2).div(10)}`,
+                      ) || '--'}
+                    </Text>
+                  </Flex>
+                  <Text
+                    fontWeight={700}
+                    alignSelf="flex-end"
+                    fontSize="16px"
+                    lineHeight="40px">
+                    ETH
+                  </Text>
                 </Flex>
-              </>
-            )}
+              </Flex>
+              <Flex flexDir="column">
+                <Box
+                  w={{ lg: '100%' }}
+                  fontSize="16px"
+                  lineHeight="24px"
+                  color="#FFA8FE">
+                  Final Key Holder
+                </Box>
+                <Flex mt="20px">
+                  <Text color="#00DAB3" fontSize="16px" lineHeight="20px">
+                    {detail.state === 0 ? '--': ellipseAddress(detail.lastPlayer)}
+                  </Text>
+                </Flex>
+              </Flex>
+            </Grid>
+
+            <Heading
+              mt="36px"
+              fontSize="24px"
+              lineHeight="36px"
+              fontWeight={700}
+              mb="16px">
+              My Keys, Dividends & Prize
+            </Heading>
+            <Box
+              padding="32px"
+              borderRadius="20px"
+              border="1px solid rgba(112, 75, 234, 1)">
+              <Text fontSize="20px" lineHeight="30px" fontWeight={700} mb="16px">
+                My Owned Keys
+              </Text>
+              <Progress
+                colorScheme="primary"
+                borderRadius="5px"
+                bgColor="rgba(42, 6, 104, 0.7)"
+                size="sm"
+                value={Number(memoPercent)}
+              />
+              <Flex mt="20px" alignItems="center">
+                <Flex mr="32px" alignItems="baseline">
+                  <Text
+                    fontSize="24px"
+                    lineHeight="36px"
+                    color="#00DAB3"
+                    fontWeight={700}>
+                    {detail.state === 0 ? '--' : (keys || '--')}
+                  </Text>
+                  <Text ml="8px" color="#fff" fontSize="16px" lineHeight="24px">
+                    Keys
+                  </Text>
+                </Flex>
+                <Flex
+                  mr="32px"
+                  alignItems="baseline"
+                  fontSize="24px"
+                  lineHeight="36px"
+                  color="#00DAB3"
+                  fontWeight={700}>
+                  <Text
+                    fontSize="24px"
+                    lineHeight="36px"
+                    color="#00DAB3"
+                    fontWeight={700}>
+                    {detail.state === 0 ? '--': memoPercent || '--'}%
+                  </Text>
+                  <Text ml="8px" color="#fff" fontSize="16px" lineHeight="24px">
+                    {' '}
+                    of Total Keys Minted
+                  </Text>
+                </Flex>
+              </Flex>
+
+              {detail.state !== State.Finished && (
+                <>
+                  <Text
+                    mt="36px"
+                    mb="12px"
+                    fontSize="20px"
+                    lineHeight="30px"
+                    fontWeight={700}>
+                    Mint Key
+                  </Text>
+                  <Flex>
+                    <Input
+                      w="272px"
+                      h="52px"
+                      borderColor="#704BEA"
+                      readOnly
+                      value="1 Key"
+                    />
+                    <Button
+                      fontSize="20px"
+                      colorScheme="primary"
+                      w="272px"
+                      h="52px"
+                      ml="24px"
+                      onClick={buyKey}
+                      fontWeight="700"
+                      color="#000"
+                      disabled={[State.Finished, State.Upcoming].includes(
+                        detail.state,
+                      )}
+                      isLoading={buyLoading}>
+                      Mint Key
+                    </Button>
+                  </Flex>
+                  <Text fontSize="14px" lineHeight="20px" mt="12px">
+                    Mint Fee：
+                    <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
+                      {detail.state === 0 ? '--': weiToEtherString(detail.keyPrice.toString())}
+                    </span>
+                    ETH/KEY
+                  </Text>
+                </>
+              )}
+
+              <Flex mt="36px" mb="12px" justifyContent="space-between">
+                <Text fontSize="20px" lineHeight="30px" fontWeight={700}>
+                  My Key Holder Dividends
+                </Text>
+                <Text fontSize="16px" lineHeight="24px">
+                  Total：
+                  <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
+                    {detail.state === 0 ? '--': detail.isClone ? (COUNT * 0.001*0.2).toFixed(3): weiToEtherString(detail.salesRevenue.toString()) || '--'}
+                  </span>
+                  ETH
+                </Text>
+              </Flex>
+              <Flex>
+                <Input
+                  w="272px"
+                  h="52px"
+                  bgColor="rgba(112, 75, 234, 0.5)"
+                  border="none"
+                  readOnly
+                  value={`Unclaimed: ${
+                    detail.state === 0 ? '--': weiToEtherString(claims.toString()) || '--'
+                  } ETH`}
+                />
+                <Button
+                  fontSize="20px"
+                  colorScheme="primary"
+                  w="272px"
+                  h="52px"
+                  ml="24px"
+                  onClick={claim}
+                  fontWeight="700"
+                  color="#000"
+                  disabled={detail.state === State.Upcoming}
+                  isLoading={claimLoading}>
+                  Claim
+                </Button>
+              </Flex>
+
+              <Flex mt="36px" mb="12px" justifyContent="space-between">
+                <Text fontSize="20px" lineHeight="30px" fontWeight={700}>
+                  My NFT Provider Dividends
+                </Text>
+                <Text fontSize="16px" lineHeight="24px">
+                  Total：
+                  <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
+                  {detail.state === 0 ? '--': 10}
+                  </span>
+                  ETH
+                </Text>
+              </Flex>
+              <Flex>
+                <Input
+                  w="272px"
+                  h="52px"
+                  bgColor="rgba(112, 75, 234, 0.5)"
+                  border="none"
+                  readOnly
+                  value={`Unclaimed: ${detail.state === 0 ? '--': '1.23'}ETH`}
+                />
+                <Button
+                  fontSize="20px"
+                  colorScheme="primary"
+                  w="272px"
+                  h="52px"
+                  ml="24px"
+                  disabled={[State.Upcoming, State.Ongoing].includes(
+                    detail.state,
+                  )}
+                  fontWeight="700"
+                  color="#000">
+                  Claim
+                </Button>
+              </Flex>
+
+              {detail.state === State.Finished && (
+                <>
+                  <Flex mt="36px" mb="12px" justifyContent="space-between">
+                    <Text fontSize="20px" lineHeight="30px" fontWeight={700}>
+                      My Final Winner Prize
+                    </Text>
+                    <Text fontSize="16px" lineHeight="24px">
+                      Total：
+                      <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
+                        {detail.state === 0 ? '--': (COUNT * 0.001 * 0.2).toFixed(3) }
+                      </span>
+                      ETH
+                    </Text>
+                  </Flex>
+                  <Flex>
+                    <Input
+                      w="272px"
+                      h="52px"
+                      bgColor="rgba(112, 75, 234, 0.5)"
+                      border="none"
+                      readOnly
+                      value="Unclaimed: 1.23 ETH"
+                    />
+                    <Button
+                      fontSize="20px"
+                      colorScheme="primary"
+                      w="272px"
+                      h="52px"
+                      ml="24px"
+                      fontWeight="700"
+                      color="#000">
+                      Claim
+                    </Button>
+                  </Flex>
+                </>
+              )}
+            </Box>
           </Box>
-        </Box>
+        </Flex>
       </Box>
+      <PurchaseNFTModal isOpen={false} onClose={null} />
     </>
   )
 }

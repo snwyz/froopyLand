@@ -2,13 +2,80 @@ import { Button, useColorModeValue, VStack, Heading, Flex, Text, Box, Image, Inp
 
 import BaseModal from '@components/Modal'
 import { ellipseAddress } from '@utils'
+import { toastError } from '@utils/toast'
+import useStore from 'packages/store'
+import { useMemo, useRef, useState } from 'react'
 
 type SubmitOfferModalProps = {
   isOpen: boolean
   onClose: () => void
 }
 
+type NFTItem = {
+  address: string;
+  bidAmount: string | number;
+  isMine: boolean;
+};
+
+// 数组数据
+const nftItems: NFTItem[] = [
+  {
+    address: "0x34d85c9C79B777399AaAAe42f7c769c7b59793D0", // CryptoPunks #7842
+    bidAmount: 100,
+    isMine: true,
+  },
+  {
+    address: "0x7f88082855B543a96735b6f773D94bF39a383614", // Bored Ape Yacht Club #420
+    bidAmount: 200,
+    isMine: false,
+  },
+  {
+    address: "0x60E4d787612f4b442e2144f775c94717c7832a1b", // Azuki #4469
+    bidAmount: 300,
+    isMine: true,
+  },
+  {
+    address: "0x8a90CAb2b38bA80c048a774907777712D232c411", // Doodles #4957
+    bidAmount: 400,
+    isMine: false,
+  },
+  {
+    address: "0x495f9f574c77f9604b8335739c7f8a4d83b79b77", // Art Blocks Curated #152
+    bidAmount: 500,
+    isMine: true,
+  },
+]
+
 const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
+  const [value, setValue] = useState(null)
+  const [list, setList] = useState<NFTItem[]>(nftItems)
+  const scrollRef = useRef(null)
+
+
+  const { address } = useStore()
+  
+  const isLowPrice = useMemo(() => list.some(k => Number(value) <= Number(k.bidAmount)), [list, value])
+  
+
+  const handleBid = () => {
+    if (!value) return toastError('Please bid the price.')
+  
+
+    if (isLowPrice) return toastError('Bid must be higher than the current highest bid.')
+  
+    setList(prevList => [...prevList, {
+      bidAmount: value,
+      address,
+      isMine: true,
+    }])
+
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    }
+
+    setValue(null)
+  }
+
   return (
     <BaseModal
       variant="bidModal"
@@ -28,6 +95,9 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
                   fontWeight={700}
                   fontSize="20px"
                   border="none"
+                  defaultValue={value}
+                  value={value}
+                  onChange={e => setValue(e.target.value)}
                 />
                 <Text color="#333" fontSize="14px" lineHeight="24px">$FLT</Text>
               </Flex>
@@ -42,8 +112,9 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
             color="#fff"
             bg="#704BEA"
             _hover={{ bg: "#704BEA" }}
+            onClick={handleBid}
           >
-            Bid & Register
+            Bid
           </Button>
         </Flex>
       }
@@ -56,20 +127,24 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
             <Text w="178px" align="left" mr="60px" fontSize="13px" color="rgba(0, 0, 0, 0.6)">BIDDER</Text>
             <Text fontSize="13px" color="rgba(0, 0, 0, 0.6)">BID</Text>
           </Flex>
+         <Box overflowY="auto" height="400px" ref={scrollRef}>
          {
-          new Array(10).fill('').map((i,v) => (
-            <Flex key={v} p="10px 20px" border="1px solid #F2F2F2" borderRadius="10px" align="center" mb="10px">
+          list.map((item,v) => (
+            <Flex key={item.address} p="10px 20px" border="1px solid #F2F2F2" borderRadius="10px" align="center" mb="10px">
               <Flex align="center" mr="60px">
                 <Image mr="10px" borderRadius="37px" border="1px solid #F2F2F2" src="/static/account/sidebar/avatar.svg" alt='avatar' w="37px" h="37px"></Image>
                 <Box fontSize="16px" w="131px">
-                  {ellipseAddress('dadasdasdasdasdaaddress', 6)}
+                  {ellipseAddress(item.address, 6)}
                 </Box>
               </Flex>
-              <Text align="left" fontSize="16px" color="rgb(0, 0, 0)" mr="164px">200 $FL Token</Text>
-              <Text fontSize="14px" color="#7E4AF1">ME</Text>
+              <Text align="left" w="200px" fontSize="16px" color="rgb(0, 0, 0)" mr="164px">{item.bidAmount} $FL Token</Text>
+              {
+                item.isMine && (<Text fontSize="14px" color="#7E4AF1">ME</Text>)
+              }
             </Flex>
           ))
          }
+         </Box>
         </Box>
       </VStack>
     </BaseModal>

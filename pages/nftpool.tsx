@@ -25,7 +25,7 @@ const NFTpool = () => {
         <Box p="0 40px">
             <Flex mt="40px" mb="20px" fontSize="20px" align="center" color="#00DAB3">
                 <Text fontSize="24px" lineHeight="36px" textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>NFT Pool </Text>
-                <Text ml="8px" fontSize="18px" lineHeight="27px"> - 26 NFTs available</Text>
+                <Text ml="8px" fontSize="18px" lineHeight="27px"> - {gameList.length} NFTs available</Text>
             </Flex>
             <Box mb="24px" w="100%" height="1px" bg="rgba(112, 75, 234, 0.5)"></Box>
             <SimpleGrid
