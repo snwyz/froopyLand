@@ -58,8 +58,14 @@ interface NavItem {
 
 const NAV_ITEMS_CONNECTED_DESKTOP: Array<NavItem> = [
   {
-    label: 'Market',
+    label: 'Auctions',
     href: '/',
+    icon: '/static/header/gallery.svg',
+    iconDark: '/static/header/gallery_dark.svg',
+  },
+  {
+    label: 'NFT Pool',
+    href: '/nftpool',
     icon: '/static/header/gallery.svg',
     iconDark: '/static/header/gallery_dark.svg',
   },

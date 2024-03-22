@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, lazy, useEffect, useState } from 'react'
 
 import { Box, Image, Button, Text, Flex, SimpleGrid, Spinner } from '@chakra-ui/react'
 import ItemGrid from 'packages/ui/components/ListItems/ItemGrid'
@@ -8,7 +8,9 @@ import useFomoStore from 'packages/store/fomo'
 import NoData from '@components/NoData'
 import { faker } from '@faker-js/faker'
 import moment from 'moment'
-import { toastWarning } from '@utils/toast'
+
+const BidderModal = lazy(() => import('@modules/Market/Main/BidderModal'))
+
 
 interface Item {
   derivativeContractAddress: string
@@ -44,6 +46,7 @@ export default function Main() {
   const [upcomingList, setUpcomingList] = useState([])
   const [ongoingList, setOngoingList] = useState([])
   const [finishedList, setFinishedList] = useState([])
+  const [open, setOpen] = useState(false)
 
   const { gameList } = useFomoStore()
 
@@ -169,12 +172,29 @@ export default function Main() {
 
   return (
     <Box alignItems="center" mb="50px">
+      <BidderModal isOpen={open} onClose={() => setOpen(false)} />
+
       <Box padding='0 42px' height='514px' position='relative'>
         <Box>
           <Box mt='60px'>
             <Image marginBottom='40px' objectFit='cover' src='./static/market/slogen.png' alt="slogen" w={{ base: '1118px'  }} height="171px" />
             <Image marginBottom='54px' objectFit='cover' src='./static/market/price-list.png' alt="logo" w='1034px' h='123px' />
-            <Button fontSize='24px' fontWeight='bold' w="280px" color='#000' h='66px' backgroundColor='#00DAB3' onClick={() => toastWarning('under development')}>Start a Auction</Button>
+            <Flex alignItems="center" mb="20px">
+              <Text fontWeight={700} color="#fff" fontSize="20px" lineHeight="30px">Get the chance to auction NFT on Feb 13 by bidding a piece of FroopyLand：</Text>
+              {/* <Text fontSize="16px" lineHeight="24px">Registration closes on Feb 14, 12am</Text> */}
+            </Flex>
+            <Flex pos="relative" _hover={{ cursor: 'pointer' }}>
+              <Button zIndex="1" fontSize='24px' fontWeight='bold' w="240px" color='#000' h='66px' backgroundColor='#00DAB3' onClick={() => setOpen(true)}>Bid</Button>
+              {/* <Button fontSize='24px' color='#fff' ml="20px" p="16px 24px" h='66px' backgroundColor='rgba(112, 75, 234, 0.5);'>
+              Feb 13, 8 p.m. auctions full
+              </Button> */}
+              <Flex borderRadius="10px" alignItems="center" position="absolute" color="#fff" fontSize="16px" zIndex="0" left="210px" ml="20px" p="20px 24px" h='66px' backgroundColor='rgba(112, 75, 234, 0.5);'>
+                <Text>Highest Bid：- - $FLT</Text>
+                <Text w="1px" h="100%" bg="rgba(255, 255, 255, 0.5)" m="0 16px"></Text>
+                <Text>0 users registered the auction</Text>
+                <Image src='./static/market/start.svg' alt='start' w="28px" h="28px" ml="30px"></Image>
+              </Flex>
+            </Flex>
           </Box>
           <Image position='absolute' top={0} right='42px' objectFit='cover' src='./static/market/bg-logo.png' alt="logo" w='630px' h='490px' />
         </Box>

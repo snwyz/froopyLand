@@ -97,9 +97,9 @@ export default function Sidebar() {
             justify="center"
             h="90px">
             <Image
-              src="/static/account/sidebar/avatar.svg"
-              w="50px"
-              h="50px"
+              src="/static/market/avatar.svg"
+              w="37px"
+              h="37px"
               alt="avatar"
             />
             <Box fontSize="20px" fontWeight="500">

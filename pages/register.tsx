@@ -1,0 +1,223 @@
+import { Flex, Box, Image, Text, Select, Button, useDisclosure  } from '@chakra-ui/react'
+import { ellipseAddress } from '@utils'
+import { toastError, toastWarning } from '@utils/toast'
+import { ethers } from 'ethers'
+import moment from 'moment'
+import http from 'packages/service'
+import useStore from 'packages/store'
+import { web3Modal } from 'packages/web3'
+import { useEffect, useRef, useState } from 'react'
+
+import flABI from 'packages/abis/demo/fl319.json'
+import ERC_ABI from 'packages/abis/demo/Erc721.json'
+import { useRouter } from 'next/router'
+
+
+import {
+    AlertDialog,
+    AlertDialogBody,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogContent,
+    AlertDialogOverlay,
+  } from '@chakra-ui/react'
+
+const NFT_ADDRESS = process.env.NEXT_PUBLIC_NFT_ADDRESS
+const FL_CONTRACT_ADR = '0xE153e162c39b67a5b18a8c5Fa2274C5B3c2E11e7'
+const ERC_NFT = '0xdbA0702f1BeaB36e9fFB6f7efF79A626C835EDc7'
+
+
+
+
+const Register = () => {
+
+    const router = useRouter()
+
+    const [nftList, setNftList] = useState([])
+    const [nft, setNFT] = useState(null)
+
+    const { address } = useStore()
+    const { isOpen, onOpen, onClose } = useDisclosure()
+    const cancelRef = useRef()
+
+
+
+    const fetchNFT = async () => {
+
+        const data = await http.get<any>(`https://api.opensea.io/api/v2/chain/ethereum/account/${NFT_ADDRESS}/nfts`, {
+            headers: {
+                "x-api-key": process.env.NEXT_PUBLIC_NFT_KEY
+            }
+        })
+        setNftList(data.nfts)
+    }
+
+
+    const genDate = () => {
+        // 创建一个代表 UTC 时间的 Moment 对象
+        const date = moment.utc()
+        // 使用 `format` 方法指定格式
+        const formattedDate = date.hour(8).minute(0).second(0)
+        
+        return formattedDate
+    }
+
+    useEffect(() => {
+        fetchNFT()
+    }, [])
+
+
+    const handleRegister = async () => {
+        if (!address) return toastWarning('Please connect wallet first')
+        if (!nft) return toastError('Please stake NFT')
+
+        const provider = await web3Modal.connect()
+        const library = new ethers.providers.Web3Provider(provider)
+        const signer = library.getSigner()
+
+        const erc_contract = new ethers.Contract(ERC_NFT, ERC_ABI, signer)
+        
+        const tt = await erc_contract.isApprovedForAll(nft.contract, FL_CONTRACT_ADR, {
+            gasLimit: BigInt(500000)
+        })
+
+        console.log(tt, '<====')
+        return
+        
+
+        // const tt = await erc_contract.getApproved(nft.identifier, {
+        //     gasLimit: BigInt(500000)
+        // })
+        const txq = await tt.wait()
+
+        console.log(txq, 'lllll')
+        return
+
+        const contract = new ethers.Contract(FL_CONTRACT_ADR, flABI, signer)
+        
+        const tx = await contract.newGame(nft.contract, nft.identifier, genDate().valueOf(), {
+            gasLimit: BigInt(500000)
+        })
+        const data = await tx.wait()
+        console.log(data, 'data')
+        
+    }
+
+    const ApproveDialog = ({
+        isOpen = false,
+        onClose,
+    }) => {
+
+        const approve = () => {
+            onClose()
+        }
+        return (
+            <AlertDialog
+                isOpen={isOpen}
+                leastDestructiveRef={cancelRef}
+                onClose={onClose}
+            >
+                <AlertDialogOverlay>
+                <AlertDialogContent>
+                    <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                    Approve NFT
+                    </AlertDialogHeader>
+
+                    <AlertDialogBody>
+                        Are you sure approve NFT?
+                    </AlertDialogBody>
+
+                    <AlertDialogFooter>
+                    <Button ref={cancelRef} onClick={onClose}>
+                        Cancel
+                    </Button>
+                    <Button colorScheme='red' onClick={approve} ml={3}>
+                        Approve
+                    </Button>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
+        )
+    }
+
+    
+    return (
+        <>
+            <ApproveDialog isOpen={isOpen} onClose={onClose} />
+            <Box p="24px 42px">
+                <Flex _hover={{ cursor: 'pointer' }} onClick={() => router.back()}>
+                    <Image src='/static/market/left.svg' alt='left' w="24px" h="24px" mr="16px"></Image>
+                    <Text fontSize="20px" lineHeight="24px">Back</Text>
+                </Flex>
+                <Box m="16px auto" w="1280px" p="48px" border="1px solid #704BEA" borderRadius="20px">
+                    <Text fontSize="24px" lineHeight="36px" fontWeight="700" mb="40px">Register an Auction</Text>
+                    <Box ml="174px">
+                        <Flex align="center" h="52px">
+                            <Text mr="44px" textAlign="right" color="rgba(255, 255, 255, 0.7)" fontSize="16px" lineHeight="18px" w="180px">Stake NFT</Text>
+                            <Select
+                                w="400px"
+                                placeholder="Select Nft in FroopLand"
+                                _focusVisible={{
+                                    borderColor: '#704BEA',
+                                }}
+                                onChange={e => setNFT(JSON.parse(e.target.value))}
+                                borderColor="#704BEA"
+                                h="52px">
+                                {
+                                    nftList.map(nft => (<option key={nft.identifier} value={JSON.stringify(nft)}>{nft.name}</option>))
+                                }
+                            </Select>
+                        </Flex>
+                        <Flex align="center" mb="20px" mt="20px">
+                            <Text mr="44px" textAlign="right" color="rgba(255, 255, 255, 0.7)" fontSize="16px" lineHeight="18px" w="180px">Image</Text>
+                            <Image src={nft?.image_url} fallbackSrc='/static/account/avatar.png' alt='logo' w="400px" h="400px" borderRadius="15px"></Image>
+                        </Flex>
+                        <Flex align="center" h="52px" mb="20px">
+                            <Text mr="44px" textAlign="right" color="rgba(255, 255, 255, 0.7)" fontSize="16px" lineHeight="18px" w="180px">NFT Owner</Text>
+                            <Text fontSize="16px" lineHeight="24px" color="#fff">{nft ? ellipseAddress(address, 10) : '-'}</Text>
+                        </Flex>
+                        <Flex align="center" h="52px" mb="20px">
+                            <Text mr="44px" textAlign="right" color="rgba(255, 255, 255, 0.7)" fontSize="16px" lineHeight="18px" w="180px">Contract Address</Text>
+                            <Text fontSize="16px" lineHeight="24px" color="#fff">{ellipseAddress(nft?.contract, 10) || '-'}</Text>
+                        </Flex>
+                        <Flex align="center" h="52px" mb="20px">
+                            <Text mr="44px" textAlign="right" color="rgba(255, 255, 255, 0.7)" fontSize="16px" lineHeight="18px" w="180px">Chain</Text>
+                            <Text fontSize="16px" lineHeight="24px" color="#fff">Ethereum</Text>
+                        </Flex>
+                        <Flex align="center" h="52px" mb="20px">
+                            <Text mr="44px" textAlign="right" color="rgba(255, 255, 255, 0.7)" fontSize="16px" lineHeight="18px" w="180px">Token ID</Text>
+                            <Text fontSize="16px" lineHeight="24px" color="#fff">{nft?.identifier || '-'}</Text>
+                        </Flex>
+                        <Flex align="center" h="52px" mb="20px">
+                            <Text mr="44px" textAlign="right" color="rgba(255, 255, 255, 0.7)" fontSize="16px" lineHeight="18px" w="180px">Auction Duration</Text>
+                            <Flex align="center" fontSize="16px" lineHeight="24px" color="#fff">24 hours <Text ml="10px" fontSize="14px" color="rgba(255, 255, 255, 0.5)">extend 30s for each key minted</Text></Flex>
+                        </Flex>
+                        <Flex align="center" h="52px" mb="20px">
+                            <Text mr="44px" textAlign="right" color="rgba(255, 255, 255, 0.7)" fontSize="16px" lineHeight="18px" w="180px">Auction Opening</Text>
+                            <Text fontSize="16px" lineHeight="24px" color="#fff">{genDate().format("MMMM DD [at] h [p.m.] z")}</Text>
+                        </Flex>
+                        <Flex align="center" h="52px" mb="20px">
+                            <Text mr="44px" textAlign="right" color="rgba(255, 255, 255, 0.7)" fontSize="16px" lineHeight="18px" w="180px">NFT Provider Dividends</Text>
+                            <Text fontSize="16px" lineHeight="24px" color="#fff">50% of key mint fee</Text>
+                        </Flex>
+                        <Flex align="center" h="52px" mb="20px">
+                            <Text mr="44px" textAlign="right" color="rgba(255, 255, 255, 0.7)" fontSize="16px" lineHeight="18px" w="180px">Final Winner Prize</Text>
+                            <Text fontSize="16px" lineHeight="24px" color="#fff">20% of key mint fee</Text>
+                        </Flex>
+                        <Flex align="center" h="52px" mb="20px">
+                            <Text mr="44px" textAlign="right" color="rgba(255, 255, 255, 0.7)" fontSize="16px" lineHeight="18px" w="180px">Key Holder Dividends</Text>
+                            <Text fontSize="16px" lineHeight="24px" color="#fff">20% of following key mint fee</Text>
+                        </Flex>
+                    </Box>
+                </Box>
+            </Box>
+            <Box mt="32px" mb="25px" w="100vw" height="1px" bg="rgba(112, 75, 234, 0.5)"></Box>
+            <Flex w="1280px" m="0 auto" mb="30px" justifyContent="end">
+                <Button w="272px" h="52px" fontSize="20px" lineHeight="30px" color="#000" fontWeight="700" borderRadius="10px" bgColor="#00DAB3" onClick={handleRegister}>Register</Button>
+            </Flex>
+        </>
+    )
+}
+
+export default Register
