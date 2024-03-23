@@ -266,7 +266,7 @@ export default function Main() {
                     color="#fff"
                     fontSize="20px"
                     lineHeight="30px">
-                    You got the chance to auction NFT on {calcStartTime.format('MMMM DD')}
+                    You got the chance to auction NFT on {calcStartTime.format('MMMM DD') || 'Mar 26'}
                   </Text>
                 ) : (
                   <Text
@@ -275,7 +275,7 @@ export default function Main() {
                   fontSize="20px"
                   lineHeight="30px">
                   Get the chance to auction NFT on{' '}
-                  {calcStartTime.format('MMMM DD')} by bidding a plot of
+                  {calcStartTime.format('MMMM DD')|| 'Mar 26'} by bidding a plot of
                   FroopyLand：
                 </Text>
                 )

@@ -348,7 +348,8 @@ const Details = () => {
                     color="#00DAB3"
                     fontSize="40px"
                     lineHeight="60px">
-                    {detail.state === 0 ? '--' : detail.isClone ? COUNT : detail.totalKeyMinted.toString() || '--'}
+                      100
+                    {/* {detail.state === 0 ? '--' : detail.isClone ? COUNT : detail.totalKeyMinted.toString() || '--'} */}
                   </Text>
                   <Text fontWeight={700} fontSize="16px" lineHeight="24px">
                     KEYS
@@ -376,7 +377,8 @@ const Details = () => {
                       color="#00DAB3"
                       fontSize="40px"
                       lineHeight="60px">
-                      {detail.state === 0 ? '--' : detail.isClone ? (COUNT * 0.001).toFixed(3) : weiToEtherString(detail.salesRevenue.toString()) || '--'}
+                        0.1
+                      {/* {detail.state === 0 ? '--' : detail.isClone ? (COUNT * 0.001).toFixed(3) : weiToEtherString(detail.salesRevenue.toString()) || '--'} */}
                     </Text>
                   </Flex>
                   <Text
@@ -410,9 +412,10 @@ const Details = () => {
                       color="#00DAB3"
                       fontSize="40px"
                       lineHeight="60px">
-                      {detail.state === 0 ? '--' : detail.isClone ? (COUNT * 0.001 * 0.2).toFixed(5) : weiToEtherString(
+                        0.02
+                      {/* {detail.state === 0 ? '--' : detail.isClone ? (COUNT * 0.001 * 0.2).toFixed(5) : weiToEtherString(
                         `${detail.salesRevenue.mul(2).div(10)}`,
-                      ) || '--'}
+                      ) || '--'} */}
                     </Text>
                   </Flex>
                   <Text
@@ -434,7 +437,10 @@ const Details = () => {
                 </Box>
                 <Flex mt="20px">
                   <Text color="#00DAB3" fontSize="16px" lineHeight="20px">
-                    {detail.state === 0 ? '--': ellipseAddress(detail.lastPlayer)}
+                    {
+                      ellipseAddress(address)
+                    }
+                    {/* {detail.state === 0 ? '--': ellipseAddress(detail.lastPlayer)} */}
                   </Text>
                 </Flex>
               </Flex>
@@ -460,7 +466,8 @@ const Details = () => {
                 borderRadius="5px"
                 bgColor="rgba(42, 6, 104, 0.7)"
                 size="sm"
-                value={Number(memoPercent)}
+                // value={Number(memoPercent)}
+                value={Number(10)}
               />
               <Flex mt="20px" alignItems="center">
                 <Flex mr="32px" alignItems="baseline">
@@ -469,7 +476,8 @@ const Details = () => {
                     lineHeight="36px"
                     color="#00DAB3"
                     fontWeight={700}>
-                    {detail.state === 0 ? '--' : (keys || '--')}
+                      10
+                    {/* {detail.state === 0 ? '--' : (keys || '--')} */}
                   </Text>
                   <Text ml="8px" color="#fff" fontSize="16px" lineHeight="24px">
                     Keys
@@ -487,7 +495,8 @@ const Details = () => {
                     lineHeight="36px"
                     color="#00DAB3"
                     fontWeight={700}>
-                    {detail.state === 0 ? '--': memoPercent || '--'}%
+                      10%
+                    {/* {detail.state === 0 ? '--': memoPercent || '--'}% */}
                   </Text>
                   <Text ml="8px" color="#fff" fontSize="16px" lineHeight="24px">
                     {' '}

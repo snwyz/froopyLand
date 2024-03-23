@@ -176,7 +176,7 @@ const Header: FC = () => {
         setAddress(address)
         window.localStorage.setItem('isConnect', 'true')
         const network = await web3Provider.getNetwork()
-
+        
         fomoStore.setGameList(web3Provider)
         
         dispatch({
@@ -263,6 +263,7 @@ const Header: FC = () => {
 
   useEffect(() => {
     try {
+      console.log(chainId, 'chainId')
       
       if (chainId) {
         const chainData = getChainData(chainId)        

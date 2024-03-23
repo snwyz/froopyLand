@@ -70,7 +70,6 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
   const [bidder, setBidder] = useState(faker.number.int({ min: 1, max: 20 }))
   
   if (pathname === PathnameType.MARKET) {
-    console.log(item, 'gridName')
     
     return (
       <Box
