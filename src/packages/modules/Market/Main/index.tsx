@@ -65,6 +65,8 @@ const getActionsState = (): ActivityStatus => {
   return state
 }
 
+const actionsState = (() => ActivityStatus.Staking)()  // TEST info
+
 
 export default function Main() {
 
@@ -106,7 +108,6 @@ export default function Main() {
 
   // getActionsState() 
 
-  const actionsState = ActivityStatus.Staking  // TEST info
   
   console.log(actionsState, 'actionsState')
   
