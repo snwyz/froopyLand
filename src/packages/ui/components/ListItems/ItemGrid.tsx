@@ -70,6 +70,8 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
   const [bidder, setBidder] = useState(faker.number.int({ min: 1, max: 20 }))
   
   if (pathname === PathnameType.MARKET) {
+    console.log(item, 'gridName')
+    
     return (
       <Box
         cursor="pointer"
@@ -81,13 +83,19 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
         p="10px"
         position="relative">
         <AspectRatio ratio={1 / 1}>
-          <Box className="image-effect">
+          <Box className="image-effect" overflow="hidden">
             <Image
               borderRadius="15px"
               alt=""
               src={item.nftImage}
               fallbackSrc="/static/license-template/template.png"
             />
+            {
+              // 无限 mock
+              gridName === 'finishedList' && (item.id.toString().slice(-1) > 6) && (
+                <Box pos="absolute" bg="#7E4AF1" left={0} right={0} bottom={0} h='48px' lineHeight="48px" fontWeight="700" textAlign="center" fontSize="18px" borderRadius="0 0 15px 15px">You won!</Box>
+              )
+            }
           </Box>
         </AspectRatio>
         <Flex
@@ -375,6 +383,12 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
           src={item.nftImage}
           fallbackSrc="/static/license-template/template.png"
         />
+            {
+              // 无限 mock
+              gridName === 'finishedList' && (item.id.toString().slice(-1) > 6) && (
+                <Box pos="absolute" bg="#7E4AF1" left={0} right={0} bottom={0} h='48px' lineHeight="48px" fontWeight="700" textAlign="center" fontSize="18px" borderRadius="0 0 15px 15px">You won!</Box>
+              )
+            }
       </Box>
     </AspectRatio>
     <Flex

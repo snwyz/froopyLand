@@ -40,7 +40,8 @@ const supportedChains: IChainData[] = [
     network: 'X1_TEST',
     chain_id: 195,
     network_id: 195,
-    rpc_url: 'https://x1-testnet.blockpi.network/v1/rpc/public',
+    // rpc_url: 'https://x1-testnet.blockpi.network/v1/rpc/public',
+    rpc_url: 'https://x1testrpc.okx.com',
     native_currency: {
       symbol: 'OKB',
       name: 'OKB',

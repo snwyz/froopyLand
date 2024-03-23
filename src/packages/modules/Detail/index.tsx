@@ -20,7 +20,7 @@ import { useRouter } from 'next/router'
 import useFomoStore from 'packages/store/fomo'
 import moment from 'moment'
 import { memo, useEffect, useMemo, useState } from 'react'
-import FroopyABI from 'packages/abis/demo/FroopyLand.json'
+import FroopyABI from 'packages/abis/demo/fl323.json'
 import { toastSuccess } from '@utils/toast'
 import useStore from 'packages/store'
 import { ellipseAddress, weiToEtherString } from '@utils'
@@ -35,6 +35,8 @@ export enum State {
 }
 
 const COUNT = faker.number.int({ min: 101, max: 1000 })
+
+const FL_CONTRACT_ADR = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR
 
 
 const Details = () => {
@@ -71,7 +73,7 @@ const Details = () => {
     const provider = await web3Modal.connect()
     const library = new ethers.providers.Web3Provider(provider)
     const signer = library.getSigner()
-    const contract = new ethers.Contract('0x49b775262e272bED00B6Cf0d07a5083a7eeFe19E', FroopyABI, signer)
+    const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
     const address = await signer.getAddress()
     
     try {
@@ -101,19 +103,19 @@ const Details = () => {
   const time = useCountDown(localTimeFormatted)
 
   const buyKey = async () => {
-    if (detail.isClone) return
+    // if (detail.isClone) return
     const provider = await web3Modal.connect()
     const library = new ethers.providers.Web3Provider(provider)
     const signer = library.getSigner()
-    const contract = new ethers.Contract('0x49b775262e272bED00B6Cf0d07a5083a7eeFe19E', FroopyABI, signer)
-    setBuyLoading(true)
+    const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
     try {
-      const tx = await contract.purchaseKeyOfGameId(id, {
-        value: ethers.utils.parseUnits(`${detail.keyPrice.toNumber()}`, "wei"),
+      setBuyLoading(true)
+      const tx = await contract.purchaseKeyOfGameId('0', {
+        value: ethers.utils.parseUnits(`${16}`, "wei"),
         gasLimit: BigInt(500000)
       })
       await tx.wait()
-      await setGameList(library)
+      // await setGameList(library)
       toastSuccess('Buy success')
     } catch (error) {
       console.log(error, 'buyKey')
@@ -127,7 +129,7 @@ const Details = () => {
     const provider = await web3Modal.connect()
     const library = new ethers.providers.Web3Provider(provider)
     const signer = library.getSigner()
-    const contract = new ethers.Contract('0x49b775262e272bED00B6Cf0d07a5083a7eeFe19E', FroopyABI, signer)
+    const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
     const address = await signer.getAddress()
     setClaimLoading(true)
     try {
@@ -146,7 +148,7 @@ const Details = () => {
 
   const CountDown = () => (
     <div className={styles.time}>
-      <div className={styles.unit}>{days || '0'}</div>
+      <div className={styles.unit}>0</div>
       <div className={styles.symbol}>Days</div>
       <div className={styles.unit}>{hours || '0'}</div>
       <div className={styles.symbol}>Hrs</div>
@@ -200,14 +202,14 @@ const Details = () => {
           <Image mr="12px" src='/static/common/finished.svg' alt='f' w="24px" h="24px"></Image>
           <Text fontSize="24px" color="#9A7CFF">NFT sold</Text>
         </Flex> */}
-        <Flex border="1px solid rgba(112, 75, 234, 1)" w="100%" borderRadius="20px" p="24px 32px" mb="20px">
+        {/* <Flex border="1px solid rgba(112, 75, 234, 1)" w="100%" borderRadius="20px" p="24px 32px" mb="20px">
             <Flex fontSize="14px" color="#fff" flex={1} mr="40px" align="center">
               You have priority to purchase the NFT within  <Text display="inline-block" color="#00DAB3">12 Hrs  29 Mins  34 Secs</Text>  cause you are the Top Key Holder of this auction.
             </Flex>
-            {/* <Flex fontSize="14px" color="#fff" flex={1} mr="40px" align="center">
+            <Flex fontSize="14px" color="#fff" flex={1} mr="40px" align="center">
               <Text fontSize="16px" color="#FFA8FE" mr="20px">NFT Price:</Text>
               <Text fontSize="16px">2500 $FL Token</Text>
-            </Flex> */}
+            </Flex>
 
             <Button
                 fontSize="20px"
@@ -219,7 +221,7 @@ const Details = () => {
                 color="#000">
                 Purchase NFT
               </Button>
-        </Flex>
+        </Flex> */}
         <Flex>
           <Box className={styles.nft}>
             <Image
@@ -236,12 +238,12 @@ const Details = () => {
               <Flex alignItems="center">
                 <Text className={styles.name}>NFT Address：</Text>
                 <Link fontWeight={600} color="#00DAB3">
-                  {detail.nftAddress}
+                  {detail.nftAddress || address}
                 </Link>
               </Flex>
               <Flex alignItems="center">
                 <Text className={styles.name}>NFT ID：</Text>
-                <Text fontWeight={600}>{detail.nftId.toNumber()}</Text>
+                <Text fontWeight={600}>{detail?.nftId?.toNumber() || '122'}</Text>
               </Flex>
               <Flex alignItems="center">
                 <Text className={styles.name}>Auction Duration：</Text>
@@ -509,8 +511,7 @@ const Details = () => {
                       w="272px"
                       h="52px"
                       borderColor="#704BEA"
-                      readOnly
-                      value="1 Key"
+                      placeholder='Maximum: 10 keys'
                     />
                     <Button
                       fontSize="20px"
@@ -529,11 +530,10 @@ const Details = () => {
                     </Button>
                   </Flex>
                   <Text fontSize="14px" lineHeight="20px" mt="12px">
-                    Mint Fee：
-                    <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
-                      {detail.state === 0 ? '--': weiToEtherString(detail.keyPrice.toString())}
-                    </span>
-                    ETH/KEY
+                    Mint Fee：Mint Fee： 0.001 ETH/KEY
+                    {/* <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
+                      {detail.state === 0 ? '--': weiToEtherString(detail.keyPrice?.toString())}
+                    </span> */}
                   </Text>
                 </>
               )}

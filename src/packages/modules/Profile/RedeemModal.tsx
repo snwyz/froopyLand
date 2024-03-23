@@ -46,7 +46,7 @@ const RedeemModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
                   fontSize="20px"
                   border="none"
                 />
-                <Text color="#7E4AF1" fontSize="16px" lineHeight="24px" fontWeight="600">Max</Text>
+                {/* <Text color="#7E4AF1" fontSize="16px" lineHeight="24px" fontWeight="600">Max</Text> */}
               </Flex>
               <Text mt="8px" fontSize="12px" lineHeight="18px" color="#4F4F4F" align="end">10,000 Available</Text>
             </Box>

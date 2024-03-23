@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker'
 import { ethers } from 'ethers'
 import create from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import FroopyABI from 'packages/abis/demo/FroopyLand.json'
+import FroopyABI from 'packages/abis/demo/fl323.json'
 import { generateTimestamp } from '@modules/Market/Main'
 
 
@@ -15,7 +15,7 @@ interface IState {
     setGameList: (web3Provider: ethers.providers.Web3Provider) => void
 }
 
-
+const FL_CONTRACT_ADR = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR
 const useFomoStore = create(immer<IState>(((set) => ({
     gameList: [],
     upcomingList: [],
@@ -25,7 +25,7 @@ const useFomoStore = create(immer<IState>(((set) => ({
     async setGameList (web3Provider: ethers.providers.Web3Provider) {
         try {
           const signer = web3Provider.getSigner()
-          const contract = new ethers.Contract('0x49b775262e272bED00B6Cf0d07a5083a7eeFe19E', FroopyABI, signer)
+          const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
             
           const imageUrls = [
             'https://i.seadn.io/s/raw/files/1c27508d0d3016e1d18e63b81c861c81.png?auto=format&dpr=1&w=1000',
@@ -35,24 +35,27 @@ const useFomoStore = create(immer<IState>(((set) => ({
             'https://i.seadn.io/s/raw/files/f404c42f90ab3d63d5f7d43eeb97d583.png?auto=format&dpr=1&w=1000',
             'https://i.seadn.io/s/raw/files/3bf515fc55478ba57bf56ada5a02031a.png?auto=format&dpr=1&w=1000'
           ]
-          const gamesByIds = [0, 1, 2, 3, 4, 5]
+
+          // const gamesByIds = [0,1,2,3,4,5] // 合约小伙伴暂时还未统一 list 接口，遂通过组合 ids 来请求。
+          const gamesByIds = [0]
           const gameList = []
           
           for (const id of gamesByIds) {
             try {
-              const tx = await contract.games(id)
-              const [state] = await contract.getGameStateOfGameIds([id])
-              const [endTime] = await contract.getGameEndTimestampOfGameIds([id])
+              const tx = await contract.getGameInfoOfGameIds(id)
+              // const [state] = await contract.getGameStateOfGameIds([id])
+              // const [endTime] = await contract.getGameEndTimestampOfGameIds([id])
+              console.log(tx, '<===tx')
               
               gameList.push({
                 ...tx,
                 id,
                 nftImage: imageUrls[id],
                 nftName: faker.internet.userName(),
-                state,
-                endTime: endTime.toNumber(),
+                endTime: tx.endTimestamp.toNumber(),
                 startTimestamp: tx.startTimestamp.toNumber()
               })
+              
             } catch (error) {
               console.error(`Error fetching data for game ID ${id}:`, error)
               gameList.push({
@@ -102,9 +105,9 @@ const useFomoStore = create(immer<IState>(((set) => ({
           const data = renderList()
           set({
             gameList: data,
-            upcomingList,
-            ongoingList,
-            finishedList,
+            upcomingList: [...upcomingList.concat(generateMockData(upcomingList, 0))],
+            ongoingList: [...ongoingList.concat(generateMockData(ongoingList, 1))],
+            finishedList: [...finishedList.concat(generateMockData(finishedList, 2))]
           })
         } catch (error) {
           console.error('Error initializing contract:', error.message)

@@ -3,8 +3,13 @@ import { Button, useColorModeValue, VStack, Heading, Flex, Text, Box, Image, Inp
 import BaseModal from '@components/Modal'
 import { ellipseAddress } from '@utils'
 import { toastError } from '@utils/toast'
+import { ethers } from 'ethers'
+import { web3Modal } from 'packages/web3'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import FroopyABI from 'packages/abis/demo/fl323.json'
 import useStore from 'packages/store'
-import { useMemo, useRef, useState } from 'react'
+
+const FL_CONTRACT_ADR = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR
 
 type SubmitOfferModalProps = {
   isOpen: boolean
@@ -13,7 +18,7 @@ type SubmitOfferModalProps = {
 
 type NFTItem = {
   address: string;
-  bidAmount: string | number;
+  bidAmount: number;
   isMine: boolean;
 };
 
@@ -22,7 +27,7 @@ const nftItems: NFTItem[] = [
   {
     address: "0x34d85c9C79B777399AaAAe42f7c769c7b59793D0", // CryptoPunks #7842
     bidAmount: 100,
-    isMine: true,
+    isMine: false,
   },
   {
     address: "0x7f88082855B543a96735b6f773D94bF39a383614", // Bored Ape Yacht Club #420
@@ -32,7 +37,7 @@ const nftItems: NFTItem[] = [
   {
     address: "0x60E4d787612f4b442e2144f775c94717c7832a1b", // Azuki #4469
     bidAmount: 300,
-    isMine: true,
+    isMine: false,
   },
   {
     address: "0x8a90CAb2b38bA80c048a774907777712D232c411", // Doodles #4957
@@ -42,32 +47,43 @@ const nftItems: NFTItem[] = [
   {
     address: "0x495f9f574c77f9604b8335739c7f8a4d83b79b77", // Art Blocks Curated #152
     bidAmount: 500,
-    isMine: true,
+    isMine: false,
   },
 ]
 
 const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
-  const [value, setValue] = useState(null)
+  const [value, setValue] = useState(undefined)
   const [list, setList] = useState<NFTItem[]>(nftItems)
   const scrollRef = useRef(null)
-
+  const available = 10000
 
   const { address } = useStore()
   
   const isLowPrice = useMemo(() => list.some(k => Number(value) <= Number(k.bidAmount)), [list, value])
   
+  const bidList = useMemo(() => list.slice().sort((a, b) => b.bidAmount - a.bidAmount), [list])
 
   const handleBid = () => {
     if (!value) return toastError('Please bid the price.')
   
 
     if (isLowPrice) return toastError('Bid must be higher than the current highest bid.')
-  
-    setList(prevList => [...prevList, {
-      bidAmount: value,
-      address,
-      isMine: true,
-    }])
+    
+    if (value > available) return toastError('Bid must be lower than the current available $FL Token')
+
+    const existingItemIndex = bidList.findIndex(item => item.isMine)
+
+    if (existingItemIndex !== -1) {
+      const updatedBidList = [...bidList]
+      updatedBidList[existingItemIndex].bidAmount = value
+      setList(updatedBidList)
+    } else {
+      setList(prevList => [...prevList, {
+        bidAmount: value,
+        address,
+        isMine: true,
+      }])
+    }
 
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
@@ -75,6 +91,26 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
 
     setValue(null)
   }
+
+
+  const getAvailableFL = async () => {
+    const provider = await web3Modal.connect()    
+    const library = new ethers.providers.Web3Provider(provider)
+    const signer = library.getSigner()
+
+    const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
+
+    const address = await signer.getAddress()
+
+    if (!address) return toastError('Please connect wallet first.')
+    
+    const [tx] = await contract.bidderInfos(address)
+  }
+
+
+  useEffect(() => {
+    getAvailableFL()
+  }, [])
 
   return (
     <BaseModal
@@ -127,13 +163,13 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
             <Text w="178px" align="left" mr="60px" fontSize="13px" color="rgba(0, 0, 0, 0.6)">BIDDER</Text>
             <Text fontSize="13px" color="rgba(0, 0, 0, 0.6)">BID</Text>
           </Flex>
-         <Box overflowY="auto" height="400px" ref={scrollRef}>
+         <Box overflowY="auto" height="360px" ref={scrollRef}>
          {
-          list.map((item,v) => (
+          bidList.map((item,v) => (
             <Flex key={item.address} p="10px 20px" border="1px solid #F2F2F2" borderRadius="10px" align="center" mb="10px">
               <Flex align="center" mr="60px">
                 <Image mr="10px" borderRadius="37px" border="1px solid #F2F2F2" src="/static/account/sidebar/avatar.svg" alt='avatar' w="37px" h="37px"></Image>
-                <Box fontSize="16px" w="131px">
+                <Box fontSize="16px" w="160px">
                   {ellipseAddress(item.address, 6)}
                 </Box>
               </Flex>
