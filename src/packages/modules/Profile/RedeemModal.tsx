@@ -45,10 +45,11 @@ const RedeemModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
                   fontWeight={700}
                   fontSize="20px"
                   border="none"
+                  value="56"
                 />
                 {/* <Text color="#7E4AF1" fontSize="16px" lineHeight="24px" fontWeight="600">Max</Text> */}
               </Flex>
-              <Text mt="8px" fontSize="12px" lineHeight="18px" color="#4F4F4F" align="end">10,000 Available</Text>
+              <Text mt="8px" fontSize="12px" lineHeight="18px" color="#4F4F4F" align="end">&nbsp;</Text>
             </Box>
             <Text color="#828282" position="relative" top="-12px" fontSize="14px" lineHeight="20px" m="0 12px">to</Text>
             <Box>
@@ -58,9 +59,9 @@ const RedeemModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
                 borderColor="#F2F2F2"
                 readOnly
                 textAlign="center"
-                value="1 Key"
+                value="1 FLT"
               />
-              <Text mt="8px" fontSize="12px" lineHeight="18px" color="#4F4F4F" align="center">1.23 Key=1 $FLT</Text>
+              <Text mt="8px" fontSize="12px" lineHeight="18px" color="#4F4F4F" align="center">1.532 Key=1 $FLT</Text>
             </Box>
         </Flex>
       </VStack>

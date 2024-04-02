@@ -57,6 +57,8 @@ const useAuctions = create(immer<IState>(((set, get) => ({
 
       const contract = new ethers.Contract(FL_CONTRACT_ADR_323, FroopyABI323, signer)
       const tx = await contract.bidRoundInfo()
+      console.log(tx, 'tx')
+      
       set({
         roundInfo: tx
       })

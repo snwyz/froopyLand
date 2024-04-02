@@ -28,12 +28,12 @@ const useFomoStore = create(immer<IState>(((set) => ({
           const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
             
           const imageUrls = [
-            'https://i.seadn.io/s/raw/files/1c27508d0d3016e1d18e63b81c861c81.png?auto=format&dpr=1&w=1000',
-            'https://i.seadn.io/gcs/files/1877dff2c72f4e338d7c1200c925e718.png?auto=format&dpr=1&w=1000',
-            'https://i.seadn.io/gcs/files/bff9ff793f644326c6bb8891803d1fbd.png?auto=format&dpr=1&w=1000',
-            'https://i.seadn.io/s/raw/files/7c50c8ce58d8976aaf8d9097a5568e20.png?auto=format&dpr=1&w=1000',
-            'https://i.seadn.io/s/raw/files/f404c42f90ab3d63d5f7d43eeb97d583.png?auto=format&dpr=1&w=1000',
-            'https://i.seadn.io/s/raw/files/3bf515fc55478ba57bf56ada5a02031a.png?auto=format&dpr=1&w=1000'
+            'https://i.seadn.io/gcs/files/16d9892108638a415d1244943f908fad.png?auto=format&dpr=1&w=1000',
+            'https://i.seadn.io/gcs/files/247c8f8946f77b9132326a4ff2340903.png?auto=format&dpr=1&w=1000',
+            'https://i.seadn.io/gcs/files/d4a9c0b5a6467a93f192c6043fe329b0.png?auto=format&dpr=1&w=1000',
+            'https://i.seadn.io/gcs/files/7b7c959e8453c734c115083d87844d05.png?auto=format&dpr=1&w=1000',
+            'https://i.seadn.io/gcs/files/f149b2d37d093ca7b8853dce5faafca1.png?auto=format&dpr=1&w=1000',
+            'https://i.seadn.io/gcs/files/1559b8597ed4db6578a218f181f24716.png?auto=format&dpr=1&w=1000'
           ]
 
           // const gamesByIds = [0,1,2,3,4,5] // 合约小伙伴暂时还未统一 list 接口，遂通过组合 ids 来请求。
@@ -42,18 +42,17 @@ const useFomoStore = create(immer<IState>(((set) => ({
           
           for (const id of gamesByIds) {
             try {
-              const tx = await contract.getGameInfoOfGameIds(id)
+              // const tx = await contract.getGameInfoOfGameIds(id)
               // const [state] = await contract.getGameStateOfGameIds([id])
               // const [endTime] = await contract.getGameEndTimestampOfGameIds([id])
-              console.log(tx, '<===tx')
-              
+              // console.log(tx, '<===tx')
               gameList.push({
-                ...tx,
+                // ...tx,
                 id,
                 nftImage: imageUrls[id],
                 nftName: faker.internet.userName(),
-                endTime: tx.endTimestamp.toNumber(),
-                startTimestamp: tx.startTimestamp.toNumber()
+                // endTime: tx.endTimestamp.toNumber(),
+                // startTimestamp: tx.startTimestamp.toNumber()
               })
               
             } catch (error) {
@@ -69,7 +68,7 @@ const useFomoStore = create(immer<IState>(((set) => ({
             const num = 6
             const len = num - list.length
             if (len <= 0) return []
-            return Array.from({ length: len }, (_) => {
+            return Array.from({ length: len }, (_, i) => {
               const clonedItem = { ...list[0] }
               delete clonedItem.state
               delete clonedItem.id
@@ -77,6 +76,8 @@ const useFomoStore = create(immer<IState>(((set) => ({
 
               const totalKeyMinted = ethers.BigNumber.from(total.toString())
               // const salesRevenue = totalKeyMinted.mul(clonedItem.price)
+              const ids = ['#404', '#1796', '#1345', '#284', '#672', '#1832']
+
               return {
                 ...clonedItem,
                 id: faker.number.int(),
@@ -85,8 +86,8 @@ const useFomoStore = create(immer<IState>(((set) => ({
                 isClone: true,
                 totalKeyMinted: state === 0 ? null:totalKeyMinted,
                 state,
-                nftName: faker.internet.userName() + '-' + faker.number.int({ min: 1, max: 100 }),
-                nftImage: imageUrls[faker.number.int({ min: 0, max: 5 })]
+                nftName: 'The Two Boys' + ids[i],
+                nftImage: imageUrls[i]
               }
             })
           }

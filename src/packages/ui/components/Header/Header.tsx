@@ -263,8 +263,6 @@ const Header: FC = () => {
 
   useEffect(() => {
     try {
-      console.log(chainId, 'chainId')
-      
       if (chainId) {
         const chainData = getChainData(chainId)        
         const validChain = address && chainData?.network === network

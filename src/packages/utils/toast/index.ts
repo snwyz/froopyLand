@@ -4,6 +4,7 @@ export const toastSuccess = (message: string): void => {
   if (message) {
     toast.success(message, {
       position: toast.POSITION.TOP_CENTER,
+      delay: 2000,
     })
   }
 }

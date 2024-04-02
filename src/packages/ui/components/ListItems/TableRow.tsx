@@ -715,7 +715,7 @@ function Table({ item, isCustom }: { item: any, isCustom: boolean }) {
                 h="40px"
                 objectFit="cover"
                 alt=""
-                src="/static/fake/detail.svg"
+                src={item.image}
                 fallbackSrc="/static/license-template/template.png"
               />
             </Box>
@@ -726,7 +726,7 @@ function Table({ item, isCustom }: { item: any, isCustom: boolean }) {
               textOverflow="ellipsis"
               overflow="hidden"
               whiteSpace="nowrap">
-              My Little Piggie
+              {item.label}
             </Text>
           </Flex>
         </Td>
@@ -737,7 +737,7 @@ function Table({ item, isCustom }: { item: any, isCustom: boolean }) {
           borderColor="#E8E8E8">
           <Flex mr="95px" align="center" color="#fff">
             <Box mr="6px" fontSize="12px" fontWeight="400">
-              adasdasdasxxxx
+              {item.id}
             </Box>
           </Flex>
         </Td>
@@ -796,7 +796,7 @@ function Table({ item, isCustom }: { item: any, isCustom: boolean }) {
                 h="40px"
                 objectFit="cover"
                 alt=""
-                src="/static/fake/detail.svg"
+                src={item.image}
                 fallbackSrc="/static/license-template/template.png"
               />
             </Box>
@@ -807,7 +807,7 @@ function Table({ item, isCustom }: { item: any, isCustom: boolean }) {
               textOverflow="ellipsis"
               overflow="hidden"
               whiteSpace="nowrap">
-              My Little Piggie
+              {item.label}
             </Text>
           </Flex>
         </Td>
@@ -818,7 +818,7 @@ function Table({ item, isCustom }: { item: any, isCustom: boolean }) {
           borderColor="#E8E8E8">
           <Flex mr="95px" align="center" color="#fff">
             <Box mr="6px" fontSize="12px" fontWeight="400">
-              Feb 28 6:05 p.m -  Feb 28 6:05 p.m
+              {item.duration}
             </Box>
           </Flex>
         </Td>
@@ -833,7 +833,7 @@ function Table({ item, isCustom }: { item: any, isCustom: boolean }) {
         <Td borderBottomColor={borderBottomColor} borderBottom="1px solid">
           <Flex mr="95px" align="center" color="#fff">
             <Box mr="6px" fontSize="12px" fontWeight="400">
-              0.5 ETH
+              {item.amount} ETH
             </Box>
           </Flex>
         </Td>

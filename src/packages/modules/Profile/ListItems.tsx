@@ -2,6 +2,7 @@ import { memo, useMemo } from 'react'
 
 import {
   Box,
+  Flex,
   Spinner,
   useBreakpointValue,
 } from '@chakra-ui/react'
@@ -11,6 +12,8 @@ import CommonTable from '@components/CommonTable'
 import NoData from '@components/NoData'
 
 import Table from '@components/ListItems/Table'
+
+import ReactPaginate from 'react-paginate'
 
 interface ListItemsProps {
   isLoading: boolean
@@ -93,20 +96,20 @@ function ListItems({
           columns={columnsList}
           renderItem={<Table isCustom={isCustom} items={currentItems} />}
         />
-      {/* <Flex my="30px" justify="flex-end" mr="40px">
+      <Flex my="30px" justify="flex-end" mr="40px">
         <ReactPaginate
           forcePage={currentPage}
           breakLabel="..."
           nextLabel=">"
           onPageChange={handlePageChange}
           pageRangeDisplayed={5}
-          pageCount={pageCount}
+          pageCount={5}
           previousLabel="<"
           renderOnZeroPageCount={null}
           containerClassName="pagination_dark"
           activeClassName="active_dark"
         />
-      </Flex> */}
+      </Flex>
     </Box>
   )
 }

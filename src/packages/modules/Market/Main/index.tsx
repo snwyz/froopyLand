@@ -1,6 +1,6 @@
-import { Suspense, lazy, useEffect, useMemo, useState } from 'react'
+import { lazy, useMemo, useState, Suspense } from 'react'
 
-import { Box, Image, Text, Flex, SimpleGrid, Spinner, Button } from '@chakra-ui/react'
+import { Box, Image, Text, Flex, SimpleGrid, Button, Spinner } from '@chakra-ui/react'
 import ItemGrid from 'packages/ui/components/ListItems/ItemGrid'
 // import { sleep } from '@utils'
 
@@ -65,19 +65,17 @@ const getActionsState = (): ActivityStatus => {
   return state
 }
 
-const actionsState = (() => ActivityStatus.Bidding)()  // TEST info
-
+const actionsState = (() => ActivityStatus.Staking)()  // TEST info
+const num = 1
 
 export default function Main() {
 
   const router = useRouter()
 
-  const [upcomingList, setUpcomingList] = useState([])
-  const [ongoingList, setOngoingList] = useState([])
-  const [finishedList, setFinishedList] = useState([])
+
   const [open, setOpen] = useState(false)
 
-  const { gameList } = useFomoStore()
+  const { gameList, upcomingList, ongoingList, finishedList } = useFomoStore()
 
   const { startTime, state, roundInfo } = useAuctions()
   
@@ -111,50 +109,53 @@ export default function Main() {
   
   console.log(actionsState, 'actionsState')
   
-  const generateMockData = (list) => {
-    const num = 6
-    const len = num - list.length
-    if (len <= 0) return []
-    return Array.from({ length: len }, (_) => {
-      const clonedItem = { ...list[0] }
-      delete clonedItem.id 
-      delete clonedItem.state
-      const imageUrls = [
-        'https://i.seadn.io/s/raw/files/1c27508d0d3016e1d18e63b81c861c81.png?auto=format&dpr=1&w=1000',
-        'https://i.seadn.io/gcs/files/1877dff2c72f4e338d7c1200c925e718.png?auto=format&dpr=1&w=1000',
-        'https://i.seadn.io/gcs/files/bff9ff793f644326c6bb8891803d1fbd.png?auto=format&dpr=1&w=1000',
-        'https://i.seadn.io/s/raw/files/7c50c8ce58d8976aaf8d9097a5568e20.png?auto=format&dpr=1&w=1000',
-        'https://i.seadn.io/s/raw/files/f404c42f90ab3d63d5f7d43eeb97d583.png?auto=format&dpr=1&w=1000',
-        'https://i.seadn.io/s/raw/files/3bf515fc55478ba57bf56ada5a02031a.png?auto=format&dpr=1&w=1000'
-      ]
-      
-      return {
-        ...clonedItem,
-        id: 0,
-        endTime: generateTimestamp(),
-        startTimestamp: generateTimestamp(),
-        isClone: true,
-        nftName: faker.internet.userName() + '-' + faker.number.int({ min: 1, max: 100 }),
-        nftImage: imageUrls[faker.number.int({ min: 0, max: 5 })]
-      }
-    })
-  }
+  // const generateMockData = (list) => {
+  //   const num = 6
+  //   const len = num - list.length
+  //   if (len <= 0) return []
+  //   return Array.from({ length: len }, (idx) => {
+  //     const clonedItem = { ...list[0] }
+  //     delete clonedItem.id 
+  //     delete clonedItem.state
+      // const imageUrls = [
+      //   'https://i.seadn.io/gcs/files/16d9892108638a415d1244943f908fad.png?auto=format&dpr=1&w=1000',
+      //   'https://i.seadn.io/gcs/files/247c8f8946f77b9132326a4ff2340903.png?auto=format&dpr=1&w=1000',
+      //   'https://i.seadn.io/gcs/files/d4a9c0b5a6467a93f192c6043fe329b0.png?auto=format&dpr=1&w=1000',
+      //   'https://i.seadn.io/gcs/files/7b7c959e8453c734c115083d87844d05.png?auto=format&dpr=1&w=1000',
+      //   'https://i.seadn.io/gcs/files/f149b2d37d093ca7b8853dce5faafca1.png?auto=format&dpr=1&w=1000',
+      //   'https://i.seadn.io/gcs/files/1559b8597ed4db6578a218f181f24716.png?auto=format&dpr=1&w=1000'
+      // ]
+  //     return {
+  //       ...clonedItem,
+  //       id: 0,
+  //       endTime: generateTimestamp(),
+  //       startTimestamp: generateTimestamp(),
+  //       isClone: true,
+  //       nftName: faker.internet.userName() + '-' + faker.number.int({ min: 1, max: 100 }),
+  //       nftImage: imageUrls[faker.number.int({ min: 0, max: 5 })]
+  //     }
+  //   })
+  // }
 
-  const renderList = () => {
-    if (!gameList.length) return
-    const upcomingList = gameList.filter(v => v.state === 0)
-    const ongoingList = gameList.filter(v => v.state === 1)
-    const finishedList = gameList.filter(v => v.state === 2)
-    setUpcomingList([upcomingList[0]])
-    setOngoingList(ongoingList.concat(generateMockData(ongoingList)))
-    setFinishedList(finishedList.concat(generateMockData(finishedList)))
-  }
-
+  // const renderList = () => {
+  //   if (!gameList.length) return
+  //   const upcomingList = gameList.filter(v => v.state === 0)
+  //   const ongoingList = gameList.filter(v => v.state === 1)
+  //   const finishedList = gameList.filter(v => v.state === 2)
+  //   setUpcomingList([upcomingList[0]])
+  //   setOngoingList(ongoingList.concat(generateMockData(ongoingList)))
+  //   setFinishedList(finishedList.concat(generateMockData(finishedList)))
+  // }
 
 
-  useEffect(() => {
-    renderList()
-  }, [gameList])
+  // const ref = useRef(false)
+
+  // useEffect(() => {
+  //   if (!ref.current) {
+  //     toastSuccess('You have successfully staked your NFT. ')
+  //     ref.current = true
+  //   }
+  // }, [])
 
   // const renderTabs = [
   //   {
@@ -188,7 +189,7 @@ export default function Main() {
         <Box padding='0 42px'>
           <SimpleGrid
             mt='20px'
-            columns={[1, 2, 3, 4, 5, 6]}
+            columns={[1, 2, 3, 4]}
             spacing="20px">
             {ongoingList?.map((item, idx) => {
               return <ItemGrid gridName='ongoingList' item={item} key={idx} />
@@ -197,15 +198,15 @@ export default function Main() {
         </Box>
   
         <Box padding='0 42px' marginTop="55px">
-          <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Upcoming Auctions</Text>({upcomingList.length}) - Queuing</Flex>
+          <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Upcoming Auctions</Text>(1) - Queuing</Flex>
           <Box h='1px' backgroundColor="rgba(112, 75, 234, 0.5)"></Box>
         </Box>
         <Box padding='0 42px'>
           <SimpleGrid
             mt='20px'
-            columns={[1, 2, 3, 4, 5, 6]}
+            columns={[1, 2, 3, 4]}
             spacing="20px">
-            {upcomingList?.map((item, idx) => {
+            {[upcomingList[0]]?.map((item, idx) => {
               return <ItemGrid gridName='upcomingList' item={item} key={idx} />
             })}
           </SimpleGrid>
@@ -218,7 +219,7 @@ export default function Main() {
         <Box padding='0 42px'>
           <SimpleGrid
             mt='20px'
-            columns={[1, 2, 3, 4, 5, 6]}
+            columns={[1, 2, 3, 4]}
             spacing="20px">
             {finishedList?.map((item, idx) => {
               return <ItemGrid gridName='finishedList' item={item} key={idx} />
@@ -266,7 +267,8 @@ export default function Main() {
                     color="#fff"
                     fontSize="20px"
                     lineHeight="30px">
-                    You got the chance to auction NFT on {calcStartTime.format('MMMM DD') || 'Mar 26'}
+                    {/* You got the chance to auction NFT on {calcStartTime.format('MMMM DD') || 'Mar 26'} */}
+                    The NFT auction will start on Mar 28, 0am
                   </Text>
                 ) : (
                   <Text
@@ -274,9 +276,7 @@ export default function Main() {
                   color="#fff"
                   fontSize="20px"
                   lineHeight="30px">
-                  Get the chance to auction NFT on{' '}
-                  {calcStartTime.format('MMMM DD')|| 'Mar 26'} by bidding a plot of
-                  FroopyLand：
+                  Get the chance to auction NFT on Mar 28 by bidding a plot of FroopyLand：
                 </Text>
                 )
               }
@@ -312,20 +312,20 @@ export default function Main() {
                   p="20px 24px"
                   h="66px"
                   backgroundColor="rgba(112, 75, 234, 0.5);">
-                  <Text>Highest Bid：- - $FLT</Text>
+                  <Text>Highest Bid： 570 $FLT</Text>
                   <Text
                     w="1px"
                     h="100%"
                     bg="rgba(255, 255, 255, 0.5)"
                     m="0 16px"></Text>
-                  <Text>0 Bidders</Text>
+                  <Text>7 Bidders</Text>
                   <Text
                     w="1px"
                     h="100%"
                     bg="rgba(255, 255, 255, 0.5)"
                     m="0 16px"></Text>
                   <Text color="rgba(255, 255, 255, 0.5)">
-                    {
+                    {/* {
                       actionsState === ActivityStatus.NotStarted && (
                         `Open on ${calcStartTime.format('MMMM DD, Ha')}`
                       )
@@ -334,7 +334,8 @@ export default function Main() {
                       actionsState === ActivityStatus.Bidding && (
                         `Close on ${calcStartTime.clone().add(moment.duration(16, 'hours')).format('MMMM DD, Ha')}`
                       )
-                    }
+                    } */}
+                    Close on Mar 27 16pm
                   </Text>
                   {
                     actionsState === ActivityStatus.Bidding && (
@@ -354,13 +355,13 @@ export default function Main() {
             {
               ActivityStatus.Staking === actionsState && (
                 <Flex pos="relative" _hover={{ cursor: 'pointer' }}  onClick={() => router.push('/stakeNFT')}>
-                  <Button zIndex="1" fontSize='24px' fontWeight='bold' w="240px" color='#000' h='66px' backgroundColor='#00DAB3'>Stake NFT</Button>
+                  <Button zIndex="1" fontSize='22px' fontWeight='bold' w="240px" color='#000' h='66px' backgroundColor='#00DAB3'>Auction Upcoming</Button>
                   <Flex borderRadius="10px" alignItems="center" position="absolute" color="#fff" fontSize="16px" zIndex="0" left="210px" ml="20px" p="20px 24px" h='66px' backgroundColor='rgba(112, 75, 234, 0.5);'>
-                    <Text>Highest Bid：20 $FLT</Text>
+                    <Text>Highest Bid：700 $FLT</Text>
                     <Text w="1px" h="100%" bg="rgba(255, 255, 255, 0.5)" m="0 16px"></Text>
-                    <Text>9 Bidders</Text>
-                    <Text w="1px" h="100%" bg="rgba(255, 255, 255, 0.5)" m="0 16px"></Text>
-                    <Text color="rgba(255, 255, 255, 0.5)">Close on April 14, 12am</Text>
+                    <Text>8 Bidders</Text>
+                    {/* <Text w="1px" h="100%" bg="rgba(255, 255, 255, 0.5)" m="0 16px"></Text> */}
+                    {/* <Text color="rgba(255, 255, 255, 0.5)">Close on Mar 28, 0am</Text> */}
                     <Image src='./static/market/start.svg' alt='start' w="28px" h="28px" ml="30px"></Image>
                   </Flex>
                 </Flex>

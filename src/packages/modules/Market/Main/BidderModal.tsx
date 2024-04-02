@@ -26,27 +26,27 @@ type NFTItem = {
 const nftItems: NFTItem[] = [
   {
     address: "0x34d85c9C79B777399AaAAe42f7c769c7b59793D0", // CryptoPunks #7842
-    bidAmount: 100,
+    bidAmount: 111,
     isMine: false,
   },
   {
     address: "0x7f88082855B543a96735b6f773D94bF39a383614", // Bored Ape Yacht Club #420
-    bidAmount: 200,
+    bidAmount: 207,
     isMine: false,
   },
   {
     address: "0x60E4d787612f4b442e2144f775c94717c7832a1b", // Azuki #4469
-    bidAmount: 300,
+    bidAmount: 320,
     isMine: false,
   },
   {
     address: "0x8a90CAb2b38bA80c048a774907777712D232c411", // Doodles #4957
-    bidAmount: 400,
+    bidAmount: 430,
     isMine: false,
   },
   {
     address: "0x495f9f574c77f9604b8335739c7f8a4d83b79b77", // Art Blocks Curated #152
-    bidAmount: 500,
+    bidAmount: 570,
     isMine: false,
   },
 ]
@@ -85,9 +85,9 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
       }])
     }
 
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-    }
+    // if (scrollRef.current) {
+    //   scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    // }
 
     setValue(null)
   }

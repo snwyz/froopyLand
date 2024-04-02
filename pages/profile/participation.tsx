@@ -33,7 +33,7 @@ export default function Main() {
   const headers = [
     {
       name: 'FLT Price',
-      number: '$ 56',
+      number: '$ ',
     },
     {
       name: 'My Key Holder Dividends',
@@ -51,28 +51,13 @@ export default function Main() {
 
   const renderTabs = [
     {
-      id: 0,
-      title: 'All Auctions',
-      value: 'all',
-      render: (
-        <SimpleGrid
-          mt='20px'
-          columns={[1, 2, 3, 4, 5]}
-          spacing="20px">
-          {gameList.map((item, idx) => {
-            return <ItemGrid gridName='all' item={item} key={idx} />
-          })}
-        </SimpleGrid>
-        ),
-    },
-    {
       id: 1,
       title: 'Ongoing Auctions',
       value: 'ongoing',
       render: (
         <SimpleGrid
           mt='20px'
-          columns={[1, 2, 3, 4, 5]}
+          columns={[1, 2, 3]}
           spacing="20px">
           {ongoingList.map((item, idx) => {
             return <ItemGrid gridName='ongoing' item={item} key={idx} />
@@ -87,7 +72,7 @@ export default function Main() {
       render: (
         <SimpleGrid
           mt='20px'
-          columns={[1, 2, 3, 4, 5]}
+          columns={[1, 2, 3]}
           spacing="20px">
           {finishedList.map((item, idx) => {
             return <ItemGrid gridName='finished' item={item} key={idx} />
@@ -116,7 +101,7 @@ export default function Main() {
             }>
             <Box p="25px 50px">
               <TabsCommon
-                initTab='all'
+                initTab='ongoing'
                 renderTabs={renderTabs}
               />
             </Box>

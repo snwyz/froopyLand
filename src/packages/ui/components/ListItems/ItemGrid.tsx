@@ -54,7 +54,8 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
 
   const RenderCount = () => {
     const formattedTime = useMemo(() => {
-      const timeString = `${time.days > 0 ? `${time.days}days ` : ''}${time.hours > 0 ? `${time.hours}hrs ` : ''}${time.minutes}mins ${time.seconds}secs`
+      // const timeString = `${time.days > 0 ? `${time.days}days ` : ''}${time.hours > 0 ? `${time.hours}hrs ` : ''}${time.minutes}mins ${time.seconds}secs`
+      const timeString = `0days ${time.hours > 0 ? `${time.hours}hrs ` : ''}${time.minutes}mins ${time.seconds}secs`
       return `${timeString}`.trim()
     }, [time])
   
@@ -67,7 +68,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
     }
   }
 
-  const [bidder, setBidder] = useState(faker.number.int({ min: 1, max: 20 }))
+  const [bidder, setBidder] = useState(faker.number.int({ min: 20, max: 500 }))
   
   if (pathname === PathnameType.MARKET) {
     
