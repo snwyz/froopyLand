@@ -7,7 +7,7 @@ import { immer } from 'zustand/middleware/immer'
 // 322的已经开始位置拍卖了，有位置拍卖中的
 // import FroopyABI322 from 'packages/abis/demo/fl322.json'
 // 323的今天晚上0点开始位置拍卖
-import FroopyABI323 from 'packages/abis/demo/fl323.json'
+import FroopyABI323 from 'packages/abis/demo/fl409.json'
 
 
 
@@ -57,6 +57,7 @@ const useAuctions = create(immer<IState>(((set, get) => ({
 
       const contract = new ethers.Contract(FL_CONTRACT_ADR_323, FroopyABI323, signer)
       const tx = await contract.bidRoundInfo()
+      
       console.log(tx, 'tx')
       
       set({

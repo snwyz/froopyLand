@@ -13,8 +13,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import '@styles/_globals.scss'
 
 import DefaultLayout from '../src/layout/default'
-import useAuctions from 'packages/store/auctions'
-import { useEffect } from 'react'
+// import useAuctions from 'packages/store/auctions'
 
 // replace console.* for disable log on production
 if (isProd) {
@@ -27,11 +26,11 @@ const queryClient = new QueryClient()
 
 const App = ({ Component, pageProps }: any) => {
   useVH()
-  const { setStartTimeByContract } = useAuctions()
+  // const { setStartTimeByContract } = useAuctions()
 
-  useEffect(() => {
-    setStartTimeByContract()
-  }, [])
+  // useEffect(() => {
+  //   setStartTimeByContract()
+  // }, [])
 
   return (
     <ChakraProvider theme={customTheme}>

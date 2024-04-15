@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import moment from 'moment'
 
 const useCountDown = (deadline, onTimeout = null) => {
+  const [ended, setEnded] = useState(false)
 
   const formatTimeUnit = (unit) => (unit < 10 ? `0${unit}` : unit)
 
@@ -12,6 +13,7 @@ const useCountDown = (deadline, onTimeout = null) => {
     
     if (diff <= 0) {
       onTimeout && onTimeout()
+      setEnded(true)
       return { days: 0, hours: 0, minutes: 0, seconds: 0 }
     }
 
@@ -26,15 +28,19 @@ const useCountDown = (deadline, onTimeout = null) => {
 
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft)
 
-  useEffect(() => {
+  useEffect(() => {    
     const timerInterval = setInterval(() => {
       setTimeLeft(calculateTimeLeft())
     }, 1000)
 
+    if (ended) {
+      return clearInterval(timerInterval)
+    }
+
     return () => {
       clearInterval(timerInterval)
     }
-  }, [deadline, onTimeout, calculateTimeLeft])
+  }, [deadline, onTimeout, calculateTimeLeft, ended])
 
   return timeLeft
 }

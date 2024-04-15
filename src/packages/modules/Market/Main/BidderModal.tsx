@@ -1,12 +1,12 @@
 import { Button, useColorModeValue, VStack, Heading, Flex, Text, Box, Image, Input  } from '@chakra-ui/react'
 
 import BaseModal from '@components/Modal'
-import { ellipseAddress } from '@utils'
+import { ellipseAddress, formatNumberWithCommas } from '@utils'
 import { toastError } from '@utils/toast'
 import { ethers } from 'ethers'
 import { web3Modal } from 'packages/web3'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import FroopyABI from 'packages/abis/demo/fl323.json'
+import FroopyABI from 'packages/abis/demo/fl409.json'
 import useStore from 'packages/store'
 
 const FL_CONTRACT_ADR = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR
@@ -51,11 +51,25 @@ const nftItems: NFTItem[] = [
   },
 ]
 
+
+
+// TODO LIST
+
+// 1. 出价列表 - API
+
+// 2. 监听日志，有新的日志拍卖，就前端直接更新列表 - 合约？
+
+// 3. 出价正常 / 异常
+
+
 const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
   const [value, setValue] = useState(undefined)
   const [list, setList] = useState<NFTItem[]>(nftItems)
+
+  const [availableNums, setAvailableNums] = useState(0)
+
   const scrollRef = useRef(null)
-  const available = 10000
+
 
   const { address } = useStore()
   
@@ -69,7 +83,7 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
 
     if (isLowPrice) return toastError('Bid must be higher than the current highest bid.')
     
-    if (value > available) return toastError('Bid must be lower than the current available $FL Token')
+    if (value > availableNums) return toastError('Bid must be lower than the current available $FL Token')
 
     const existingItemIndex = bidList.findIndex(item => item.isMine)
 
@@ -104,7 +118,28 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
 
     if (!address) return toastError('Please connect wallet first.')
     
-    const [tx] = await contract.bidderInfos(address)
+    try {
+      const tx = await contract.getBidderInofOf(address)
+      
+      setAvailableNums(tx.sysTokenBalance.toNumber())
+    } catch (error) {
+      console.log(error, '<====')
+    }
+  }
+
+  const registerUpdateSOL = async () => {
+    const provider = await web3Modal.connect()    
+    const library = new ethers.providers.Web3Provider(provider)
+    const signer = library.getSigner()
+
+    const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
+
+
+    // wait SOL deploy 
+    contract.on('NewBids', (from, to, value) => {
+      console.log(`NewBids event detected: ${from} -> ${to}, value: ${value}`)
+    })
+
   }
 
 
@@ -131,13 +166,12 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
                   fontWeight={700}
                   fontSize="20px"
                   border="none"
-                  defaultValue={value}
                   value={value}
                   onChange={e => setValue(e.target.value)}
                 />
                 <Text color="#333" fontSize="14px" lineHeight="24px">$FLT</Text>
               </Flex>
-              <Text mt="8px" fontSize="12px" lineHeight="18px" color="#4F4F4F">Available：10,000 $FL Token</Text>
+              <Text mt="8px" fontSize="12px" lineHeight="18px" color="#4F4F4F">Available：{formatNumberWithCommas(availableNums)} $FL Token</Text>
             </Box>
           <Button
             w="298px"
@@ -149,6 +183,7 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
             bg="#704BEA"
             _hover={{ bg: "#704BEA" }}
             onClick={handleBid}
+            disabled={availableNums <= 0}
           >
             Bid
           </Button>

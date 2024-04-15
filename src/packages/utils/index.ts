@@ -47,7 +47,7 @@ export function convertUrlImage(url: string) {
 
 export function ellipseAddress(address = '', width = 6): string {
   if (!address) {
-    return ''
+    return '--'
   }
   return `${address.slice(0, width)}...${address.slice(-width)}`
 }
@@ -162,4 +162,13 @@ export function formatEther(wei: BigNumberish): string {
 
 export function parseEther(ether: string): BigNumber {
   return parseUnits(ether, 18)
+}
+
+
+export function formatNumberWithCommas(num: number): string {
+  if (num === 0) return '0'
+
+  // 用于生成千位分隔符格式
+  // eg: 10000 输出 "10,000"
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }

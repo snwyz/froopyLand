@@ -1,4 +1,4 @@
-import { lazy, useMemo, useState, Suspense } from 'react'
+import { lazy, useState, Suspense } from 'react'
 
 import { Box, Image, Text, Flex, SimpleGrid, Button, Spinner } from '@chakra-ui/react'
 import ItemGrid from 'packages/ui/components/ListItems/ItemGrid'
@@ -8,12 +8,21 @@ import useFomoStore from 'packages/store/fomo'
 import NoData from '@components/NoData'
 import { faker } from '@faker-js/faker'
 import moment from 'moment'
-import useAuctions, { ActivityStatus } from 'packages/store/auctions'
+import { ActivityStatus } from 'packages/store/auctions'
 import { useRouter } from 'next/router'
 import { toastWarning } from '@utils/toast'
 
 const BidderModal = lazy(() => import('@modules/Market/Main/BidderModal'))
 
+
+// TODO 
+
+// 1.  获取游戏信息（包括开始时间，开始状态，出价信息，质押状态） - API 
+// data struct
+//  createTime
+//  state 
+//  bidInfo()
+// 2.  未登录 / 登录 界面控制
 
 interface Item {
   derivativeContractAddress: string
@@ -65,8 +74,7 @@ const getActionsState = (): ActivityStatus => {
   return state
 }
 
-const actionsState = (() => ActivityStatus.Staking)()  // TEST info
-const num = 1
+const actionsState = (() => ActivityStatus.Bidding)()  // TEST info
 
 export default function Main() {
 
@@ -76,107 +84,6 @@ export default function Main() {
   const [open, setOpen] = useState(false)
 
   const { gameList, upcomingList, ongoingList, finishedList } = useFomoStore()
-
-  const { startTime, state, roundInfo } = useAuctions()
-  
-  // const getActivityStatus  = (startTime: Moment) => {
-  //   if (!startTime) return ActivityStatus.NotStarted
-  //   console.log(startTime.format('YYYY-MM-DD'), '<=====startTime')
-    
-  //   const biddingEndTime = startTime.add(moment.duration(16, 'hours'))
-  //   const stakingEndTime = biddingEndTime.clone().add(moment.duration(8, 'hours'))
-
-  //   let state = ActivityStatus.NotStarted
-
-  //   if (moment().isBefore(startTime)) {
-  //     state = ActivityStatus.NotStarted
-  //   } else if (moment().isBetween(startTime, biddingEndTime)) {
-  //     state = ActivityStatus.Bidding
-  //   } else if (moment().isBetween(biddingEndTime, stakingEndTime)) {
-  //     state = ActivityStatus.Staking
-  //   } else {
-  //     state = ActivityStatus.Playing
-  //   }
-  //   return state
-  // }
-
-  const calcStartTime = useMemo(() => moment(Number(roundInfo?.bidStartTimePoint) * 1000), [roundInfo])
-
-  // const actionsState = useMemo(()=> getActivityStatus(moment(Number(roundInfo?.bidStartTimePoint) * 1000)), [roundInfo])
-
-  // getActionsState() 
-
-  
-  console.log(actionsState, 'actionsState')
-  
-  // const generateMockData = (list) => {
-  //   const num = 6
-  //   const len = num - list.length
-  //   if (len <= 0) return []
-  //   return Array.from({ length: len }, (idx) => {
-  //     const clonedItem = { ...list[0] }
-  //     delete clonedItem.id 
-  //     delete clonedItem.state
-      // const imageUrls = [
-      //   'https://i.seadn.io/gcs/files/16d9892108638a415d1244943f908fad.png?auto=format&dpr=1&w=1000',
-      //   'https://i.seadn.io/gcs/files/247c8f8946f77b9132326a4ff2340903.png?auto=format&dpr=1&w=1000',
-      //   'https://i.seadn.io/gcs/files/d4a9c0b5a6467a93f192c6043fe329b0.png?auto=format&dpr=1&w=1000',
-      //   'https://i.seadn.io/gcs/files/7b7c959e8453c734c115083d87844d05.png?auto=format&dpr=1&w=1000',
-      //   'https://i.seadn.io/gcs/files/f149b2d37d093ca7b8853dce5faafca1.png?auto=format&dpr=1&w=1000',
-      //   'https://i.seadn.io/gcs/files/1559b8597ed4db6578a218f181f24716.png?auto=format&dpr=1&w=1000'
-      // ]
-  //     return {
-  //       ...clonedItem,
-  //       id: 0,
-  //       endTime: generateTimestamp(),
-  //       startTimestamp: generateTimestamp(),
-  //       isClone: true,
-  //       nftName: faker.internet.userName() + '-' + faker.number.int({ min: 1, max: 100 }),
-  //       nftImage: imageUrls[faker.number.int({ min: 0, max: 5 })]
-  //     }
-  //   })
-  // }
-
-  // const renderList = () => {
-  //   if (!gameList.length) return
-  //   const upcomingList = gameList.filter(v => v.state === 0)
-  //   const ongoingList = gameList.filter(v => v.state === 1)
-  //   const finishedList = gameList.filter(v => v.state === 2)
-  //   setUpcomingList([upcomingList[0]])
-  //   setOngoingList(ongoingList.concat(generateMockData(ongoingList)))
-  //   setFinishedList(finishedList.concat(generateMockData(finishedList)))
-  // }
-
-
-  // const ref = useRef(false)
-
-  // useEffect(() => {
-  //   if (!ref.current) {
-  //     toastSuccess('You have successfully staked your NFT. ')
-  //     ref.current = true
-  //   }
-  // }, [])
-
-  // const renderTabs = [
-  //   {
-  //     id: 0,
-  //     title: 'Game List',
-  //     value: MarketTabs.PUBLIC,
-  //     render: (
-  //       <ListItems
-  //         isLoading={isLoading}
-  //         items={gameList}
-  //         columnsList={[
-  //           'NFT name',
-  //           'NFT Provider Address',
-  //           'Key Price (Ether)',
-  //           'Start time',
-  //           'State'
-  //         ]}
-  //       />
-  //     ),
-  //   },
-  // ]
 
   const List = () => {
     if (gameList.length === 0) return <NoData />
@@ -250,16 +157,27 @@ export default function Main() {
               w={{ base: '1118px' }}
               height="171px"
             />
-            <Image
-              marginBottom="54px"
-              objectFit="cover"
-              src="./static/market/price-list.png"
-              alt="logo"
-              w="1034px"
-              h="123px"
-            />
+            <Flex gap="20px" mb="50px">
+              <Flex flexDir="column">
+                <Text color="#FFA8FE" fontSize="24px" lineHeight="36px">$FLT Price</Text>
+                <Text color="#fff" fontWeight="700" fontSize="32px" lineHeight="48px">$5.40</Text>
+              </Flex>
+              <Flex flexDir="column">
+                <Text color="#FFA8FE" fontSize="24px" lineHeight="36px">Total Keys Minted</Text>
+                <Flex align="center"><Image src='/static/common/eth-index.svg' alt='ethereum' w="19px" h="32px" mr="8px"></Image><Text fontSize="32px" lineHeight="48px">5240</Text></Flex>
+                <Text color="#fff" fontWeight="700" fontSize="20px" lineHeight="30px">$78.48M</Text>
+              </Flex>
+              <Flex flexDir="column">
+                <Text color="#FFA8FE" fontSize="24px" lineHeight="36px">Total Prize & Dividends</Text>
+                <Flex align="center"><Image src='/static/common/eth-index.svg' alt='ethereum' w="19px" h="32px" mr="8px"></Image><Text fontSize="32px" lineHeight="48px">5240</Text></Flex>
+                <Text color="#fff" fontWeight="700" fontSize="20px" lineHeight="30px">$78.48M</Text>
+              </Flex>
+              <Flex flexDir="column">
+                <Text color="#FFA8FE" fontSize="24px" lineHeight="36px">Total NFTs Auctioned</Text>
+                <Text color="#fff" fontWeight="700" fontSize="32px" lineHeight="48px">$5.40</Text>
+              </Flex>
+            </Flex>
             <Flex alignItems="center" mb="20px">
-
               {
                 ActivityStatus.Staking === actionsState ? (
                   <Text
@@ -283,9 +201,7 @@ export default function Main() {
               
               {/* <Text fontSize="16px" lineHeight="24px">Registration closes on Feb 14, 12am</Text> */}
             </Flex>
-            {[ActivityStatus.NotStarted, ActivityStatus.Bidding].includes(
-              actionsState,
-            ) && (
+            {[ActivityStatus.NotStarted, ActivityStatus.Bidding].includes(actionsState) && (
               <Flex pos="relative" _hover={ActivityStatus.NotStarted !== actionsState ? { cursor: 'pointer' } : null}>
                 <Button
                   zIndex="1"
@@ -380,8 +296,6 @@ export default function Main() {
                 <Image src='./static/market/start.svg' alt='start' w="28px" h="28px" ml="30px"></Image>
               </Flex>
             </Flex> */}
-
-
 
           </Box>
           <Image
