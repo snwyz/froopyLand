@@ -4,15 +4,17 @@ import create from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import FroopyABI from 'packages/abis/demo/fl409.json'
 import { generateTimestamp } from '@modules/Market/Main'
+import { getNftAuctions } from 'packages/service/api'
 
 
 interface IState {
-  loading: boolean
-  gameList: any[]
-  upcomingList: any[]
-  ongoingList: any[]
-  finishedList: any[]
-  setGameList: (web3Provider: ethers.providers.Web3Provider) => void
+    loading: boolean
+    gameList: any[]
+    upcomingList: any[]
+    ongoingList: any[]
+    finishedList: any[]
+    setGameList: (web3Provider: ethers.providers.Web3Provider) => void
+    getNftAuctions: () => Promise<void>
 }
 
 const FL_CONTRACT_ADR = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR
@@ -96,24 +98,38 @@ const useFomoStore = create(immer<IState>(((set) => ({
       const ongoingList = gameList.filter(v => v.state === 1)
       const finishedList = gameList.filter(v => v.state === 2)
 
-      const renderList = () => {
-        return [
-          ...upcomingList.concat(generateMockData(upcomingList, 0)),
-          ...ongoingList.concat(generateMockData(ongoingList, 1)),
-          ...finishedList.concat(generateMockData(finishedList, 2))
-        ]
-      }
-      const data = renderList()
+          const renderList = () => {
+            return [
+              ...upcomingList.concat(generateMockData(upcomingList, 0)), 
+              ...ongoingList.concat(generateMockData(ongoingList, 1)), 
+              ...finishedList.concat(generateMockData(finishedList, 2))
+            ]
+          }
+          const data = renderList()
+          set({
+            gameList: data,
+            upcomingList: [...upcomingList.concat(generateMockData(upcomingList, 0))],
+            ongoingList: [...ongoingList.concat(generateMockData(ongoingList, 1))],
+            finishedList: [...finishedList.concat(generateMockData(finishedList, 2))]
+          })
+        } catch (error) {
+          console.error('Error initializing contract:', error.message)
+        }
+    },
+    async getNftAuctions() {
+      const { nftList } = await getNftAuctions()
+
+      const upcomingList = nftList.filter(v => v.status === '0')
+      const ongoingList = nftList.filter(v => v.status === '1')
+      const finishedList = nftList.filter(v => v.status === '2')
+      
       set({
-        gameList: data,
-        upcomingList: [...upcomingList.concat(generateMockData(upcomingList, 0))],
-        ongoingList: [...ongoingList.concat(generateMockData(ongoingList, 1))],
-        finishedList: [...finishedList.concat(generateMockData(finishedList, 2))]
+        gameList: nftList,
+        upcomingList,
+        ongoingList,
+        finishedList
       })
-    } catch (error) {
-      console.error('Error initializing contract:', error.message)
     }
-  },
 }))))
 
 

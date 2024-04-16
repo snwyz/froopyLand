@@ -166,8 +166,11 @@ export function parseEther(ether: string): BigNumber {
 
 
 export function formatNumberWithCommas(num: number): string {
-  if (num === 0) return '0'
-
+  if (!num) return '0'
+  
+  if (typeof num === 'string') {
+    num =  parseFloat(num)
+  }
   // 用于生成千位分隔符格式
   // eg: 10000 输出 "10,000"
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")

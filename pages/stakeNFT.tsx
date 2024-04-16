@@ -3,7 +3,6 @@ import { ellipseAddress } from '@utils'
 import { toastError, toastWarning } from '@utils/toast'
 import { ethers } from 'ethers'
 import moment from 'moment'
-import http from 'packages/service'
 import useStore from 'packages/store'
 import { web3Modal } from 'packages/web3'
 import { useEffect, useRef, useState } from 'react'
@@ -11,14 +10,12 @@ import { useEffect, useRef, useState } from 'react'
 import flABI from 'packages/abis/demo/fl409.json'
 import ERC_ABI from 'packages/abis/demo/Erc721.json'
 import { useRouter } from 'next/router'
+import useAuctions from 'packages/store/auctions'
 
 
 const FL_CONTRACT_ADR = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR
-
-
 const ERC_NFT = process.env.NEXT_PUBLIC_ERC_NFT
 
-const NFT_ADDRESS = process.env.NEXT_PUBLIC_NFT_ADDRESS
 const NFT_ID = 29 // 28-35
 
 
@@ -27,35 +24,29 @@ const Register = () => {
 
     const router = useRouter()
 
-    const [nftList, setNftList] = useState([])
+    // const [nftList, setNftList] = useState([])
     const [nft, setNFT] = useState(null)
 
     const [isLoading, setIsLoading] = useState(false)
 
     const { address } = useStore()
+
+    const { nftList, auctionInfo, getUserNftList } = useAuctions()
+
+
     const { isOpen, onOpen, onClose } = useDisclosure()
     const cancelRef = useRef()
 
 
 
     const fetchNFT = async () => {
-
-        const data = await http.get<any>(`https://api.opensea.io/api/v2/chain/ethereum/account/${NFT_ADDRESS}/nfts`, {
-            headers: {
-                "x-api-key": process.env.NEXT_PUBLIC_NFT_KEY
-            }
-        })
-        setNftList(data.nfts)
-    }
-
-
-    const genDate = () => {
-        // 创建一个代表 UTC 时间的 Moment 对象
-        const date = moment.utc()
-        // 使用 `format` 方法指定格式
-        const formattedDate = date.hour(8).minute(0).second(0)
-        
-        return formattedDate
+        getUserNftList(address)
+        // const data = await http.get<any>(`https://api.opensea.io/api/v2/chain/ethereum/account/${NFT_ADDRESS}/nfts`, {
+        //     headers: {
+        //         "x-api-key": process.env.NEXT_PUBLIC_NFT_KEY
+        //     }
+        // })
+        // setNftList(data.nfts)
     }
 
     useEffect(() => {
@@ -75,7 +66,7 @@ const Register = () => {
     
             const erc_contract = new ethers.Contract(ERC_NFT, ERC_ABI, signer)
     
-            const approvedAddr = await erc_contract.getApproved(NFT_ID, {
+            const approvedAddr = await erc_contract.getApproved(nft.tokenId, {
                 gasLimit: BigInt(500000)
             })
     
@@ -86,14 +77,13 @@ const Register = () => {
             
             if (!isApproved) {
                 try {
-                    const tt = await erc_contract.approve(FL_CONTRACT_ADR, NFT_ID, {
+                    const tt = await erc_contract.approve(FL_CONTRACT_ADR, nft.tokenId, {
                         gasLimit: BigInt(500000)
                     })
                     console.log(tt, '<=======91')
-                    
                     await tt.wait()
                 } catch (error) {
-                    console.log('创建授权 NFT：已被使用')
+                    console.log('Current NFT Authorization: In Use')
                     
                 }
             }
@@ -101,10 +91,10 @@ const Register = () => {
             const contract = new ethers.Contract(FL_CONTRACT_ADR, flABI, signer)
             
             try {
-                const tx = await contract.newGame(ERC_NFT, NFT_ID, {
+                const tx = await contract.newGame(ERC_NFT, nft.tokenId, {
                     gasLimit: BigInt(500000)
                 })
-                const data = await tx.wait()
+                await tx.wait()
                 router.back()
             } catch (error) {
                 toastWarning('The auction has not yet begun, please be patient.')
@@ -117,6 +107,8 @@ const Register = () => {
             setIsLoading(false)
         }
     }
+
+    if (!auctionInfo) return router.push('/')
 
     return (
         <>
@@ -132,7 +124,7 @@ const Register = () => {
                             <Text mr="44px" textAlign="right" color="rgba(255, 255, 255, 0.7)" fontSize="16px" lineHeight="18px" w="180px">Stake NFT</Text>
                             <Select
                                 w="400px"
-                                placeholder="Select Nft in FroopLand"
+                                placeholder="Select Nft in Fromo"
                                 _focusVisible={{
                                     borderColor: '#704BEA',
                                 }}
@@ -140,7 +132,7 @@ const Register = () => {
                                 borderColor="#704BEA"
                                 h="52px">
                                 {
-                                    nftList.map(nft => (<option key={nft.identifier} value={JSON.stringify(nft)}>{nft.name}</option>))
+                                    nftList.map(nft => (<option key={nft.nftAddress} value={JSON.stringify(nft)}>{nft.name}</option>))
                                 }
                             </Select>
                         </Flex>
@@ -148,21 +140,21 @@ const Register = () => {
                             nft && (
                             <Flex align="center" mb="20px" mt="20px">
                                 <Text mr="44px" textAlign="right" color="rgba(255, 255, 255, 0.7)" fontSize="16px" lineHeight="18px" w="180px"></Text>
-                                <Image src={nft?.image_url} fallbackSrc='/static/account/avatar.png' alt='logo' w="400px" h="400px" borderRadius="15px"></Image>
+                                <Image src={nft?.imageUrl} fallbackSrc='/static/account/avatar.png' alt='logo' w="400px" h="400px" borderRadius="15px"></Image>
                             </Flex>
                             )
                         }
                         <Flex align="center" h="52px" mb="20px">
                             <Text mr="44px" textAlign="right" color="rgba(255, 255, 255, 0.7)" fontSize="16px" lineHeight="18px" w="180px">NFT Owner</Text>
-                            <Text fontSize="16px" lineHeight="24px" color="#fff">{nft ? ellipseAddress(address, 10) : '-'}</Text>
+                            <Text fontSize="16px" lineHeight="24px" color="#fff">{nft ? ellipseAddress(nft?.userAddress, 10) : '-'}</Text>
                         </Flex>
                         <Flex align="center" h="52px" mb="20px">
                             <Text mr="44px" textAlign="right" color="rgba(255, 255, 255, 0.7)" fontSize="16px" lineHeight="18px" w="180px">Contract Address</Text>
-                            <Text fontSize="16px" lineHeight="24px" color="#fff">{ellipseAddress(nft?.contract, 10) || '-'}</Text>
+                            <Text fontSize="16px" lineHeight="24px" color="#fff">{ellipseAddress(nft?.nftAddress, 10) || '-'}</Text>
                         </Flex>
                         <Flex align="center" h="52px" mb="20px">
                             <Text mr="44px" textAlign="right" color="rgba(255, 255, 255, 0.7)" fontSize="16px" lineHeight="18px" w="180px">Token ID</Text>
-                            <Text fontSize="16px" lineHeight="24px" color="#fff">{nft?.identifier || '-'}</Text>
+                            <Text fontSize="16px" lineHeight="24px" color="#fff">{nft?.tokenId || '-'}</Text>
                         </Flex>
                         <Flex align="center" h="52px" mb="20px">
                             <Text mr="44px" textAlign="right" color="rgba(255, 255, 255, 0.7)" fontSize="16px" lineHeight="18px" w="180px">Token Standard</Text>
@@ -178,7 +170,8 @@ const Register = () => {
                         </Flex>
                         <Flex align="center" h="52px" mb="20px">
                             <Text mr="44px" textAlign="right" color="rgba(255, 255, 255, 0.7)" fontSize="16px" lineHeight="18px" w="180px">Auction Opening</Text>
-                            <Text fontSize="16px" lineHeight="24px" color="#fff">{genDate().format("MMMM DD [at] h [p.m.] [PST]")}</Text>
+                            {/* <Text fontSize="16px" lineHeight="24px" color="#fff">{genDate().format("MMMM DD [at] h [p.m.] [PST]")}</Text> */}
+                            <Text fontSize="16px" lineHeight="24px" color="#fff">{moment(auctionInfo.startTimestamp).format("MMMM DD ha [GMT]")}</Text>
                         </Flex>
                         <Flex align="center" h="52px" mb="20px">
                             <Text mr="44px" textAlign="right" color="rgba(255, 255, 255, 0.7)" fontSize="16px" lineHeight="18px" w="180px">NFT Provider Dividends</Text>

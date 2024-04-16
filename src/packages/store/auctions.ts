@@ -5,17 +5,17 @@ import create from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import FroopyABI323 from 'packages/abis/demo/fl409.json'
 
-import { getAuctionInfo } from 'packages/service/api'
+import { getAuctionInfo, getUserNftList } from 'packages/service/api'
 
 
 
 const FL_CONTRACT_ADR = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR //323的今天晚上0点开始位置拍卖
 
 export enum ActivityStatus {
-  NotStarted = 'NotStarted',
-  Bidding = 'Bidding',
-  Staking = 'Staking',
-  Playing = 'Playing'
+  NotStarted = 0,
+  Bidding = 1,
+  Staking = 2,
+  Playing = 3
 }
 
 type IAuctionInfo = {
@@ -25,6 +25,7 @@ type IAuctionInfo = {
   endTimestamp: Date,
   highestBid: number,
   biddersCount: number
+  bidWinnerAddress: string
 }
 
 interface IState {
@@ -32,9 +33,11 @@ interface IState {
   state: ActivityStatus
   roundInfo: any
   auctionInfo: IAuctionInfo
+  nftList: any
   setStartTime: (date: moment.Moment) => void
   setStartTimeByContract: () => void
   getAuctionInfo: typeof getAuctionInfo
+  getUserNftList: typeof getUserNftList
 }
 
 
@@ -44,6 +47,7 @@ const useAuctions = create(immer<IState>(((set, get) => ({
     state: ActivityStatus.NotStarted,
     roundInfo: null,
     auctionInfo: null,
+    nftList: [],
     setStartTime(date: moment.Moment) {
       set({
         startTime: date
@@ -52,10 +56,15 @@ const useAuctions = create(immer<IState>(((set, get) => ({
 
     async getAuctionInfo() {
       const data = await getAuctionInfo()
+      data.status = 1  // todo
       set({ auctionInfo: data })
       return data
     },
-
+    async getUserNftList(address: string) {
+      const data = await getUserNftList(address) || []
+      set({ nftList: data.nftList })
+      return data
+    },
     async setStartTimeByContract() {
       const provider = await web3Modal.connect()    
       const library = new ethers.providers.Web3Provider(provider)

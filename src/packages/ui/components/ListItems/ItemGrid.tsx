@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react'
 import ApproveLicenseContractModal from '@modules/Modals/ApproveLicenseContractModal'
 
-import { ellipseAddress, weiToEtherString } from '@utils'
+import { ellipseAddress } from '@utils'
 
 import { PathnameType } from '@ts'
 
@@ -23,15 +23,15 @@ import { myNFTUnlicensedData } from './FakeData'
 import { State } from '@modules/Detail'
 import moment from 'moment'
 import useCountDown from '@hooks/useCountDown'
-import { faker } from '@faker-js/faker'
+import useStore from 'packages/store'
 
-const COUNT = faker.number.int({ min: 101, max: 1000 })
 
 
 function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
   const router = useRouter()
   const { pathname } = router
   const [isDetail, setIsGetDetail] = useState()
+  const { address } = useStore()
 
   const {
     isOpen: isOpenApproveLicenseContractModal,
@@ -46,29 +46,31 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
 
 
   const localTimeFormatted = useMemo(() => {
-    const date =  item?.state === State.Upcoming ? item?.['startTimestamp'] : item?.['endTime']
-    return moment(date*1000).format('YYYY-MM-DD HH:mm:ss')
+    const date =  item?.status === State.Upcoming ? item?.['startTimestamp'] : item?.['endTimestamp']
+    return moment(date).format('YYYY-MM-DD HH:mm:ss')
   }, [item])
 
   const time = useCountDown(localTimeFormatted)
 
+
+
   const RenderCount = () => {
+
     const formattedTime = useMemo(() => {
-      // const timeString = `${time.days > 0 ? `${time.days}days ` : ''}${time.hours > 0 ? `${time.hours}hrs ` : ''}${time.minutes}mins ${time.seconds}secs`
-      const timeString = `0days ${time.hours > 0 ? `${time.hours}hrs ` : ''}${time.minutes}mins ${time.seconds}secs`
+      const timeString = `${time.hours > 0 ? `${time.hours}hrs ` : ''}${time.minutes}mins ${time.seconds}secs`
       return `${timeString}`.trim()
     }, [time])
-  
-    if (item.state === State.Upcoming) {
+
+    if (item.status === State.Upcoming) {
       return <span>Start in {formattedTime}</span>
-    } else if (item.state === State.Ongoing) {
+    } else if (item.status === State.Ongoing) {
       return <span>End in {formattedTime}</span>
     } else {
       return <>Finished</>
     }
+
   }
 
-  const [bidder, setBidder] = useState(faker.number.int({ min: 20, max: 500 }))
   
   if (pathname === PathnameType.MARKET) {
     
@@ -76,7 +78,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
       <Box
         cursor="pointer"
         onClickCapture={() => {
-          router.push(`/${item.id}?state=${item.state}`)
+          router.push(`/${item.gameId}`)
         }}
         border="1px solid #704BEA"
         borderRadius="20px"
@@ -87,12 +89,11 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
             <Image
               borderRadius="15px"
               alt=""
-              src={item.nftImage}
+              src={item.imageUrl}
               fallbackSrc="/static/license-template/template.png"
             />
             {
-              // 无限 mock
-              gridName === 'finishedList' && (item.id.toString().slice(-1) > 6) && (
+              gridName === 'finishedList' && item?.lastPlayer === address && (
                 <Box pos="absolute" bg="#7E4AF1" left={0} right={0} bottom={0} h='48px' lineHeight="48px" fontWeight="700" textAlign="center" fontSize="18px" borderRadius="0 0 15px 15px">You won!</Box>
               )
             }
@@ -106,10 +107,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
           left="16px"
           bgColor={gridName === 'ongoingList' ? '#00DAB3' : 'rgba(255, 255, 255, 0.5)'}>
           <Text fontSize="12px" fontWeight={600} color="#2A0668">
-            <RenderCount></RenderCount>
-          {/* {
-            gridName === 'upcomingList' ? 'Start in 23 hr 29 min 34 sec' : gridName === 'ongoingList' ? 'Ends in 29 min 34 sec' : 'Finished'
-          } */}
+            <RenderCount />
           </Text>
         </Flex>
         {
@@ -123,7 +121,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
                 borderRadius="20px"
                 bgColor="rgba(255, 255, 255, 0.5)">
                 <Text fontSize="12px" color="#2A0668">
-                {bidder} Bidders
+                {item.biddersCount || '--'} Bidders
                 </Text>
               </Flex>
             )
@@ -132,10 +130,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
         <Box m="16px 8px 0px 8px">
           <Flex justifyContent="space-between" align="center">
             <Box fontWeight="700" fontSize="14px" lineHeight="16px" m="0 0 6px">
-              {item.nftName}
-              {/* {item?.name?.length > 25
-                ? `${item?.name.substring(0, 25)}...`
-                : item?.name} */}
+              {item.name}
             </Box>
             {/* <Image cursor="pointer" alt="" src="./static/market/iconStar.svg" /> */}
           </Flex>
@@ -149,7 +144,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
                 fontWeight="500"
                 lineHeight="18px"
                 color="#FFA8FE">
-                Total Keys Minted
+                Total Keys Fee
               </Box>
               <Box
                 w={{ lg: '100%' }}
@@ -157,7 +152,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
                 fontWeight={900}
                 fontSize={{ base: '14px', md: '14px' }}
                 color="#00DAB3">
-                {item.state === 0 ? '--' : item?.totalKeyMinted?.toNumber() || '--'}
+                {item.status === 0 ? '--' : item?.totalKeyMinted || '--'} ETH
               </Box>
             </Flex>
             <Flex flexDir="column">
@@ -175,9 +170,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
                 fontWeight={900}
                 fontSize={{ base: '14px', md: '14px' }}
                 color="#00DAB3">
-                {item.state === 0 ? '--' : item.isClone ? (item?.totalKeyMinted?.toNumber() * 0.001 * 0.2).toFixed(3) : weiToEtherString(
-                      `${item.salesRevenue.mul(2).div(10)}`,
-                    ) || '--'} ETH
+                {item.status === 0 ? '--' : item?.finalPrice || '--'} ETH
               </Box>
             </Flex>
           </Flex>
@@ -369,7 +362,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
     <Box
     cursor="pointer"
     onClickCapture={() => {
-      router.push(`/${item.id}?state=${item.state}`)
+      router.push(`/${item.gameId}`)
     }}
     border="1px solid #704BEA"
     borderRadius="20px"
@@ -384,8 +377,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
           fallbackSrc="/static/license-template/template.png"
         />
             {
-              // 无限 mock
-              gridName === 'finishedList' && (item.id.toString().slice(-1) > 6) && (
+              gridName === 'finishedList' && item.finalPrice && (
                 <Box pos="absolute" bg="#7E4AF1" left={0} right={0} bottom={0} h='48px' lineHeight="48px" fontWeight="700" textAlign="center" fontSize="18px" borderRadius="0 0 15px 15px">You won!</Box>
               )
             }
@@ -399,10 +391,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
       left="16px"
       bgColor={gridName === 'ongoingList' ? '#00DAB3' : 'rgba(255, 255, 255, 0.5)'}>
       <Text fontSize="12px" fontWeight={600} color="#2A0668">
-        <RenderCount></RenderCount>
-      {/* {
-        gridName === 'upcomingList' ? 'Start in 23 hr 29 min 34 sec' : gridName === 'ongoingList' ? 'Ends in 29 min 34 sec' : 'Finished'
-      } */}
+        <RenderCount />
       </Text>
     </Flex>
     {
@@ -416,7 +405,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
             borderRadius="20px"
             bgColor="rgba(255, 255, 255, 0.5)">
             <Text fontSize="12px" color="#2A0668">
-            {bidder} Bidders
+            {item.biddersCount || '--'} Bidders
             </Text>
           </Flex>
         )
@@ -425,10 +414,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
     <Box m="16px 8px 0px 8px">
       <Flex justifyContent="space-between" align="center">
         <Box fontWeight="700" fontSize="14px" lineHeight="16px" m="0 0 6px">
-          {item.nftName}
-          {/* {item?.name?.length > 25
-            ? `${item?.name.substring(0, 25)}...`
-            : item?.name} */}
+          {item.name}
         </Box>
         {/* <Image cursor="pointer" alt="" src="./static/market/iconStar.svg" /> */}
       </Flex>
@@ -442,7 +428,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
             fontWeight="500"
             lineHeight="18px"
             color="#FFA8FE">
-            Total Keys Minted
+            Total Keys Fee
           </Box>
           <Box
             w={{ lg: '100%' }}
@@ -450,7 +436,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
             fontWeight={900}
             fontSize={{ base: '14px', md: '14px' }}
             color="#00DAB3">
-            {item.state === 0 ? '--' : item?.totalKeyMinted?.toNumber() || '--'}
+            {item.status === 0 ? '--' : item?.totalKeyMinted || '--'} ETH
           </Box>
         </Flex>
         <Flex flexDir="column">
@@ -468,9 +454,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
             fontWeight={900}
             fontSize={{ base: '14px', md: '14px' }}
             color="#00DAB3">
-            {item.state === 0 ? '--' : item.isClone ? (item?.totalKeyMinted?.toNumber() * 0.001 * 0.2).toFixed(3) : weiToEtherString(
-                  `${item.salesRevenue.mul(2).div(10)}`,
-                ) || '--'} ETH
+            {item.status === 0 ? '--' : item?.finalPrice || '--'} ETH
           </Box>
         </Flex>
       </Flex>

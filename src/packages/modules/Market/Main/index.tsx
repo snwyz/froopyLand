@@ -11,6 +11,7 @@ import moment from 'moment'
 import useAuctions, { ActivityStatus } from 'packages/store/auctions'
 import { useRouter } from 'next/router'
 import { toastWarning } from '@utils/toast'
+import useStore from 'packages/store'
 // import BidderModal from '@modules/Market/Main/BidderModal'
 
 const BidderModal = lazy(() => import('@modules/Market/Main/BidderModal'))
@@ -81,15 +82,18 @@ export default function Main() {
 
   const router = useRouter()
 
+  const { address } = useStore()
 
   const [open, setOpen] = useState(false)
 
-  const { gameList, upcomingList, ongoingList, finishedList } = useFomoStore()
+  const { gameList, upcomingList, ongoingList, finishedList, getNftAuctions } = useFomoStore()
 
   const { auctionInfo, getAuctionInfo }= useAuctions()
 
   const List = () => {
+    
     if (gameList.length === 0) return <NoData />
+
     return (
       <>
         <Box padding='0 42px' marginTop="90px">
@@ -149,11 +153,12 @@ export default function Main() {
 
   useEffect(() => {
     getAuctionInfo()
+    // getNftAuctions()
   }, []) 
 
 
   if (!auctionInfo) return null
-
+  
   return (
     <Box alignItems="center" mb="50px">
       <Box padding="0 42px" height="514px" position="relative">
@@ -195,8 +200,11 @@ export default function Main() {
                     color="#fff"
                     fontSize="20px"
                     lineHeight="30px">
-                    {/* You got the chance to auction NFT on {calcStartTime.format('MMMM DD') || 'Mar 26'} */}
-                    The NFT auction will start on Mar 28, 0am GMT
+                    {
+                      auctionInfo.bidWinnerAddress === address ? (
+                        <Flex align="center"><Image src='/static/common/warning.svg' alt='warning' w="19px" h="24px" mr="10px" /><Text>You won the FROMO plot and the chance to auction NFT on {moment(auctionInfo.startTimestamp).format('MMMM DD, ha')} GMT</Text></Flex>
+                      ) : (<Text>The NFT auction will start on {moment(auctionInfo.startTimestamp).add(8, 'hours').format('MMMM DD, ha')} GMT</Text>)
+                    }
                   </Text>
                 ) : (
                   <Text
@@ -204,11 +212,10 @@ export default function Main() {
                   color="#fff"
                   fontSize="20px"
                   lineHeight="30px">
-                  Get the chance to auction NFT on Mar 28, 8pm GMT by bidding a plot of FroopyLand：
+                  Get the chance to auction NFT on {moment(auctionInfo.startTimestamp).format('MMMM DD, ha')} GMT by bidding a plot of FroopyLand：
                 </Text>
                 )
               }
-              
               {/* <Text fontSize="16px" lineHeight="24px">Registration closes on Feb 14, 12am</Text> */}
             </Flex>
             {[ActivityStatus.NotStarted, ActivityStatus.Bidding].includes(auctionInfo.status) && (
@@ -238,30 +245,29 @@ export default function Main() {
                   p="20px 24px"
                   h="66px"
                   backgroundColor="rgba(112, 75, 234, 0.5);">
-                  <Text>Highest Bid： 570 $FLT</Text>
+                  <Text>Highest Bid： {auctionInfo.highestBid || '--'} $FLT</Text>
                   <Text
                     w="1px"
                     h="100%"
                     bg="rgba(255, 255, 255, 0.5)"
                     m="0 16px"></Text>
-                  <Text>7 Bidders</Text>
+                  <Text>{auctionInfo.biddersCount || '--'} Bidders</Text>
                   <Text
                     w="1px"
                     h="100%"
                     bg="rgba(255, 255, 255, 0.5)"
                     m="0 16px"></Text>
                   <Text color="rgba(255, 255, 255, 0.5)">
-                    {/* {
+                  {
                       auctionInfo.status === ActivityStatus.NotStarted && (
-                        `Open on ${calcStartTime.format('MMMM DD, Ha')}`
+                        `Open on ${moment(auctionInfo.startTimestamp).format('MMMM DD, Ha')}`
                       )
                     }
                     {
                       auctionInfo.status === ActivityStatus.Bidding && (
-                        `Close on ${calcStartTime.clone().add(moment.duration(16, 'hours')).format('MMMM DD, Ha')}`
+                        `Close on ${moment(auctionInfo.startTimestamp).add(16, 'hours').format('MMMM DD, Ha')}`
                       )
-                    } */}
-                    Close on Mar 27 16pm
+                    }
                   </Text>
                   {
                     auctionInfo.status === ActivityStatus.Bidding && (
@@ -280,33 +286,38 @@ export default function Main() {
 
             {
               ActivityStatus.Staking === auctionInfo.status && (
-                <Flex pos="relative" _hover={{ cursor: 'pointer' }}  onClick={() => router.push('/stakeNFT')}>
-                  <Button zIndex="1" fontSize='22px' fontWeight='bold' w="240px" color='#000' h='66px' backgroundColor='#00DAB3'>Stake NFT</Button>
-                  <Flex borderRadius="10px" alignItems="center" position="absolute" color="#fff" fontSize="16px" zIndex="0" left="210px" ml="20px" p="20px 24px" h='66px' backgroundColor='rgba(112, 75, 234, 0.5);'>
-                    <Text>Highest Bid：700 $FLT</Text>
-                    <Text w="1px" h="100%" bg="rgba(255, 255, 255, 0.5)" m="0 16px"></Text>
-                    <Text>8 Bidders</Text>
-                    {/* <Text w="1px" h="100%" bg="rgba(255, 255, 255, 0.5)" m="0 16px"></Text> */}
-                    {/* <Text color="rgba(255, 255, 255, 0.5)">Close on Mar 28, 0am</Text> */}
-                    <Image src='./static/market/start.svg' alt='start' w="28px" h="28px" ml="30px"></Image>
-                  </Flex>
-                </Flex>
+                <Box>
+                  {
+                    auctionInfo.bidWinnerAddress === address ? (
+                      <Flex pos="relative" _hover={{ cursor: 'pointer' }}  onClick={() => router.push('/stakeNFT')}>
+                        <Button zIndex="1" fontSize='22px' fontWeight='bold' w="240px" color='#000' h='66px' backgroundColor='#00DAB3'>Stake NFT</Button>
+                        <Flex borderRadius="10px" alignItems="center" position="absolute" color="#fff" fontSize="16px" zIndex="0" left="210px" ml="20px" p="20px 24px" h='66px' backgroundColor='rgba(112, 75, 234, 0.5);'>
+                          <Text>Highest Bid： {auctionInfo.highestBid || '--'} $FLT</Text>
+                          <Text w="1px" h="100%" bg="rgba(255, 255, 255, 0.5)" m="0 16px"></Text>
+                          <Text>{auctionInfo.biddersCount || '--'} Bidders</Text>
+                          <Text w="1px" h="100%" bg="rgba(255, 255, 255, 0.5)" m="0 16px"></Text>
+                          <Text color="rgba(255, 255, 255, 0.5)">Close on {moment(auctionInfo.startTimestamp).add(8, 'hours').format('MMMM DD, ha')}</Text>
+                          <Image src='./static/market/start.svg' alt='start' w="28px" h="28px" ml="30px"></Image>
+                        </Flex>
+                      </Flex>
+                  ) : (
+                      <Flex pos="relative">
+                        <Flex borderRadius="10px" alignItems="center"  color="#fff" fontSize="16px" zIndex="0" p="20px 24px" h='66px' backgroundColor='rgba(112, 75, 234, 0.5);'>
+                          <Text fontWeight="700" fontSize="18px" color="#9A7CFF">Bidding Closed</Text>
+                          <Text w="1px" h="100%" bg="rgba(255, 255, 255, 0.5)" m="0 16px"></Text>
+                          <Text>Highest Bid：- - $FLT</Text>
+                          <Text w="1px" h="100%" bg="rgba(255, 255, 255, 0.5)" m="0 16px"></Text>
+                          <Text>0 Bidders</Text>
+                          <Text w="1px" h="100%" bg="rgba(255, 255, 255, 0.5)" m="0 16px"></Text>
+                          <Text color="rgba(255, 255, 255, 0.5)">Close on April 14, 12am</Text>
+                          {/* <Image src='./static/market/start.svg' alt='start' w="28px" h="28px" ml="30px"></Image> */}
+                        </Flex>
+                      </Flex>
+                    )
+                  }
+                </Box>
               )
             }
-
-            {/* <Flex pos="relative" _hover={{ cursor: 'pointer' }}>
-              <Flex borderRadius="10px" alignItems="center"  color="#fff" fontSize="16px" zIndex="0" p="20px 24px" h='66px' backgroundColor='rgba(112, 75, 234, 0.5);'>
-                <Text fontWeight="700" fontSize="18px" color="#9A7CFF">Bidding Closed</Text>
-                <Text w="1px" h="100%" bg="rgba(255, 255, 255, 0.5)" m="0 16px"></Text>
-                <Text>Highest Bid：- - $FLT</Text>
-                <Text w="1px" h="100%" bg="rgba(255, 255, 255, 0.5)" m="0 16px"></Text>
-                <Text>0 Bidders</Text>
-                <Text w="1px" h="100%" bg="rgba(255, 255, 255, 0.5)" m="0 16px"></Text>
-                <Text color="rgba(255, 255, 255, 0.5)">Close on April 14, 12am</Text>
-                <Image src='./static/market/start.svg' alt='start' w="28px" h="28px" ml="30px"></Image>
-              </Flex>
-            </Flex> */}
-
           </Box>
           <Image
             position="absolute"

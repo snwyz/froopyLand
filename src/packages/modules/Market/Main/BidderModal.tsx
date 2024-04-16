@@ -8,6 +8,7 @@ import { web3Modal } from 'packages/web3'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import FroopyABI from 'packages/abis/demo/fl409.json'
 import useStore from 'packages/store'
+import { getBidderForm } from 'packages/service/api'
 
 const FL_CONTRACT_ADR = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR
 
@@ -17,39 +18,9 @@ type SubmitOfferModalProps = {
 }
 
 type NFTItem = {
-  address: string;
-  bidAmount: number;
-  isMine: boolean;
+  userAddress: string;
+  amount: number;
 };
-
-// 数组数据
-const nftItems: NFTItem[] = [
-  {
-    address: "0x34d85c9C79B777399AaAAe42f7c769c7b59793D0", // CryptoPunks #7842
-    bidAmount: 111,
-    isMine: false,
-  },
-  {
-    address: "0x7f88082855B543a96735b6f773D94bF39a383614", // Bored Ape Yacht Club #420
-    bidAmount: 207,
-    isMine: false,
-  },
-  {
-    address: "0x60E4d787612f4b442e2144f775c94717c7832a1b", // Azuki #4469
-    bidAmount: 320,
-    isMine: false,
-  },
-  {
-    address: "0x8a90CAb2b38bA80c048a774907777712D232c411", // Doodles #4957
-    bidAmount: 430,
-    isMine: false,
-  },
-  {
-    address: "0x495f9f574c77f9604b8335739c7f8a4d83b79b77", // Art Blocks Curated #152
-    bidAmount: 570,
-    isMine: false,
-  },
-]
 
 
 
@@ -63,21 +34,21 @@ const nftItems: NFTItem[] = [
 
 
 const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
-  const [value, setValue] = useState(undefined)
-  const [list, setList] = useState<NFTItem[]>(nftItems)
+  const [value, setValue] = useState('')
+  const [list, setList] = useState<NFTItem[]>([])
 
-  const [availableNums, setAvailableNums] = useState(0)
+  const [availableNums, setAvailableNums] = useState<any>()
 
   const scrollRef = useRef(null)
 
 
   const { address } = useStore()
   
-  const isLowPrice = useMemo(() => list.some(k => Number(value) <= Number(k.bidAmount)), [list, value])
+  const isLowPrice = useMemo(() => list.some(k => Number(value) <= Number(k.amount)), [list, value])
   
-  const bidList = useMemo(() => list.slice().sort((a, b) => b.bidAmount - a.bidAmount), [list])
+  const bidList = useMemo(() => list.slice().sort((a, b) => b.amount - a.amount), [list])
 
-  const handleBid = () => {
+  const handleBid = async () => {
     if (!value) return toastError('Please bid the price.')
   
 
@@ -85,25 +56,32 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
     
     if (value > availableNums) return toastError('Bid must be lower than the current available $FL Token')
 
-    const existingItemIndex = bidList.findIndex(item => item.isMine)
+    const provider = await web3Modal.connect()    
+    const library = new ethers.providers.Web3Provider(provider)
+    const signer = library.getSigner()
+    const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
 
-    if (existingItemIndex !== -1) {
-      const updatedBidList = [...bidList]
-      updatedBidList[existingItemIndex].bidAmount = value
-      setList(updatedBidList)
-    } else {
-      setList(prevList => [...prevList, {
-        bidAmount: value,
-        address,
-        isMine: true,
-      }])
+    try {
+      const tx = await contract.bidLand(value)
+      console.log(tx, 'tx')
+
+      const existingItemIndex = bidList.findIndex(item => item.userAddress === address)
+
+      if (existingItemIndex !== -1) {
+        const updatedBidList = [...bidList]
+        updatedBidList[existingItemIndex].amount = parseFloat(value)
+        setList(updatedBidList)
+      } else {
+        setList(prevList => [...prevList, {
+          amount: parseFloat(value),
+          userAddress: address,
+        }])
+      }
+      setValue(null)
+    } catch (error) {
+      console.log(error, '<===')
+      
     }
-
-    // if (scrollRef.current) {
-    //   scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-    // }
-
-    setValue(null)
   }
 
 
@@ -120,8 +98,7 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
     
     try {
       const tx = await contract.getBidderInofOf(address)
-      
-      setAvailableNums(tx.sysTokenBalance.toNumber())
+      setAvailableNums(ethers.utils.formatEther(tx.sysTokenBalance))
     } catch (error) {
       console.log(error, '<====')
     }
@@ -139,12 +116,17 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
     contract.on('NewBids', (from, to, value) => {
       console.log(`NewBids event detected: ${from} -> ${to}, value: ${value}`)
     })
-
   }
 
+  const getBidList = async () => {
+    const data = await getBidderForm()
+    setList(data)
+  }
 
   useEffect(() => {
     getAvailableFL()
+    getBidList()
+    registerUpdateSOL()
   }, [])
 
   return (
@@ -162,19 +144,19 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
             <Text w="178px" align="left" mr="60px" fontSize="13px" color="rgba(0, 0, 0, 0.6)">BIDDER</Text>
             <Text fontSize="13px" color="rgba(0, 0, 0, 0.6)">BID</Text>
           </Flex>
-         <Box overflowY="auto" height="360px" ref={scrollRef}>
+         <Box overflowY="auto" height="220px" ref={scrollRef}>
          {
           bidList.map((item,v) => (
-            <Flex key={item.address} p="10px 20px" border="1px solid #F2F2F2" borderRadius="10px" align="center" mb="10px">
+            <Flex key={item.userAddress} p="10px 20px" border="1px solid #F2F2F2" borderRadius="10px" align="center" mb="10px">
               <Flex align="center" mr="60px">
                 <Image mr="10px" borderRadius="37px" border="1px solid #F2F2F2" src="/static/account/sidebar/avatar.svg" alt='avatar' w="37px" h="37px"></Image>
                 <Box fontSize="16px" w="160px">
-                  {ellipseAddress(item.address, 6)}
+                  {ellipseAddress(item.userAddress, 6)}
                 </Box>
               </Flex>
-              <Text align="left" w="200px" fontSize="16px" color="rgb(0, 0, 0)" mr="164px">{item.bidAmount} $FL Token</Text>
+              <Text align="left" w="200px" fontSize="16px" color="rgb(0, 0, 0)" mr="164px">{item.amount} $FL Token</Text>
               {
-                item.isMine && (<Text fontSize="14px" color="#7E4AF1">ME</Text>)
+                item.userAddress === address && (<Text fontSize="14px" color="#7E4AF1">ME</Text>)
               }
             </Flex>
           ))
@@ -193,12 +175,10 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
                   fontWeight={700}
                   fontSize="20px"
                   border="none"
-                  value={value}
                   onChange={e => setValue(e.target.value)}
                 />
                 <Text color="#333" fontSize="14px" lineHeight="24px">$FLT</Text>
               </Flex>
-              <Text mt="8px" fontSize="12px" lineHeight="18px" color="#4F4F4F">Available：{formatNumberWithCommas(availableNums)} $FL Token</Text>
             </Box>
             <Button
               w="298px"
@@ -215,6 +195,7 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
               Bid
             </Button>
         </Flex>
+        <Text mt="8px" fontSize="12px" lineHeight="18px" color="#4F4F4F">Available：{formatNumberWithCommas(availableNums)} $FL Token</Text>
         <Flex bg="#F6BF324D" p='15px' borderRadius="8px" mt="24px">
             <Image src="/static/common/info.svg" alt="info" w='16px' h="16px" mr="10px" />
             <Text textAlign="justify" color="#000" fontSize="14px" lineHeight="21px" mt="-5px">
