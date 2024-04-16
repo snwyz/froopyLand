@@ -305,10 +305,10 @@ const Header: FC = () => {
         justifyContent="space-between">
         <Flex
           justify="center"
-          w={{ base: '140px', md: '200px' }}
-          h="100%"
+          w={{ base: '138px', md: '200px' }}
+          h="28px"
           onClick={() => router.replace('/')}>
-          <Image cursor="pointer" src="/static/header/logo.svg" alt="" />
+          <Image cursor="pointer" src="/static/common/logo.svg" alt="" />
         </Flex>
 
         <Stack

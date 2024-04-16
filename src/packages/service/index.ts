@@ -13,6 +13,7 @@ class Http {
 
   public constructor() {
     this.instance = Axios.create({
+      baseURL: process.env.NEXT_PUBLIC_BASE_API + '/fl/game',
       timeout: TIMEOUT,
     })
 
@@ -27,7 +28,7 @@ class Http {
         .request(res)
         .then((response) => {
           this.response = response
-          resolve(response?.data ?? response)
+          resolve(response?.data.data ?? response)
         })
         .catch((axiosError) => {
           const { response } = axiosError ?? {}

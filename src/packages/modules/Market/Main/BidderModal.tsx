@@ -152,43 +152,7 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
       variant="bidModal"
       size="2xl"
       isOpen={isOpen}
-      title={<Heading fontSize="22px" lineHeight="32px" textAlign="left">Bid on this Plot of FroopyLand</Heading>}
-      buttons={
-        <Flex align="baseline">
-            <Box mr="14px">
-              <Flex w="264px" p="16px" borderRadius="10px" alignItems="center" bg="#F4F4F4">
-                <Text>Bid:</Text>
-                <Input
-                  _focusVisible={{
-                    borderWidth: '0px',
-                  }}
-                  type="number"
-                  fontWeight={700}
-                  fontSize="20px"
-                  border="none"
-                  value={value}
-                  onChange={e => setValue(e.target.value)}
-                />
-                <Text color="#333" fontSize="14px" lineHeight="24px">$FLT</Text>
-              </Flex>
-              <Text mt="8px" fontSize="12px" lineHeight="18px" color="#4F4F4F">Available：{formatNumberWithCommas(availableNums)} $FL Token</Text>
-            </Box>
-          <Button
-            w="298px"
-            borderRadius="10px"
-            fontSize="20px"
-            fontWeight="700"
-            h="66px"
-            color="#fff"
-            bg="#704BEA"
-            _hover={{ bg: "#704BEA" }}
-            onClick={handleBid}
-            disabled={availableNums <= 0}
-          >
-            Bid
-          </Button>
-        </Flex>
-      }
+      title={<Heading fontSize="22px" lineHeight="32px" textAlign="left">Bid on this Plot of FROMO</Heading>}
       onClose={onClose}
       bgColor={useColorModeValue ? '#fff' : '#fff'}>
       <VStack align="left">
@@ -217,6 +181,47 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
          }
          </Box>
         </Box>
+        <Flex align="baseline">
+            <Box mr="14px">
+              <Flex w="264px" p="16px" borderRadius="10px" alignItems="center" bg="#F4F4F4">
+                <Text>Bid:</Text>
+                <Input
+                  _focusVisible={{
+                    borderWidth: '0px',
+                  }}
+                  type="number"
+                  fontWeight={700}
+                  fontSize="20px"
+                  border="none"
+                  value={value}
+                  onChange={e => setValue(e.target.value)}
+                />
+                <Text color="#333" fontSize="14px" lineHeight="24px">$FLT</Text>
+              </Flex>
+              <Text mt="8px" fontSize="12px" lineHeight="18px" color="#4F4F4F">Available：{formatNumberWithCommas(availableNums)} $FL Token</Text>
+            </Box>
+            <Button
+              w="298px"
+              borderRadius="10px"
+              fontSize="20px"
+              fontWeight="700"
+              h="66px"
+              color="#fff"
+              bg="#704BEA"
+              _hover={{ bg: "#704BEA" }}
+              onClick={handleBid}
+              disabled={availableNums <= 0}
+            >
+              Bid
+            </Button>
+        </Flex>
+        <Flex bg="#F6BF324D" p='15px' borderRadius="8px" mt="24px">
+            <Image src="/static/common/info.svg" alt="info" w='16px' h="16px" mr="10px" />
+            <Text textAlign="justify" color="#000" fontSize="14px" lineHeight="21px" mt="-5px">
+              The $OMO you bid is used to purchase the FROMO plot. It will be locked until the bidding ends. 
+              If you lose the FROMO plot, it will be unlocked after the bidding ends. The FROMO plot winner who failed to stake NFT will lose the $OMO he/she bid. 
+            </Text>
+         </Flex>
       </VStack>
     </BaseModal>
   )

@@ -1,4 +1,4 @@
-import { lazy, useState, Suspense } from 'react'
+import { useState, Suspense, useEffect, lazy } from 'react'
 
 import { Box, Image, Text, Flex, SimpleGrid, Button, Spinner } from '@chakra-ui/react'
 import ItemGrid from 'packages/ui/components/ListItems/ItemGrid'
@@ -8,9 +8,10 @@ import useFomoStore from 'packages/store/fomo'
 import NoData from '@components/NoData'
 import { faker } from '@faker-js/faker'
 import moment from 'moment'
-import { ActivityStatus } from 'packages/store/auctions'
+import useAuctions, { ActivityStatus } from 'packages/store/auctions'
 import { useRouter } from 'next/router'
 import { toastWarning } from '@utils/toast'
+// import BidderModal from '@modules/Market/Main/BidderModal'
 
 const BidderModal = lazy(() => import('@modules/Market/Main/BidderModal'))
 
@@ -85,6 +86,8 @@ export default function Main() {
 
   const { gameList, upcomingList, ongoingList, finishedList } = useFomoStore()
 
+  const { auctionInfo, getAuctionInfo }= useAuctions()
+
   const List = () => {
     if (gameList.length === 0) return <NoData />
     return (
@@ -139,10 +142,17 @@ export default function Main() {
   
   const handleBid = (e) => {
     e.stopPropagation()
-    if (actionsState === ActivityStatus.NotStarted) return toastWarning('The activity has not started yet, please stay tuned.')
+    if (auctionInfo.status === ActivityStatus.NotStarted) return toastWarning('The activity has not started yet, please stay tuned.')
     setOpen(true)
   }
+  
 
+  useEffect(() => {
+    getAuctionInfo()
+  }, []) 
+
+
+  if (!auctionInfo) return null
 
   return (
     <Box alignItems="center" mb="50px">
@@ -163,7 +173,7 @@ export default function Main() {
                 <Text color="#fff" fontWeight="700" fontSize="32px" lineHeight="48px">$5.40</Text>
               </Flex>
               <Flex flexDir="column">
-                <Text color="#FFA8FE" fontSize="24px" lineHeight="36px">Total Keys Minted</Text>
+                <Text color="#FFA8FE" fontSize="24px" lineHeight="36px">Total Keys Fee</Text>
                 <Flex align="center"><Image src='/static/common/eth-index.svg' alt='ethereum' w="19px" h="32px" mr="8px"></Image><Text fontSize="32px" lineHeight="48px">5240</Text></Flex>
                 <Text color="#fff" fontWeight="700" fontSize="20px" lineHeight="30px">$78.48M</Text>
               </Flex>
@@ -179,14 +189,14 @@ export default function Main() {
             </Flex>
             <Flex alignItems="center" mb="20px">
               {
-                ActivityStatus.Staking === actionsState ? (
+                ActivityStatus.Staking === auctionInfo.status ? (
                   <Text
                     fontWeight={700}
                     color="#fff"
                     fontSize="20px"
                     lineHeight="30px">
                     {/* You got the chance to auction NFT on {calcStartTime.format('MMMM DD') || 'Mar 26'} */}
-                    The NFT auction will start on Mar 28, 0am
+                    The NFT auction will start on Mar 28, 0am GMT
                   </Text>
                 ) : (
                   <Text
@@ -194,15 +204,15 @@ export default function Main() {
                   color="#fff"
                   fontSize="20px"
                   lineHeight="30px">
-                  Get the chance to auction NFT on Mar 28 by bidding a plot of FroopyLand：
+                  Get the chance to auction NFT on Mar 28, 8pm GMT by bidding a plot of FroopyLand：
                 </Text>
                 )
               }
               
               {/* <Text fontSize="16px" lineHeight="24px">Registration closes on Feb 14, 12am</Text> */}
             </Flex>
-            {[ActivityStatus.NotStarted, ActivityStatus.Bidding].includes(actionsState) && (
-              <Flex pos="relative" _hover={ActivityStatus.NotStarted !== actionsState ? { cursor: 'pointer' } : null}>
+            {[ActivityStatus.NotStarted, ActivityStatus.Bidding].includes(auctionInfo.status) && (
+              <Flex pos="relative" _hover={ActivityStatus.NotStarted !== auctionInfo.status ? { cursor: 'pointer' } : null}>
                 <Button
                   zIndex="1"
                   fontSize="24px"
@@ -211,19 +221,19 @@ export default function Main() {
                   color="#000"
                   h="66px"
                   bgColor="#00DAB3"
-                  borderRadius={ActivityStatus.NotStarted === actionsState ? '10px 0 0 10px' : '10px'}
-                  isDisabled={ActivityStatus.NotStarted === actionsState}
+                  borderRadius={ActivityStatus.NotStarted === auctionInfo.status ? '10px 0 0 10px' : '10px'}
+                  isDisabled={ActivityStatus.NotStarted === auctionInfo.status}
                   onClick={handleBid}>
-                  Bid
+                  Bid FROMO
                 </Button>
                 <Flex
-                  borderRadius={ActivityStatus.NotStarted === actionsState ? '0 10px 10px 0' : '10px'}
+                  borderRadius={ActivityStatus.NotStarted === auctionInfo.status ? '0 10px 10px 0' : '10px'}
                   alignItems="center"
                   color="#fff"
                   fontSize="16px"
                   zIndex="0"
                   position="absolute"
-                  left={ActivityStatus.NotStarted === actionsState ? '220px': '210px'}
+                  left={ActivityStatus.NotStarted === auctionInfo.status ? '220px': '210px'}
                   ml="20px"
                   p="20px 24px"
                   h="66px"
@@ -242,19 +252,19 @@ export default function Main() {
                     m="0 16px"></Text>
                   <Text color="rgba(255, 255, 255, 0.5)">
                     {/* {
-                      actionsState === ActivityStatus.NotStarted && (
+                      auctionInfo.status === ActivityStatus.NotStarted && (
                         `Open on ${calcStartTime.format('MMMM DD, Ha')}`
                       )
                     }
                     {
-                      actionsState === ActivityStatus.Bidding && (
+                      auctionInfo.status === ActivityStatus.Bidding && (
                         `Close on ${calcStartTime.clone().add(moment.duration(16, 'hours')).format('MMMM DD, Ha')}`
                       )
                     } */}
                     Close on Mar 27 16pm
                   </Text>
                   {
-                    actionsState === ActivityStatus.Bidding && (
+                    auctionInfo.status === ActivityStatus.Bidding && (
                       <Image
                       src="./static/market/start.svg"
                       alt="start"
@@ -269,9 +279,9 @@ export default function Main() {
             )}
 
             {
-              ActivityStatus.Staking === actionsState && (
+              ActivityStatus.Staking === auctionInfo.status && (
                 <Flex pos="relative" _hover={{ cursor: 'pointer' }}  onClick={() => router.push('/stakeNFT')}>
-                  <Button zIndex="1" fontSize='22px' fontWeight='bold' w="240px" color='#000' h='66px' backgroundColor='#00DAB3'>Auction Upcoming</Button>
+                  <Button zIndex="1" fontSize='22px' fontWeight='bold' w="240px" color='#000' h='66px' backgroundColor='#00DAB3'>Stake NFT</Button>
                   <Flex borderRadius="10px" alignItems="center" position="absolute" color="#fff" fontSize="16px" zIndex="0" left="210px" ml="20px" p="20px 24px" h='66px' backgroundColor='rgba(112, 75, 234, 0.5);'>
                     <Text>Highest Bid：700 $FLT</Text>
                     <Text w="1px" h="100%" bg="rgba(255, 255, 255, 0.5)" m="0 16px"></Text>
@@ -325,7 +335,9 @@ export default function Main() {
         }>
         <List />
       </Suspense>
-      <BidderModal isOpen={open} onClose={() => setOpen(false)} />
+      <Suspense>
+        <BidderModal isOpen={open} onClose={() => setOpen(false)} />
+      </Suspense>
     </Box>
   )
 }
