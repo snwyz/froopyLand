@@ -253,7 +253,7 @@ const useStore = create<MyState>((set) => ({
       const updateLicensesData = state.licensesData.map((minion) => {
         if (
           minion.derivativeNFTContractAddress ===
-            item.derivativeNFTContractAddress &&
+          item.derivativeNFTContractAddress &&
           item.mintType === minion.mintType
         ) {
           return { ...item, remaining: item.remaining - 1 }
@@ -263,7 +263,7 @@ const useStore = create<MyState>((set) => ({
       const updateLicensesDataInit = state.licensesDataInit.map((minion) => {
         if (
           minion.derivativeNFTContractAddress ===
-            item.derivativeNFTContractAddress &&
+          item.derivativeNFTContractAddress &&
           item.mintType === minion.mintType
         ) {
           return { ...item, remaining: item.remaining - 1 }

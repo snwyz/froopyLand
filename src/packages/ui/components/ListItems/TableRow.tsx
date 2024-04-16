@@ -38,7 +38,7 @@ import TableBuyAll from './TableBuyAll'
 import moment from 'moment'
 import { ethers } from 'ethers'
 
-function Table({ item, isCustom }: { item: any, isCustom: boolean }) {
+function Table({ item, isCustom }: { item: any; isCustom: boolean }) {
   const { width } = useWindowSize()
   const textColor = useColorModeValue('#fff', '#fff')
   const borderBottomColor = useColorModeValue('#704BEA4D', '#704BEA4D')
@@ -140,21 +140,14 @@ function Table({ item, isCustom }: { item: any, isCustom: boolean }) {
     checkApproved()
   }, [checkApproved])
 
-
-
-  const formatDate = (date) => moment(date*1000).format('YYYY-MM-DD HH:mm:ss')
+  const formatDate = (date) => moment(date * 1000).format('YYYY-MM-DD HH:mm:ss')
   const states = ['Not Active', 'Active', 'Ended']
-
 
   if (pathname === PathnameType.MARKET) {
     return (
       <>
         <Tr
-          onClickCapture={() =>
-            router.push(
-              `/${item.id}`,
-            )
-          }
+          onClickCapture={() => router.push(`/${item.id}`)}
           cursor="pointer"
           _hover={{ background: '#bab9b929' }}>
           <Td
@@ -199,10 +192,7 @@ function Table({ item, isCustom }: { item: any, isCustom: boolean }) {
             borderBottom="1px solid"
             borderColor="#E8E8E8">
             <Flex>
-              <Text
-                lineHeight="16px"
-                fontSize="12px"
-                fontWeight="500">
+              <Text lineHeight="16px" fontSize="12px" fontWeight="500">
                 {item.nftAddress}
               </Text>
             </Flex>
@@ -222,7 +212,7 @@ function Table({ item, isCustom }: { item: any, isCustom: boolean }) {
           <Td borderBottomColor={borderBottomColor} borderBottom="1px solid">
             <Flex alignItems="center" gridGap="6px">
               <Text lineHeight="16px" fontSize="14px" color={textColor}>
-              {formatDate(item.startTimestamp.toNumber())}
+                {formatDate(item.startTimestamp.toNumber())}
               </Text>
             </Flex>
           </Td>
@@ -691,88 +681,101 @@ function Table({ item, isCustom }: { item: any, isCustom: boolean }) {
     )
   }
 
-
   if (pathname === PathProfileType.PROFILE) {
-
     if (isCustom) {
       return (
         <Tr _hover={{ background: '#bab9b929' }}>
-        <Td
-          minW="210px"
-          maxW="300px"
-          lineHeight="16px"
-          fontSize="14px"
-          fontWeight="500"
-          color={textColor}
-          borderBottomColor={borderBottomColor}
-          borderBottom="1px solid"
-          borderColor="#E8E8E8"
-          background="unset">
-          <Flex alignItems="center">
-            <Box borderRadius="4px" w="40px" h="40px" overflow="hidden" mr="16px">
-              <Image
+          <Td
+            minW="210px"
+            maxW="300px"
+            lineHeight="16px"
+            fontSize="14px"
+            fontWeight="500"
+            color={textColor}
+            borderBottomColor={borderBottomColor}
+            borderBottom="1px solid"
+            borderColor="#E8E8E8"
+            background="unset">
+            <Flex alignItems="center">
+              <Box
+                borderRadius="4px"
                 w="40px"
                 h="40px"
-                objectFit="cover"
-                alt=""
-                src={item.image}
-                fallbackSrc="/static/license-template/template.png"
-              />
-            </Box>
-            <Text
-              cursor="pointer"
-              fontWeight="700"
-              pl="8px"
-              textOverflow="ellipsis"
-              overflow="hidden"
-              whiteSpace="nowrap">
-              {item.label}
-            </Text>
-          </Flex>
-        </Td>
-        <Td
-          color={textColor}
-          borderBottomColor={borderBottomColor}
-          borderBottom="1px solid"
-          borderColor="#E8E8E8">
-          <Flex mr="95px" align="center" color="#fff">
-            <Box mr="6px" fontSize="12px" fontWeight="400">
-              {item.id}
-            </Box>
-          </Flex>
-        </Td>
-        <Td borderBottomColor={borderBottomColor} borderBottom="1px solid"></Td>
+                overflow="hidden"
+                mr="16px">
+                <Image
+                  w="40px"
+                  h="40px"
+                  objectFit="cover"
+                  alt=""
+                  src={item.image}
+                  fallbackSrc="/static/license-template/template.png"
+                />
+              </Box>
+              <Text
+                cursor="pointer"
+                fontWeight="700"
+                pl="8px"
+                textOverflow="ellipsis"
+                overflow="hidden"
+                whiteSpace="nowrap">
+                {item.label}
+              </Text>
+            </Flex>
+          </Td>
+          <Td
+            color={textColor}
+            borderBottomColor={borderBottomColor}
+            borderBottom="1px solid"
+            borderColor="#E8E8E8">
+            <Flex mr="95px" align="center" color="#fff">
+              <Box mr="6px" fontSize="12px" fontWeight="400">
+                {item.id}
+              </Box>
+            </Flex>
+          </Td>
+          <Td
+            borderBottomColor={borderBottomColor}
+            borderBottom="1px solid"></Td>
 
-        <Td borderBottomColor={borderBottomColor} borderBottom="1px solid"></Td>
+          <Td
+            borderBottomColor={borderBottomColor}
+            borderBottom="1px solid"></Td>
 
-        <Td
-          py={0}
-          isNumeric
-          minW="170px"
-          borderBottom="1px solid"
-          borderBottomColor={borderBottomColor}></Td>
-        <Td
-          py={0}
-          isNumeric
-          minW="170px"
-          borderBottom="1px solid"
-          borderBottomColor={borderBottomColor}>
-          <Flex align="center">
-            <Image _hover={{ cursor: 'pointer' }} mr="20px" src='/static/profile/link.svg' alt='link' w="16px" h="16px"></Image>
-            <Button
-              h="35px"
-              minW="170px"
-              border="1px solid"
-              borderColor="#704BEA"
-              textColor="#704BEA"
-              fontSize="12px"
-              fontWeight="500"
-              bg="transparent">
-              Detail
-            </Button>
-          </Flex>
-        </Td>
-      </Tr>
+          <Td
+            py={0}
+            isNumeric
+            minW="170px"
+            borderBottom="1px solid"
+            borderBottomColor={borderBottomColor}></Td>
+          <Td
+            py={0}
+            isNumeric
+            minW="170px"
+            borderBottom="1px solid"
+            borderBottomColor={borderBottomColor}>
+            <Flex align="center">
+              <Image
+                _hover={{ cursor: 'pointer' }}
+                mr="20px"
+                src="/static/profile/link.svg"
+                alt="link"
+                w="16px"
+                h="16px"></Image>
+              <Button
+                h="35px"
+                minW="170px"
+                border="1px solid"
+                borderColor="#704BEA"
+                textColor="#704BEA"
+                fontSize="12px"
+                fontWeight="500"
+                bg="transparent">
+                Detail
+              </Button>
+            </Flex>
+          </Td>
+        </Tr>
       )
     }
 
@@ -790,7 +793,12 @@ function Table({ item, isCustom }: { item: any, isCustom: boolean }) {
           borderColor="#E8E8E8"
           background="unset">
           <Flex alignItems="center">
-            <Box borderRadius="4px" w="40px" h="40px" overflow="hidden" mr="16px">
+            <Box
+              borderRadius="4px"
+              w="40px"
+              h="40px"
+              overflow="hidden"
+              mr="16px">
               <Image
                 w="40px"
                 h="40px"
@@ -825,7 +833,7 @@ function Table({ item, isCustom }: { item: any, isCustom: boolean }) {
         <Td borderBottomColor={borderBottomColor} borderBottom="1px solid">
           <Flex mr="95px" align="center" color="#fff">
             <Box mr="6px" fontSize="12px" fontWeight="400">
-              Key Holder Dividends   
+              Key Holder Dividends
             </Box>
           </Flex>
         </Td>
@@ -845,7 +853,13 @@ function Table({ item, isCustom }: { item: any, isCustom: boolean }) {
           borderBottom="1px solid"
           borderBottomColor={borderBottomColor}>
           <Flex align="center">
-            <Image _hover={{ cursor: 'pointer' }} mr="20px" src='/static/profile/link.svg' alt='link' w="16px" h="16px"></Image>
+            <Image
+              _hover={{ cursor: 'pointer' }}
+              mr="20px"
+              src="/static/profile/link.svg"
+              alt="link"
+              w="16px"
+              h="16px"></Image>
             <Button
               h="35px"
               minW="170px"

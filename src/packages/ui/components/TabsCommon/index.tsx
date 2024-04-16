@@ -4,7 +4,6 @@ import { useRouter } from 'next/router'
 
 import { Flex, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 
-
 type RenderTabsType = {
   id: number
   title: string
@@ -21,6 +20,7 @@ type TabsCommonProps = {
     header: string
     text: string
   }
+  onSwitch?: (tab: string) => void
 }
 function TabsCommon({
   renderTabs,
@@ -28,6 +28,7 @@ function TabsCommon({
   variant,
   gridAndListMode = true,
   fontSizeTable,
+  onSwitch = () => {},
 }: TabsCommonProps) {
   const [selectedTab, setSelectedTab] = useState(initTab)
 
@@ -47,13 +48,7 @@ function TabsCommon({
     if (renderTabs.length > 1) {
       const selectedTab = renderTabs[index]?.value || initTab
       setSelectedTab(selectedTab)
-      // if (index === 0) {
-      //   router.push(`?tab=${initTab}`, undefined, {
-      //     shallow: true,
-      //   })
-      // } else {
-      //   router.push(`?tab=${selectedTab}`, undefined, { shallow: true })
-      // }
+      onSwitch(selectedTab)
     }
   }
 
@@ -69,7 +64,7 @@ function TabsCommon({
           color: 'rgba(255,255,255, .8)',
           '::-webkit-scrollbar': {
             display: 'none',
-          }
+          },
         }}>
         <Flex w="100%" justify="space-between" align="center">
           <Flex align="center" gap="10px">
@@ -96,7 +91,12 @@ function TabsCommon({
       <TabPanels>
         {renderTabs?.map((item) => {
           return (
-            <TabPanel p={0} key={item.id}>
+            <TabPanel
+              fontSize="14px"
+              lineHeight="20px"
+              fontWeight={500}
+              p={0}
+              key={item.id}>
               {item.render}
             </TabPanel>
           )

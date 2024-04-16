@@ -261,6 +261,11 @@ export enum MyAccountTabs {
   SELL = 'sell',
 }
 
+export enum MyDividendsTabs {
+  UNCLAIMED = 'Unclaimed',
+  CLAIMED = 'Claimed',
+}
+
 export enum MarketTabs {
   PUBLIC = 'public',
   PRIVATE = 'private',

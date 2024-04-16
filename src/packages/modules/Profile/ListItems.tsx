@@ -1,11 +1,6 @@
 import { memo, useMemo } from 'react'
 
-import {
-  Box,
-  Flex,
-  Spinner,
-  useBreakpointValue,
-} from '@chakra-ui/react'
+import { Box, Flex, Spinner, useBreakpointValue } from '@chakra-ui/react'
 import useStore from 'packages/store'
 
 import CommonTable from '@components/CommonTable'
@@ -21,6 +16,8 @@ interface ListItemsProps {
   items: any[]
   haveGridMode?: boolean
   columnsGrid?: number[]
+  currentPage: number
+  setCurrentPage: (page: number) => void
   columnsList?: Array<string>
 }
 
@@ -30,10 +27,12 @@ function ListItems({
   items,
   haveGridMode = true,
   columnsGrid = [1, 2, 3, 4, 5, 6],
+  currentPage,
+  setCurrentPage,
   columnsList,
 }: ListItemsProps) {
-  const { isGridMode, currentPage, itemOffset, setItemOffset, setCurrentPage } =
-    useStore()
+  // const { isGridMode, currentPage, itemOffset, setItemOffset, setCurrentPage } =
+  //   useStore()
 
   const itemsPerPage =
     useBreakpointValue(
@@ -50,17 +49,18 @@ function ListItems({
       },
     ) ?? 15
 
-  const endOffset = useMemo(() => {
-    return itemOffset + itemsPerPage
-  }, [itemOffset, itemsPerPage])
+  // const endOffset = useMemo(() => {
+  //   return itemOffset + itemsPerPage
+  // }, [itemOffset, itemsPerPage])
 
-  const pageCount = useMemo(() => {
-    return Math.ceil(items.length / itemsPerPage)
-  }, [items.length, itemsPerPage])
+  // const pageCount = useMemo(() => {
+  //   return Math.ceil(items.length / itemsPerPage)
+  // }, [items.length, itemsPerPage])
 
-  const currentItems = useMemo(() => {
-    return items.slice(itemOffset, endOffset)
-  }, [endOffset, itemOffset, items])
+  // const currentItems = useMemo(() => {
+  //   return items.slice(itemOffset, endOffset)
+  // }, [endOffset, itemOffset, items])
+
   if (isLoading) {
     return (
       <Box textAlign="center" mt="300px">
@@ -80,23 +80,22 @@ function ListItems({
   }
   const handlePageChange = ({ selected: selectedPage }) => {
     setCurrentPage(selectedPage)
-    const newOffset = (selectedPage * itemsPerPage) % items.length
-
-    setItemOffset(newOffset)
+    // const newOffset = (selectedPage * itemsPerPage) % items.length
+    // setItemOffset(newOffset)
   }
 
   return (
     <Box>
-        <CommonTable
-          paddingTopHeader="12px"
-          borderLeftWidth="0px"
-          borderTopWidth="0px"
-          fontWeightHeaderTable="400"
-          fontSizeHeaderTable="12px"
-          columns={columnsList}
-          renderItem={<Table isCustom={isCustom} items={currentItems} />}
-        />
-      <Flex my="30px" justify="flex-end" mr="40px">
+      <CommonTable
+        paddingTopHeader="12px"
+        borderLeftWidth="0px"
+        borderTopWidth="0px"
+        fontWeightHeaderTable="400"
+        fontSizeHeaderTable="12px"
+        columns={columnsList}
+        renderItem={<Table isCustom={isCustom} items={columnsList} />}
+      />
+      <Flex my="30px" justify="center">
         <ReactPaginate
           forcePage={currentPage}
           breakLabel="..."

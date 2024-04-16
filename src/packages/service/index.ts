@@ -13,7 +13,7 @@ class Http {
 
   public constructor() {
     this.instance = Axios.create({
-      baseURL: process.env.NEXT_PUBLIC_BASE_API + '/fl/game',
+      baseURL: process.env.NEXT_PUBLIC_BASE_API,
       timeout: TIMEOUT,
     })
 
