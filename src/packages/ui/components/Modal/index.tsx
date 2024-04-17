@@ -207,7 +207,7 @@ export default function BaseModal({
               {children}
             </ModalBody>
 
-            <ModalFooter display="flex" justifyContent="center">
+            <ModalFooter px="0px" display="flex" justifyContent="center">
               {buttons}
             </ModalFooter>
           </Box>

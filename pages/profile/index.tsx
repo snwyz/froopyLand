@@ -7,21 +7,29 @@ import TabsCommon from '@components/TabsCommon'
 import { useWindowSize } from '@hooks/useWindowSize'
 
 import { MarketTabs, MyDividendsTabs } from '@ts'
-import { BigNumber } from 'ethers'
+import { BigNumber, ethers } from 'ethers'
 import {
   getHistoricalDividendsAndPrize,
-  getMyProfit,
+  getMyPurchasedNfts,
 } from 'packages/service/api'
-import { IProfit, IUserDividends } from 'packages/service/api/types'
+import {
+  IProfit,
+  IUserDividends,
+  IUserRetrieved,
+} from 'packages/service/api/types'
 import useStore from 'packages/store'
+import useFomoStore from 'packages/store/fomo'
+import { checkApprovalFunc } from 'packages/web3'
 
 const ListItems = lazy(() => import('@modules/Profile/ListItems'))
 const Sidebar = lazy(() => import('@modules/Profile/Sidebar'))
 const Header = lazy(() => import('@modules/Profile/Header'))
 const RedeemModal = lazy(() => import('@modules/Profile/RedeemModal'))
+const OmoModal = lazy(() => import('@modules/Profile/OmoModal'))
 
 export default function Main() {
   const { width } = useWindowSize()
+  const { userHeaderInfo, getUserHeaderInfo } = useFomoStore()
 
   const handleHistoricalPageChange = (page: number) => {
     setCurrentHistoricalPage(page)
@@ -39,30 +47,28 @@ export default function Main() {
     }
   }
 
+  const handleOpenOmo = (type: number) => {
+    if (type === 1) {
+      checkApprovalFunc().then((res) => {
+        if (res) {
+          setOmoType(type)
+          setOpenOmo(true)
+        }
+      })
+    } else {
+      setOmoType(type)
+      setOpenOmo(true)
+    }
+  }
+
   const { address } = useStore()
 
   const [open, setOpen] = useState(false)
+  const [oepnOmo, setOpenOmo] = useState(false)
+  const [omoType, setOmoType] = useState<number>(0)
   const [historicalTab, setHistoricalTab] = useState<number>(0)
-  const [currentHistoricalPage, setCurrentHistoricalPage] = useState(1)
-  const [currentNFTPage, setCurrentNFTPage] = useState(1)
-  const [header, setHeader] = useState([
-    {
-      name: 'FLT Price',
-      number: '-',
-    },
-    {
-      name: 'My Historical Key Holder Dividends',
-      number: '-',
-    },
-    {
-      name: 'My Historical Final Winner Prize',
-      number: '-',
-    },
-    {
-      name: 'My Historical Final Winner Prize',
-      number: '-',
-    },
-  ])
+  const [currentHistoricalPage, setCurrentHistoricalPage] = useState(0)
+  const [currentNFTPage, setCurrentNFTPage] = useState(0)
   const [profit, setProfit] = useState<IProfit>({
     keys: '-',
     flTokens: '-',
@@ -83,6 +89,11 @@ export default function Main() {
       historicalDividendsList: [],
     })
 
+  const [purchasedNfts, setPurchasedNfts] = useState<IUserRetrieved>({
+    total: 0,
+    gameNftList: [],
+  })
+
   const renderDividends = [
     {
       id: 0,
@@ -96,9 +107,13 @@ export default function Main() {
           isCustom={false}
           currentPage={currentHistoricalPage}
           setCurrentPage={handleHistoricalPageChange}
-          items={historicalDividends.historicalDividendsList}
+          items={
+            historicalDividends
+              ? historicalDividends.historicalDividendsList
+              : []
+          }
           columnsList={[
-            `${historicalDividends.total} in Total`,
+            `${historicalDividends ? historicalDividends.total : 0} in Total`,
             'Type',
             'Amount',
             'Status',
@@ -120,9 +135,13 @@ export default function Main() {
           isCustom={false}
           currentPage={currentHistoricalPage}
           setCurrentPage={handleHistoricalPageChange}
-          items={historicalDividends.historicalDividendsList}
+          items={
+            historicalDividends
+              ? historicalDividends.historicalDividendsList
+              : []
+          }
           columnsList={[
-            `${historicalDividends.total} in Total`,
+            `${historicalDividends ? historicalDividends.total : 0} in Total`,
             'Type',
             'Amount',
             'Status',
@@ -134,26 +153,6 @@ export default function Main() {
     },
   ]
 
-  const nfts = [
-    {
-      label: 'Pepe',
-      image:
-        'https://i.seadn.io/s/raw/files/7720ce176c5f99f259455d9df2e183c0.png?auto=format&dpr=1&w=3840',
-      id: '#331',
-    },
-    {
-      label: 'Pepe',
-      image:
-        'https://i.seadn.io/s/raw/files/d628a7e260cb549690b006ad7d8e459b.png?auto=format&dpr=1&w=3840',
-      id: '#99',
-    },
-    {
-      label: 'Pepe',
-      image:
-        'https://i.seadn.io/s/raw/files/a7c8d34ae894e73f8ac8045a6298d602.png?auto=format&dpr=1&w=3840',
-      id: '#932',
-    },
-  ]
   const renderNFTS = [
     {
       id: 0,
@@ -164,9 +163,16 @@ export default function Main() {
           haveGridMode={false}
           columnsGrid={[1, 2, 2, 2]}
           isLoading={false}
-          items={nfts}
+          items={purchasedNfts ? purchasedNfts.gameNftList : []}
+          currentPage={currentNFTPage}
+          setCurrentPage={handleNFTPageChange}
           isCustom
-          columnsList={['3 Total', 'NFT ID', 'Transaction', 'Detail']}
+          columnsList={[
+            `${purchasedNfts ? purchasedNfts.total : 0} Total `,
+            'NFT ID',
+            'Transaction',
+            'Detail',
+          ]}
         />
       ),
     },
@@ -174,34 +180,12 @@ export default function Main() {
 
   // profit
   useEffect(() => {
-    getMyProfit(address)
-      .then((res) => {
-        if (res.code === '200' && res.data) {
-          setHeader([
-            {
-              name: 'FLT Price',
-              number: res.data.flTokens,
-            },
-            {
-              name: 'My Historical Key Holder Dividends',
-              number: res.data.keyDividends,
-            },
-            {
-              name: 'My Historical Final Winner Prize',
-              number: res.data.finalWinPrice,
-            },
-            {
-              name: 'My Historical Final Winner Prize',
-              number: res.data.nftDividends,
-            },
-          ])
-          setProfit(res.data)
-        }
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-  }, [address])
+    getUserHeaderInfo(address).then((res) => {
+      if (res) {
+        setProfit(res)
+      }
+    })
+  }, [address, getUserHeaderInfo])
 
   // historical dividends
   useEffect(() => {
@@ -211,8 +195,8 @@ export default function Main() {
       historicalTab,
     )
       .then((res) => {
-        if (res.code === '200' && res.data) {
-          setHistoricalDividends(res.data)
+        if (res) {
+          setHistoricalDividends(res)
         }
       })
       .catch((err) => {
@@ -220,11 +204,24 @@ export default function Main() {
       })
   }, [address, currentHistoricalPage, historicalTab])
 
+  // my nfts
+  useEffect(() => {
+    getMyPurchasedNfts(address, currentNFTPage)
+      .then((res) => {
+        if (res) {
+          setPurchasedNfts(res)
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  }, [address, currentNFTPage])
+
   return (
     <Flex>
       <Sidebar />
       <Box flex="1" minW={{ base: 'full', md: '500px' }}>
-        <Header headers={header} />
+        <Header headers={userHeaderInfo} />
         <Box m="0 216px" pb="72px">
           <Text
             fontSize="20px"
@@ -281,10 +278,10 @@ export default function Main() {
               borderRadius="20px">
               <Flex justify="space-between" align="center">
                 <Text fontSize="16px" color="#FFA8FE" lineHeight="24px">
-                  My $FLT
+                  My $OMO
                 </Text>
                 <Flex align="center">
-                  Swap $FLT{' '}
+                  Swap $OMO{' '}
                   <Image
                     src="/static/profile/share.svg"
                     ml="10px"
@@ -300,27 +297,32 @@ export default function Main() {
                   fontSize="36px"
                   fontWeight="900"
                   mr="10px">
-                  {profit.flTokens}
+                  {profit.flTokens && profit.flTokens !== '-'
+                    ? ethers.utils.formatEther(profit.flTokens)
+                    : '-'}
                 </Text>
                 <Text fontSize="16px" lineHeight="24px">
-                  $FLT
+                  $OMO
                 </Text>
               </Flex>
               {/* <Text>$ 1117.8</Text> */}
               <Flex mt="33px" gap="12px">
                 <Button
                   disabled={profit.flTokens === '0' || profit.flTokens === '-'}
-                  border="1px solid #704BEA"
-                  bg="rgba(118, 74, 242, 0.5)"
+                  onClick={() => handleOpenOmo(0)}
+                  border="1px solid #FCFBFF"
+                  bg="transparent"
                   w="100%"
                   height="52px"
-                  color="#9778FF"
+                  color="#FFFFFF"
+                  _hover={{ color: '#000000', bg: '#00DAB3' }}
                   fontSize="20px"
                   lineHeight="30px"
                   textShadow="0px 0px 30px 0px #390885;">
                   Withdraw
                 </Button>
                 <Button
+                  onClick={() => handleOpenOmo(1)}
                   bgColor="#00DAB3"
                   w="100%"
                   height="52px"
@@ -504,6 +506,12 @@ export default function Main() {
         </Box>
       </Box>
       <RedeemModal isOpen={open} onClose={() => setOpen(false)} />
+      <OmoModal
+        type={omoType}
+        isOpen={oepnOmo}
+        isApproval={false}
+        onClose={() => setOpenOmo(false)}
+      />
     </Flex>
   )
 }

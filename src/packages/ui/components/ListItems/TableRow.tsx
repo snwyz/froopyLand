@@ -28,15 +28,14 @@ import {
 
 import { useWindowSize } from '@hooks/useWindowSize'
 
-import { getTitleErrorMetamask } from '@utils'
-import { convertUrlImage, ellipseAddress } from '@utils'
+import { convertUrlImage, ellipseAddress, getTitleErrorMetamask } from '@utils'
 import { toastError } from '@utils/toast'
 
 import { MyNFTsTabs, PathnameType, PathProfileType } from '@ts'
 
-import TableBuyAll from './TableBuyAll'
-import moment from 'moment'
 import { ethers } from 'ethers'
+import moment from 'moment'
+import TableBuyAll from './TableBuyAll'
 
 function Table({ item, isCustom }: { item: any; isCustom: boolean }) {
   const { width } = useWindowSize()
@@ -708,7 +707,7 @@ function Table({ item, isCustom }: { item: any; isCustom: boolean }) {
                   h="40px"
                   objectFit="cover"
                   alt=""
-                  src={item.image}
+                  src={item.imageUrl}
                   fallbackSrc="/static/license-template/template.png"
                 />
               </Box>
@@ -719,7 +718,7 @@ function Table({ item, isCustom }: { item: any; isCustom: boolean }) {
                 textOverflow="ellipsis"
                 overflow="hidden"
                 whiteSpace="nowrap">
-                {item.label}
+                {item.name} # {item.tokenId}
               </Text>
             </Flex>
           </Td>
@@ -730,24 +729,28 @@ function Table({ item, isCustom }: { item: any; isCustom: boolean }) {
             borderColor="#E8E8E8">
             <Flex mr="95px" align="center" color="#fff">
               <Box mr="6px" fontSize="12px" fontWeight="400">
-                {item.id}
+                {item.tokenId}
               </Box>
             </Flex>
           </Td>
-          <Td
-            borderBottomColor={borderBottomColor}
-            borderBottom="1px solid"></Td>
-
-          <Td
-            borderBottomColor={borderBottomColor}
-            borderBottom="1px solid"></Td>
-
-          <Td
-            py={0}
-            isNumeric
-            minW="170px"
-            borderBottom="1px solid"
-            borderBottomColor={borderBottomColor}></Td>
+          <Td borderBottomColor={borderBottomColor} borderBottom="1px solid">
+            <Flex mr="95px" align="center" color="#fff">
+              <Box mr="6px" fontSize="12px" fontWeight="400">
+                <Image
+                  onClick={() =>
+                    window.open(
+                      process.env.NEXT_PUBLIC_CHAIN_URL + item.gameNft.txHash,
+                    )
+                  }
+                  _hover={{ cursor: 'pointer' }}
+                  mr="20px"
+                  src="/static/profile/link.svg"
+                  alt="link"
+                  w="16px"
+                  h="16px"></Image>
+              </Box>
+            </Flex>
+          </Td>
           <Td
             py={0}
             isNumeric
@@ -755,13 +758,6 @@ function Table({ item, isCustom }: { item: any; isCustom: boolean }) {
             borderBottom="1px solid"
             borderBottomColor={borderBottomColor}>
             <Flex align="center">
-              <Image
-                _hover={{ cursor: 'pointer' }}
-                mr="20px"
-                src="/static/profile/link.svg"
-                alt="link"
-                w="16px"
-                h="16px"></Image>
               <Button
                 h="35px"
                 minW="170px"
@@ -804,7 +800,7 @@ function Table({ item, isCustom }: { item: any; isCustom: boolean }) {
                 h="40px"
                 objectFit="cover"
                 alt=""
-                src={item.image}
+                src={item.gameNft.imageUrl}
                 fallbackSrc="/static/license-template/template.png"
               />
             </Box>
@@ -815,7 +811,7 @@ function Table({ item, isCustom }: { item: any; isCustom: boolean }) {
               textOverflow="ellipsis"
               overflow="hidden"
               whiteSpace="nowrap">
-              {item.label}
+              {item.gameNft.name} # {item.gameNft.tokenId}
             </Text>
           </Flex>
         </Td>
@@ -826,14 +822,18 @@ function Table({ item, isCustom }: { item: any; isCustom: boolean }) {
           borderColor="#E8E8E8">
           <Flex mr="95px" align="center" color="#fff">
             <Box mr="6px" fontSize="12px" fontWeight="400">
-              {item.duration}
+              {item.type === '0'
+                ? 'My Claim Key'
+                : item.type === '1'
+                ? 'My Final Winner Prize '
+                : 'My NFT Dividends'}
             </Box>
           </Flex>
         </Td>
         <Td borderBottomColor={borderBottomColor} borderBottom="1px solid">
           <Flex mr="95px" align="center" color="#fff">
             <Box mr="6px" fontSize="12px" fontWeight="400">
-              Key Holder Dividends
+              {item.amount} ETH
             </Box>
           </Flex>
         </Td>
@@ -841,7 +841,26 @@ function Table({ item, isCustom }: { item: any; isCustom: boolean }) {
         <Td borderBottomColor={borderBottomColor} borderBottom="1px solid">
           <Flex mr="95px" align="center" color="#fff">
             <Box mr="6px" fontSize="12px" fontWeight="400">
-              {item.amount} ETH
+              {item.status === '1' ? 'Claimed' : 'Unclaimed'}
+            </Box>
+          </Flex>
+        </Td>
+
+        <Td borderBottomColor={borderBottomColor} borderBottom="1px solid">
+          <Flex mr="95px" align="center" color="#fff">
+            <Box mr="6px" fontSize="12px" fontWeight="400">
+              <Image
+                onClick={() =>
+                  window.open(
+                    process.env.NEXT_PUBLIC_CHAIN_URL + item.gameNft.txHash,
+                  )
+                }
+                _hover={{ cursor: 'pointer' }}
+                mr="20px"
+                src="/static/profile/link.svg"
+                alt="link"
+                w="16px"
+                h="16px"></Image>
             </Box>
           </Flex>
         </Td>
@@ -853,13 +872,6 @@ function Table({ item, isCustom }: { item: any; isCustom: boolean }) {
           borderBottom="1px solid"
           borderBottomColor={borderBottomColor}>
           <Flex align="center">
-            <Image
-              _hover={{ cursor: 'pointer' }}
-              mr="20px"
-              src="/static/profile/link.svg"
-              alt="link"
-              w="16px"
-              h="16px"></Image>
             <Button
               h="35px"
               minW="170px"

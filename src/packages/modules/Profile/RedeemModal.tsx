@@ -1,6 +1,18 @@
-import { Button, useColorModeValue, VStack, Heading, Flex, Input, Text, Box  } from '@chakra-ui/react'
+import {
+  Button,
+  useColorModeValue,
+  VStack,
+  Heading,
+  Flex,
+  Input,
+  Text,
+  Box,
+  useToast,
+} from '@chakra-ui/react'
 
 import BaseModal from '@components/Modal'
+import useStore from 'packages/store'
+import { convertKeyToToken } from 'packages/web3'
 
 type SubmitOfferModalProps = {
   isOpen: boolean
@@ -8,6 +20,42 @@ type SubmitOfferModalProps = {
 }
 
 const RedeemModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
+  const toast = useToast()
+  const { address } = useStore()
+
+  const redeemKeys = () => {
+    convertKeyToToken(null, address)
+      .then((res) => {
+        if (res) {
+          toast({
+            title: `You have successfully redeemed your Keys.`,
+            status: 'success',
+            duration: null,
+            isClosable: false,
+            position: 'top',
+          })
+        } else {
+          toast({
+            title: `You failed to redeem your Keys due to some error.`,
+            status: 'error',
+            duration: null,
+            isClosable: false,
+            position: 'top',
+          })
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+        toast({
+          title: `You failed to redeem your Keys due to some error.`,
+          status: 'error',
+          duration: null,
+          isClosable: false,
+          position: 'top',
+        })
+      })
+  }
+
   return (
     <BaseModal
       variant="redeemModal"
@@ -15,6 +63,7 @@ const RedeemModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
       isOpen={isOpen}
       buttons={
         <Button
+          onClick={redeemKeys}
           m="auto"
           my="20px"
           w="576px"
@@ -24,45 +73,72 @@ const RedeemModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
           h="66px"
           color="#fff"
           bg="#704BEA"
-          _hover={{ bg: "#704BEA" }}
-        >
+          _hover={{ bg: '#704BEA' }}>
           Redeem
         </Button>
       }
       onClose={onClose}
       bgColor={useColorModeValue ? '#fff' : '#fff'}>
       <VStack align="left">
-        <Heading fontSize="22px" lineHeight="32px" mb="60px">Redeem Keys</Heading>
+        <Heading fontSize="22px" lineHeight="32px" mb="60px">
+          Redeem Keys
+        </Heading>
         <Flex alignItems="center">
-            <Box>
-              <Flex w="328px" p="12px 20px" borderRadius="10px" alignItems="center" bg="#F4F4F4">
-                <Text>Keys:</Text>
-                <Input
-                  _focusVisible={{
-                    borderWidth: '0px',
-                  }}
-                  type="number"
-                  fontWeight={700}
-                  fontSize="20px"
-                  border="none"
-                  value="56"
-                />
-                {/* <Text color="#7E4AF1" fontSize="16px" lineHeight="24px" fontWeight="600">Max</Text> */}
-              </Flex>
-              <Text mt="8px" fontSize="12px" lineHeight="18px" color="#4F4F4F" align="end">&nbsp;</Text>
-            </Box>
-            <Text color="#828282" position="relative" top="-12px" fontSize="14px" lineHeight="20px" m="0 12px">to</Text>
-            <Box>
+          <Box>
+            <Flex
+              w="328px"
+              p="12px 20px"
+              borderRadius="10px"
+              alignItems="center"
+              bg="#F4F4F4">
+              <Text>Keys:</Text>
               <Input
-                w="212px"
-                h="57px"
-                borderColor="#F2F2F2"
-                readOnly
-                textAlign="center"
-                value="1 FLT"
+                _focusVisible={{
+                  borderWidth: '0px',
+                }}
+                type="number"
+                fontWeight={700}
+                fontSize="20px"
+                border="none"
+                value="56"
               />
-              <Text mt="8px" fontSize="12px" lineHeight="18px" color="#4F4F4F" align="center">1.532 Key=1 $FLT</Text>
-            </Box>
+            </Flex>
+            <Text
+              mt="8px"
+              fontSize="12px"
+              lineHeight="18px"
+              color="#4F4F4F"
+              align="end">
+              &nbsp;
+            </Text>
+          </Box>
+          <Text
+            color="#828282"
+            position="relative"
+            top="-12px"
+            fontSize="14px"
+            lineHeight="20px"
+            m="0 12px">
+            to
+          </Text>
+          <Box>
+            <Input
+              w="212px"
+              h="57px"
+              borderColor="#F2F2F2"
+              readOnly
+              textAlign="center"
+              value="1 FLT"
+            />
+            <Text
+              mt="8px"
+              fontSize="12px"
+              lineHeight="18px"
+              color="#4F4F4F"
+              align="center">
+              1.532 Key=1 $FLT
+            </Text>
+          </Box>
         </Flex>
       </VStack>
     </BaseModal>

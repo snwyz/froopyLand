@@ -1,15 +1,15 @@
-import { lazy, Suspense, useEffect } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 
-import { Box, Flex, Spinner, SimpleGrid } from '@chakra-ui/react'
+import { Box, Flex, SimpleGrid, Spinner } from '@chakra-ui/react'
 import ItemGrid from '@components/ListItems/ItemGrid'
 
 import TabsCommon from '@components/TabsCommon'
 
 import { useWindowSize } from '@hooks/useWindowSize'
+import { getMyParticipationGames } from 'packages/service/api'
+import { INftList } from 'packages/service/api/types'
+import useStore from 'packages/store'
 import useFomoStore from 'packages/store/fomo'
-import { web3Modal } from 'packages/web3'
-import { ethers } from 'ethers'
-
 
 const ListItems = lazy(() => import('@components/ListItems'))
 const Sidebar = lazy(() => import('@modules/Profile/Sidebar'))
@@ -17,75 +17,72 @@ const Header = lazy(() => import('@modules/Profile/Header'))
 
 export default function Main() {
   const { width } = useWindowSize()
+  const { address } = useStore()
+  const { userHeaderInfo } = useFomoStore()
 
-  const { setGameList, ongoingList, upcomingList, finishedList, gameList } = useFomoStore()
+  const [gameNft, setGameNft] = useState<INftList>({
+    total: 0,
+    nftList: [],
+  })
+
+  let ongoingList = gameNft.nftList.filter((item) => item.status === '1')
+  let finishedList = gameNft.nftList.filter((item) => item.status === '2')
 
   const fetchList = async () => {
-    const provider = await web3Modal.connect()
-    const library = new ethers.providers.Web3Provider(provider)
-    setGameList(library)
+    getMyParticipationGames(address, null).then((res) => {
+      if (res) {
+        setGameNft(res)
+      }
+    })
   }
 
   useEffect(() => {
     fetchList()
   }, [])
 
-  const headers = [
-    {
-      name: 'FLT Price',
-      number: '$ ',
-    },
-    {
-      name: 'My Key Holder Dividends',
-      number: '52 ETH',
-    },
-    {
-      name: 'My NFT Provider Dividends',
-      number: '16 ETH',
-    },
-    {
-      name: 'My Final Winner Prize',
-      number: '10 ETH',
-    },
-  ]
-
   const renderTabs = [
     {
       id: 1,
-      title: 'Ongoing Auctions',
+      title: `All Auctions (${gameNft.total})`,
       value: 'ongoing',
       render: (
-        <SimpleGrid
-          mt='20px'
-          columns={[1, 2, 3]}
-          spacing="20px">
-          {ongoingList.map((item, idx) => {
-            return <ItemGrid gridName='ongoing' item={item} key={idx} />
+        <SimpleGrid mt="20px" columns={[1, 2, 3]} spacing="20px">
+          {gameNft.nftList.map((item, idx) => {
+            return <ItemGrid gridName="ongoing" item={item} key={idx} />
           })}
         </SimpleGrid>
-        ),
+      ),
     },
     {
       id: 2,
-      title: 'Finished Auctions',
-      value: 'finished',
+      title: `Ongoing Auctions (${ongoingList.length})`,
+      value: 'ongoing',
       render: (
-        <SimpleGrid
-          mt='20px'
-          columns={[1, 2, 3]}
-          spacing="20px">
-          {finishedList.map((item, idx) => {
-            return <ItemGrid gridName='finished' item={item} key={idx} />
+        <SimpleGrid mt="20px" columns={[1, 2, 3]} spacing="20px">
+          {ongoingList.map((item, idx) => {
+            return <ItemGrid gridName="ongoing" item={item} key={idx} />
           })}
         </SimpleGrid>
-        ),
+      ),
+    },
+    {
+      id: 3,
+      title: `Finished Auctions (${finishedList.length})`,
+      value: 'finished',
+      render: (
+        <SimpleGrid mt="20px" columns={[1, 2, 3]} spacing="20px">
+          {finishedList.map((item, idx) => {
+            return <ItemGrid gridName="finished" item={item} key={idx} />
+          })}
+        </SimpleGrid>
+      ),
     },
   ]
   return (
     <Flex>
       <Sidebar />
       <Box flex="1" minW={{ base: 'full', md: '500px' }}>
-        <Header headers={headers} />
+        <Header headers={userHeaderInfo} />
         <Box textAlign="center">
           <Suspense
             fallback={
@@ -100,10 +97,7 @@ export default function Main() {
               </Box>
             }>
             <Box p="25px 50px">
-              <TabsCommon
-                initTab='ongoing'
-                renderTabs={renderTabs}
-              />
+              <TabsCommon initTab="ongoing" renderTabs={renderTabs} />
             </Box>
           </Suspense>
         </Box>

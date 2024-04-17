@@ -10,6 +10,10 @@ const nextConfig = {
         source: `/robots.txt`,
         destination: `/robotstxt`,
       },
+      {
+        source: `/fl/:path*`,
+        destination: `http://localhost:8080/fl/:path*`,
+      }
     ]
   },
   webpack(config) {
