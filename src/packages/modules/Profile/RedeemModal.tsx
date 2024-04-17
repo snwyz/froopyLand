@@ -59,9 +59,9 @@ const RedeemModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
                 borderColor="#F2F2F2"
                 readOnly
                 textAlign="center"
-                value="1 FLT"
+                value="1 OMO"
               />
-              <Text mt="8px" fontSize="12px" lineHeight="18px" color="#4F4F4F" align="center">1.532 Key=1 $FLT</Text>
+              <Text mt="8px" fontSize="12px" lineHeight="18px" color="#4F4F4F" align="center">1.532 Key=1 $OMO</Text>
             </Box>
         </Flex>
       </VStack>

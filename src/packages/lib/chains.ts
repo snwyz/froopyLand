@@ -49,6 +49,22 @@ const supportedChains: IChainData[] = [
       contractAddress: '',
       balance: '',
     },
+  },
+  {
+    name: 'Sepolia test network',
+    short_name: 'sepolia',
+    chain: 'sepolia_test',
+    network: 'sepolia_test',
+    chain_id: 11155111,
+    network_id: 11155111,
+    rpc_url: 'https://rpc.sepolia.org',
+    native_currency: {
+      symbol: 'SepoliaETH',
+      name: 'SepoliaETH',
+      decimals: '18',
+      contractAddress: '',
+      balance: '',
+    },
   }
 ]
 

@@ -19,7 +19,7 @@ import { ethers } from 'ethers'
 import { useRouter } from 'next/router'
 import moment from 'moment'
 import { memo, useEffect, useMemo, useState } from 'react'
-import FroopyABI from 'packages/abis/demo/fl409.json'
+import FroopyABI from 'packages/abis/demo/fl417.json'
 import { toastError, toastSuccess } from '@utils/toast'
 import useStore from 'packages/store'
 import { ellipseAddress } from '@utils'
@@ -40,10 +40,7 @@ const FL_CONTRACT_ADR = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR
 const Details = () => {
   const router = useRouter()
   
-  // const { pool: id } = router.query 
-
-  // todo 
-  const id = 1
+  const { pool: id } = router.query 
 
   const { address } = useStore()
   const [claims, setClaims] = useState(0)
@@ -64,6 +61,7 @@ const Details = () => {
   const init = () => {
     fetchGameState()
     getGameInfoOfGameIds()
+    listenerGame()
   }
 
   // 获取详细信息 - sol
@@ -227,7 +225,7 @@ const Details = () => {
     const signer = library.getSigner()
     const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
     contract.on('NewBids', (from, to, value) => {
-      console.log(`NewBids event detected: ${from} -> ${to}, value: ${value}`)
+      init()
     })
 
   }
@@ -323,7 +321,7 @@ const Details = () => {
                   </Flex>
                   <Flex fontSize="14px" color="#fff" flex={1} mr="40px" align="center">
                     <Text fontSize="16px" color="#FFA8FE" mr="20px">NFT Price:</Text>
-                    <Text fontSize="16px">{detailInfos.totalKeyMinted.toNumber() * 1.1} $FL Token</Text>
+                    <Text fontSize="16px">{detailInfos.totalKeyMinted.toNumber() * 1.1} $OMO Token</Text>
                   </Flex>
                 </Flex>
 
@@ -351,7 +349,7 @@ const Details = () => {
               <Flex border="1px solid rgba(112, 75, 234, 1)" w="100%" borderRadius="20px" p="24px 32px" mb="20px">
               <Flex fontSize="14px" color="#fff" flex={1} mr="40px" align="center">
                   <Text fontSize="16px" color="#FFA8FE" mr="20px">NFT Price:</Text>
-                  <Text fontSize="16px">{detailInfos.totalKeyMinted.toNumber() * 1.1} $FL Token</Text>
+                  <Text fontSize="16px">{detailInfos.totalKeyMinted.toNumber() * 1.1} $OMO Token</Text>
                 </Flex>
               <Button
                   fontSize="20px"

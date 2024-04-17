@@ -47,7 +47,7 @@ export default function Main() {
   const [currentNFTPage, setCurrentNFTPage] = useState(1)
   const [header, setHeader] = useState([
     {
-      name: 'FLT Price',
+      name: 'OMO Price',
       number: '-',
     },
     {
@@ -179,7 +179,7 @@ export default function Main() {
         if (res.code === '200' && res.data) {
           setHeader([
             {
-              name: 'FLT Price',
+              name: 'OMO Price',
               number: res.data.flTokens,
             },
             {
@@ -281,10 +281,10 @@ export default function Main() {
               borderRadius="20px">
               <Flex justify="space-between" align="center">
                 <Text fontSize="16px" color="#FFA8FE" lineHeight="24px">
-                  My $FLT
+                  My $OMO
                 </Text>
                 <Flex align="center">
-                  Swap $FLT{' '}
+                  Swap $OMO{' '}
                   <Image
                     src="/static/profile/share.svg"
                     ml="10px"
@@ -303,7 +303,7 @@ export default function Main() {
                   {profit.flTokens}
                 </Text>
                 <Text fontSize="16px" lineHeight="24px">
-                  $FLT
+                  $OMO
                 </Text>
               </Flex>
               {/* <Text>$ 1117.8</Text> */}

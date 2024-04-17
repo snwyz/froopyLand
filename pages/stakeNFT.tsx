@@ -7,7 +7,7 @@ import useStore from 'packages/store'
 import { web3Modal } from 'packages/web3'
 import { useEffect, useRef, useState } from 'react'
 
-import flABI from 'packages/abis/demo/fl409.json'
+import flABI from 'packages/abis/demo/fl417.json'
 import ERC_ABI from 'packages/abis/demo/Erc721.json'
 import { useRouter } from 'next/router'
 import useAuctions from 'packages/store/auctions'

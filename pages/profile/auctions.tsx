@@ -32,7 +32,7 @@ export default function Main() {
 
   const headers = [
     {
-      name: 'FLT Price',
+      name: 'OMO Price',
       number: '$ 56',
     },
     {

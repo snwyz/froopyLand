@@ -6,7 +6,7 @@ import { toastError } from '@utils/toast'
 import { ethers } from 'ethers'
 import { web3Modal } from 'packages/web3'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import FroopyABI from 'packages/abis/demo/fl409.json'
+import FroopyABI from 'packages/abis/demo/fl417.json'
 import useStore from 'packages/store'
 import { getBidderForm } from 'packages/service/api'
 
@@ -54,7 +54,7 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
 
     if (isLowPrice) return toastError('Bid must be higher than the current highest bid.')
     
-    if (value > availableNums) return toastError('Bid must be lower than the current available $FL Token')
+    if (value > availableNums) return toastError('Bid must be lower than the current available $OMO Token')
 
     const provider = await web3Modal.connect()    
     const library = new ethers.providers.Web3Provider(provider)
@@ -62,8 +62,7 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
     const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
 
     try {
-      const tx = await contract.bidLand(value)
-      console.log(tx, 'tx')
+      await contract.bidLand(value)
 
       const existingItemIndex = bidList.findIndex(item => item.userAddress === address)
 
@@ -80,7 +79,6 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
       setValue(null)
     } catch (error) {
       console.log(error, '<===')
-      
     }
   }
 
@@ -97,10 +95,10 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
     if (!address) return toastError('Please connect wallet first.')
     
     try {
-      const tx = await contract.getBidderInofOf(address)
-      setAvailableNums(ethers.utils.formatEther(tx.sysTokenBalance))
+      const tx = await contract.getBidderInfoOf(address)
+      setAvailableNums(ethers.utils.formatEther(tx.sysTokenBalance.toString()))
     } catch (error) {
-      console.log(error, '<====')
+      console.log(error, '<====getAvailableFL')
     }
   }
 
@@ -108,14 +106,10 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
     const provider = await web3Modal.connect()    
     const library = new ethers.providers.Web3Provider(provider)
     const signer = library.getSigner()
-
     const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
-
-
-    // wait SOL deploy 
-    contract.on('NewBids', (from, to, value) => {
-      console.log(`NewBids event detected: ${from} -> ${to}, value: ${value}`)
-    })
+    
+    // TODO: 考虑到后续服务端压力，比如 Ddos，需要从合约侧返回的新数据去组装列表
+    contract.on('NewBids', (from, to, value) => getBidList())
   }
 
   const getBidList = async () => {
@@ -154,7 +148,7 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
                   {ellipseAddress(item.userAddress, 6)}
                 </Box>
               </Flex>
-              <Text align="left" w="200px" fontSize="16px" color="rgb(0, 0, 0)" mr="164px">{item.amount} $FL Token</Text>
+              <Text align="left" w="200px" fontSize="16px" color="rgb(0, 0, 0)" mr="164px">{item.amount} $OMO Token</Text>
               {
                 item.userAddress === address && (<Text fontSize="14px" color="#7E4AF1">ME</Text>)
               }
@@ -177,7 +171,7 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
                   border="none"
                   onChange={e => setValue(e.target.value)}
                 />
-                <Text color="#333" fontSize="14px" lineHeight="24px">$FLT</Text>
+                <Text color="#333" fontSize="14px" lineHeight="24px">$OMO</Text>
               </Flex>
             </Box>
             <Button
@@ -195,7 +189,7 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
               Bid
             </Button>
         </Flex>
-        <Text mt="8px" fontSize="12px" lineHeight="18px" color="#4F4F4F">Available：{formatNumberWithCommas(availableNums)} $FL Token</Text>
+        <Text mt="8px" fontSize="12px" lineHeight="18px" color="#4F4F4F">Available：{formatNumberWithCommas(availableNums)} $OMO Token</Text>
         <Flex bg="#F6BF324D" p='15px' borderRadius="8px" mt="24px">
             <Image src="/static/common/info.svg" alt="info" w='16px' h="16px" mr="10px" />
             <Text textAlign="justify" color="#000" fontSize="14px" lineHeight="21px" mt="-5px">

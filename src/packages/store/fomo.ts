@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker'
 import { ethers } from 'ethers'
 import create from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import FroopyABI from 'packages/abis/demo/fl409.json'
+import FroopyABI from 'packages/abis/demo/fl417.json'
 import { generateTimestamp } from '@modules/Market/Main'
 import { getNftAuctions } from 'packages/service/api'
 

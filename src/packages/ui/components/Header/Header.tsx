@@ -39,11 +39,9 @@ import useStore from 'packages/store'
 import { initialState, reducer, web3Modal } from 'packages/web3'
 
 import { ellipseAddress } from '@utils'
-import useFomoStore from 'packages/store/fomo'
 
 // TODO 生产
-
-const network = 'X1_TEST'
+const NETWORK = 'sepolia_test'
 
 interface NavItem {
   label: string
@@ -153,7 +151,6 @@ const Header: FC = () => {
   const { pathname } = router
 
   const toast = useToast()
-  const fomoStore = useFomoStore()
   
   const [state, dispatch] = useReducer(reducer, initialState)
   const { provider, web3Provider, address, chainId } = state
@@ -177,8 +174,6 @@ const Header: FC = () => {
         window.localStorage.setItem('isConnect', 'true')
         const network = await web3Provider.getNetwork()
         
-        fomoStore.setGameList(web3Provider)
-        
         dispatch({
           type: 'SET_WEB3_PROVIDER',
           provider,
@@ -187,7 +182,7 @@ const Header: FC = () => {
           chainId: network.chainId,
         })
       } catch (error) {
-        console.log(error, '<157')
+        console.log(error)
       }
     },
     [setAddress],
@@ -265,10 +260,10 @@ const Header: FC = () => {
     try {
       if (chainId) {
         const chainData = getChainData(chainId)        
-        const validChain = address && chainData?.network === network
+        const validChain = address && chainData?.network === NETWORK
         if (!validChain) {
           toast({
-            title: `Please switch to ${network} network.`,
+            title: `Please switch to ${NETWORK} network.`,
             status: 'warning',
             duration: null,
             isClosable: false,
