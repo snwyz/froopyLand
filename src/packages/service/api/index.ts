@@ -6,7 +6,7 @@ import { INftList, IProfit, IUserDividends, IUserRetrieved } from './types'
  * @param {string} userAddress user address
  * @return {*}
  */
-export const getMyProfit = (userAddress: string) => http.get<IProfit>(`/user/myProfit/${userAddress}`)
+export const getMyProfit = (userAddress: string) => http.get<IProfit>(`/fl/user/myProfit/${userAddress}`)
 
 
 /**
@@ -16,7 +16,7 @@ export const getMyProfit = (userAddress: string) => http.get<IProfit>(`/user/myP
  * @param {number} status 0 unclaimed 1 claimed
  * @return {*}
  */
-export const getHistoricalDividendsAndPrize = (userAddress: string, pageNum: number, status: number) => http.get<IUserDividends>(`/user/historicalDividendsAndPrize/${userAddress}/${pageNum}/${status}`)
+export const getHistoricalDividendsAndPrize = (userAddress: string, pageNum: number, status: number) => http.get<IUserDividends>(`/fl/user/historicalDividendsAndPrize/${userAddress}/${pageNum}/${status}`)
 
 /**
  * @description: Get the user's NFT
@@ -24,7 +24,7 @@ export const getHistoricalDividendsAndPrize = (userAddress: string, pageNum: num
  * @param {number} pageNum
  * @return {*}
  */
-export const getMyPurchasedNfts = (userAddress: string, pageNum: number) => http.get<IUserRetrieved>(`/user/myPurchasedNfts/${userAddress}/${pageNum}`)
+export const getMyPurchasedNfts = (userAddress: string, pageNum: number) => http.get<IUserRetrieved>(`/fl/user/myPurchasedNfts/${userAddress}/${pageNum}`)
 
 /**
  * @description: Get the user's participation games
@@ -32,7 +32,7 @@ export const getMyPurchasedNfts = (userAddress: string, pageNum: number) => http
  * @param {number} status 1 ongoing 2 ended 3 all
  * @return {*}
  */
-export const getMyParticipationGames = (userAddress: string, status: number) => http.get<INftList>(`/user/myParticipationGames/${userAddress}/${status}`)
+export const getMyParticipationGames = (userAddress: string, status?: number) => http.get<INftList>(status ? `/fl/user/myParticipationGames/${userAddress}/${status}` : `/fl/user/myParticipationGames/${userAddress}`)
 
 /**
  * @description: Get the user's auctions
@@ -40,7 +40,14 @@ export const getMyParticipationGames = (userAddress: string, status: number) => 
  * @param {number} status 0 upcoming 1 ongoing 2 ended 3 all
  * @return {*}
  */
-export const getMyAuctions = (userAddress: string, status: number) => http.get<INftList>(`/user/myAuctions/${userAddress}/${status}`)
+export const getMyAuctions = (userAddress: string, status?: number) => http.get<INftList>(status ? `/fl/user/myAuctions/${userAddress}/${status}` : `/fl/user/myAuctions/${userAddress}`)
+
+/**
+ * @description: Get nft pool list
+ * @param {number} pageNum page number start from 1
+ * @return {*}
+ */
+export const getNftPoolList = (pageNum: number) => http.get<INftList>('/fl/nft/getNftPoolList/1')
 
 export const getAuctionInfo = () => http.get<Promise<any>>('/fl/game/getAuctionInfo')
 

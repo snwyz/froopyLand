@@ -24,7 +24,7 @@ export interface IHistoricalDividendsList {
   gameNft: IGameNft;
   type: number;
   amount: string;
-  status: string;
+  status: number;
 }
 
 export interface IUserDividends {
@@ -50,7 +50,7 @@ export interface IGameNftDetail {
   tokenMetadataUrl: string;
   openSeaUrl: string;
   finalPrice: string;
-  status: string;
+  status: number;
   totalKeyMinted: string;
   biddersCount: number;
   startTimestamp: number;

@@ -7,9 +7,8 @@ import { Box } from '@chakra-ui/react'
 // import DetailPool from '@modules/DetailPool'
 import Details from '@modules/Detail'
 
-
-
 const DetailPage: FC = () => {
+
   return (
     <>
       <Head>

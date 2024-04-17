@@ -13,7 +13,7 @@ const nextConfig = {
       {
         source: `/fl/:path*`,
         destination: `http://localhost:8080/fl/:path*`,
-      }
+      },
     ]
   },
   webpack(config) {

@@ -30,7 +30,7 @@ export default function Main() {
   let finishedList = gameNft.nftList.filter((item) => item.status === '2')
 
   const fetchList = async () => {
-    getMyAuctions(address, null).then((res) => {
+    getMyAuctions(address).then((res) => {
       setGameNft(res)
     })
   }
