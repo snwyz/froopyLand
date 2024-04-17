@@ -70,7 +70,7 @@ const Details = () => {
 
   const fetchGameDetailById = async () => {
     if (!address) return null
-    const { keyDividends } = await getGameDetailById(address, id as string)
+    const { keyDividends } = await getGameDetailById(address, id as any)
     setKeyDividends(keyDividends)
   }
 
