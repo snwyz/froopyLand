@@ -25,9 +25,9 @@ export default function Main() {
     nftList: [],
   })
 
-  let upcomingList = gameNft.nftList.filter((item) => item.status === '0')
-  let ongoingList = gameNft.nftList.filter((item) => item.status === '1')
-  let finishedList = gameNft.nftList.filter((item) => item.status === '2')
+  let upcomingList = gameNft.nftList.filter((item) => item.status === 0)
+  let ongoingList = gameNft.nftList.filter((item) => item.status === 1)
+  let finishedList = gameNft.nftList.filter((item) => item.status === 2)
 
   const fetchList = async () => {
     getMyAuctions(address).then((res) => {
