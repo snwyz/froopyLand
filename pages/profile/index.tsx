@@ -279,8 +279,10 @@ export default function Main() {
               <Flex justify="space-between" align="center">
                 <Text fontSize="16px" color="#FFA8FE" lineHeight="24px">
                   My $OMO
+                  My $OMO
                 </Text>
                 <Flex align="center">
+                  Swap $OMO{' '}
                   Swap $OMO{' '}
                   <Image
                     src="/static/profile/share.svg"
@@ -302,6 +304,7 @@ export default function Main() {
                     : '-'}
                 </Text>
                 <Text fontSize="16px" lineHeight="24px">
+                  $OMO
                   $OMO
                 </Text>
               </Flex>

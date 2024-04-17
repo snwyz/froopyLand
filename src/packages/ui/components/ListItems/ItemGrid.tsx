@@ -46,7 +46,9 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
 
 
   const localTimeFormatted = useMemo(() => {
-    const date =  item?.status === State.Upcoming ? item?.['startTimestamp'] : item?.['endTimestamp']
+    const date = parseInt(item.status) === State.Upcoming ? item?.['startTimestamp'] : item?.['endTimestamp']
+    if (!date) return null
+    
     return moment(date).format('YYYY-MM-DD HH:mm:ss')
   }, [item])
 
@@ -55,15 +57,14 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
 
 
   const RenderCount = () => {
-
     const formattedTime = useMemo(() => {
       const timeString = `${time.hours > 0 ? `${time.hours}hrs ` : ''}${time.minutes}mins ${time.seconds}secs`
       return `${timeString}`.trim()
     }, [time])
 
-    if (item.status === State.Upcoming) {
+    if (parseInt(item.status) === State.Upcoming) {
       return <span>Start in {formattedTime}</span>
-    } else if (item.status === State.Ongoing) {
+    } else if (parseInt(item.status) === State.Ongoing) {
       return <span>End in {formattedTime}</span>
     } else {
       return <>Finished</>
@@ -73,7 +74,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
 
   
   if (pathname === PathnameType.MARKET) {
-    
+
     return (
       <Box
         cursor="pointer"
@@ -93,23 +94,27 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
               fallbackSrc="/static/license-template/template.png"
             />
             {
-              gridName === 'finishedList' && item?.lastPlayer === address && (
+              gridName === 'finishedList' && item?.lastAddress === address && (
                 <Box pos="absolute" bg="#7E4AF1" left={0} right={0} bottom={0} h='48px' lineHeight="48px" fontWeight="700" textAlign="center" fontSize="18px" borderRadius="0 0 15px 15px">You won!</Box>
               )
             }
           </Box>
         </AspectRatio>
-        <Flex
-          p="6px 12px"
-          borderRadius="20px"
-          position="absolute"
-          top="16px"
-          left="16px"
-          bgColor={gridName === 'ongoingList' ? '#00DAB3' : 'rgba(255, 255, 255, 0.5)'}>
-          <Text fontSize="12px" fontWeight={600} color="#2A0668">
-            <RenderCount />
-          </Text>
-        </Flex>
+        {
+          localTimeFormatted && (
+            <Flex
+              p="6px 12px"
+              borderRadius="20px"
+              position="absolute"
+              top="16px"
+              left="16px"
+              bgColor={gridName === 'ongoingList' ? '#00DAB3' : 'rgba(255, 255, 255, 0.5)'}>
+              <Text fontSize="12px" fontWeight={600} color="#2A0668">
+                <RenderCount />
+              </Text>
+            </Flex>
+          )
+        }
         {
             gridName !== 'upcomingList' && (
               <Flex
@@ -130,7 +135,7 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
         <Box m="16px 8px 0px 8px">
           <Flex justifyContent="space-between" align="center">
             <Box fontWeight="700" fontSize="14px" lineHeight="16px" m="0 0 6px">
-              {item.name}
+              {item.name || '--'}
             </Box>
             {/* <Image cursor="pointer" alt="" src="./static/market/iconStar.svg" /> */}
           </Flex>
@@ -377,23 +382,28 @@ function ItemGrid({ item, gridName }: { item: any, gridName?: string }) {
           fallbackSrc="/static/license-template/template.png"
         />
             {
-              gridName === 'finishedList' && item.finalPrice && (
+              gridName === 'finishedList' && item?.lastAddress === address && (
                 <Box pos="absolute" bg="#7E4AF1" left={0} right={0} bottom={0} h='48px' lineHeight="48px" fontWeight="700" textAlign="center" fontSize="18px" borderRadius="0 0 15px 15px">You won!</Box>
               )
             }
       </Box>
     </AspectRatio>
-    <Flex
-      p="6px 12px"
-      borderRadius="20px"
-      position="absolute"
-      top="16px"
-      left="16px"
-      bgColor={gridName === 'ongoingList' ? '#00DAB3' : 'rgba(255, 255, 255, 0.5)'}>
-      <Text fontSize="12px" fontWeight={600} color="#2A0668">
-        <RenderCount />
-      </Text>
-    </Flex>
+    {
+      localTimeFormatted && (
+        <Flex
+          p="6px 12px"
+          borderRadius="20px"
+          position="absolute"
+          top="16px"
+          left="16px"
+          bgColor={gridName === 'ongoingList' ? '#00DAB3' : 'rgba(255, 255, 255, 0.5)'}>
+          <Text fontSize="12px" fontWeight={600} color="#2A0668">
+            <RenderCount />
+          </Text>
+        </Flex>
+      )
+    }
+    
     {
         gridName !== 'upcomingList' && (
           <Flex
