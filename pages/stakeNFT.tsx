@@ -40,6 +40,7 @@ const Register = () => {
 
 
     const fetchNFT = async () => {
+        if(!address) return
         getUserNftList(address)
         // const data = await http.get<any>(`https://api.opensea.io/api/v2/chain/ethereum/account/${NFT_ADDRESS}/nfts`, {
         //     headers: {
@@ -49,6 +50,8 @@ const Register = () => {
         // setNftList(data.nfts)
     }
 
+
+    // TODO：1. 未登录的时候 逻辑判断；2. NFT 搜索框 不是下拉框
     useEffect(() => {
         fetchNFT()
     }, [])
@@ -107,8 +110,6 @@ const Register = () => {
             setIsLoading(false)
         }
     }
-
-    if (!auctionInfo) return router.push('/')
 
     return (
         <>
@@ -171,7 +172,7 @@ const Register = () => {
                         <Flex align="center" h="52px" mb="20px">
                             <Text mr="44px" textAlign="right" color="rgba(255, 255, 255, 0.7)" fontSize="16px" lineHeight="18px" w="180px">Auction Opening</Text>
                             {/* <Text fontSize="16px" lineHeight="24px" color="#fff">{genDate().format("MMMM DD [at] h [p.m.] [PST]")}</Text> */}
-                            <Text fontSize="16px" lineHeight="24px" color="#fff">{moment(auctionInfo.startTimestamp).format("MMMM DD ha [GMT]")}</Text>
+                            <Text fontSize="16px" lineHeight="24px" color="#fff">{moment(auctionInfo?.startTimestamp).format("MMMM DD ha [GMT]") || '--'}</Text>
                         </Flex>
                         <Flex align="center" h="52px" mb="20px">
                             <Text mr="44px" textAlign="right" color="rgba(255, 255, 255, 0.7)" fontSize="16px" lineHeight="18px" w="180px">NFT Provider Dividends</Text>

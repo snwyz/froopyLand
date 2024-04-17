@@ -76,8 +76,6 @@ const getActionsState = (): ActivityStatus => {
   return state
 }
 
-const actionsState = (() => ActivityStatus.Bidding)()  // TEST info
-
 export default function Main() {
 
   const router = useRouter()
@@ -195,7 +193,7 @@ export default function Main() {
                 <Text color="#fff" fontWeight="700" fontSize="32px" lineHeight="48px">$5.40</Text>
               </Flex>
               <Flex flexDir="column">
-                <Text color="#FFA8FE" fontSize="24px" lineHeight="36px">Total Keys Fee</Text>
+                <Text color="#FFA8FE" fontSize="24px" lineHeight="36px">Total Mint Fee</Text>
                 <Flex align="center"><Image src='/static/common/eth-index.svg' alt='ethereum' w="19px" h="32px" mr="8px"></Image><Text fontSize="32px" lineHeight="48px">5240</Text></Flex>
                 <Text color="#fff" fontWeight="700" fontSize="20px" lineHeight="30px">$78.48M</Text>
               </Flex>

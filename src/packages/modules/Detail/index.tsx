@@ -25,6 +25,7 @@ import useStore from 'packages/store'
 import { ellipseAddress } from '@utils'
 import { faker } from '@faker-js/faker'
 import PurchaseNFTModal from './PurchaseNFTModal'
+import { getGameDetailById } from 'packages/service/api'
 
 export enum State {
   Upcoming = 0,
@@ -40,7 +41,8 @@ const FL_CONTRACT_ADR = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR
 const Details = () => {
   const router = useRouter()
   
-  const { pool: id } = router.query 
+  // const { pool: id } = router.query 
+  const id = 0
 
   const { address } = useStore()
   const [claims, setClaims] = useState(0)
@@ -52,10 +54,12 @@ const Details = () => {
   const [retrieveNftLoading, setRetrieveNftLoading] = useState(false)
   const [detailInfos, setDetailInfos] = useState(null)
   const [mintKey, setMintKey] = useState('')
+  const [keyDividends, setKeyDividends] = useState('')
 
-
+  // TODO: 未登录情况，拦截链接钱包？
   useEffect(() => {
     init()
+    fetchGameDetailById()
   }, [id, router.query])
 
   const init = () => {
@@ -64,13 +68,19 @@ const Details = () => {
     listenerGame()
   }
 
+  const fetchGameDetailById = async () => {
+    if (!address) return null
+    const { keyDividends } = await getGameDetailById(address, id as string)
+    setKeyDividends(keyDividends)
+  }
+
+
   // 获取详细信息 - sol
   const getGameInfoOfGameIds = async () => {
     const provider = await web3Modal.connect()
     const library = new ethers.providers.Web3Provider(provider)
     const signer = library.getSigner()
     const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
-
     const [data] = await contract.getGameInfoOfGameIds([id])
     console.log(data, 'data')
     setDetailInfos(data)
@@ -299,7 +309,7 @@ const Details = () => {
       } */}
         <Box
         borderRadius={
-          detailInfos.state === State.Finished && detailInfos.lastPlayer === address ? '0 0 20px 20px' : '20px'
+          detailInfos?.state === State.Finished && detailInfos?.lastPlayer === address ? '0 0 20px 20px' : '20px'
         }
         p="48px"
         w={{ lg: '1280px', md: '1120px' }}
@@ -685,7 +695,7 @@ const Details = () => {
                 <Text fontSize="16px" lineHeight="24px">
                  Total：
                   <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
-                    { Number(claims) === 0 ? '--' : Number(ethers.utils.formatEther(detailInfos.salesRevenue.mul(2).div(10))).toFixed(3)|| '--'}
+                    { Number(claims) === 0 ? '--' : keyDividends || '--'}
                   </span>
                   ETH
                 </Text>

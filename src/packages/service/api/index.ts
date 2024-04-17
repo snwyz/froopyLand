@@ -51,9 +51,14 @@ export const getNftPoolList = (pageNum: number) => http.get<INftList>('/fl/nft/g
 
 export const getAuctionInfo = () => http.get<Promise<any>>('/fl/game/getAuctionInfo')
 
-export const getUserNftList = (address: string) => http.get<Promise<any>>(`/fl/game/getUserNftList/${address}/1`) // /walletAddress/pageNumber
+
+export const getUserNftList = (address: string) => http.get<Promise<any>>(`/fl/nft/getUserNftList/${address}/200`) // /walletAddress/pageNumber
 
 export const getBidderForm = () => http.get<Promise<any>>('/fl/game/getBidderForm')
 
 export const getNftAuctions = () => http.get<Promise<any>>('/fl/nft/getNftAuctions/1')
+
+export const getGameDetailById = (userAddress: string, gameId: string) => http.get<Promise<any>>(`/fl/user/gameDetail/${userAddress}/${gameId}`)
+
+
 
