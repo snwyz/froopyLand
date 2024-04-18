@@ -44,7 +44,7 @@ function ItemGrid({ item, gridName }: { item: any; gridName?: string }) {
 
   const localTimeFormatted = useMemo(() => {
     const date =
-      parseInt(item.status) === State.Upcoming
+      item.status === State.Upcoming
         ? item?.['startTimestamp']
         : item?.['endTimestamp']
     if (!date) return null
@@ -62,9 +62,9 @@ function ItemGrid({ item, gridName }: { item: any; gridName?: string }) {
       return `${timeString}`.trim()
     }, [])
 
-    if (parseInt(item.status) === State.Upcoming) {
+    if (item.status === State.Upcoming) {
       return <span>Start in {formattedTime}</span>
-    } else if (parseInt(item.status) === State.Ongoing) {
+    } else if (item.status === State.Ongoing) {
       return <span>End in {formattedTime}</span>
     } else {
       return <>Finished</>

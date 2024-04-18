@@ -1,6 +1,6 @@
 import { Flex, Box, Image, Text, Select, Button, useDisclosure  } from '@chakra-ui/react'
 import { ellipseAddress } from '@utils'
-import { toastError, toastWarning } from '@utils/toast'
+import { toastError, toastSuccess, toastWarning } from '@utils/toast'
 import { ethers } from 'ethers'
 import moment from 'moment'
 import useStore from 'packages/store'
@@ -98,6 +98,7 @@ const Register = () => {
                     gasLimit: BigInt(500000)
                 })
                 await tx.wait()
+                toastSuccess('You won the FROMO plot, stake your NFT now and start your own gamified NFT auction.')
                 router.back()
             } catch (error) {
                 toastWarning('The auction has not yet begun, please be patient.')
