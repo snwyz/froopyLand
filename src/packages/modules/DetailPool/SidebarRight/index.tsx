@@ -24,13 +24,13 @@ import {
   getHighestOfferFunc,
   getLicenseOwnerListFunc,
   getOffersFunc,
-  getPoolTokenCounterFunc,
-  WeiToEther,
+  getPoolTokenCounterFunc
 } from 'packages/web3'
 
 import { ellipseAddress, getTitleErrorMetamask } from '@utils'
 import { toastError, toastSuccess } from '@utils/toast'
 
+import { ethers } from 'ethers'
 import PriceHistory from './PriceHistory'
 
 // TODO: fix any
@@ -246,7 +246,7 @@ export default function SideBarRight({
                       mb="10px"
                       key={idx}>
                       <Flex color="#fff" w={{ base: 'none', md: '50%' }}>
-                        {WeiToEther(item.offerAmount)} ETH
+                        {ethers.utils.formatEther(item.offerAmount)} ETH
                       </Flex>
                       <Box w={{ base: 'none', md: '40%' }} color="#fff">
                         {item?.bidder?.toLowerCase() === address?.toLowerCase()

@@ -10,7 +10,7 @@ import axios from 'axios'
 import { ethers } from 'ethers'
 import moment from 'moment'
 import OriginNFT from 'packages/abis/contracts/OriginNFT.sol/OriginNFT.json'
-import fl417ABI from 'packages/abis/demo/fl417.json'
+import fl419ABI from 'packages/abis/demo/fl419.json'
 import ERC20ABI from 'packages/abis/ERC20.json'
 import FactoryContractABI from 'packages/abis/FactoryContractABI.json'
 import GeneralNFTContractABI from 'packages/abis/GeneralNFTContractABI.json'
@@ -32,7 +32,6 @@ const INFURA_KEY = process.env.NEXT_PUBLIC_INFURA_KEY
 
 const network = isProd ? Network.ETH_MAINNET : Network.ETH_GOERLI
 
-
 const settings = {
   apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY, // Replace with your Alchemy API Key.
   network,
@@ -45,10 +44,6 @@ const web3 = new Web3(
 )
 const alchemy = initializeAlchemy(settings)
 
-export const WeiToEther = (weiValue) =>
-  web3.utils.fromWei(String(weiValue), 'ether')
-
-export const EtherToWei = (ethers) => web3.utils.toWei(String(ethers), 'ether')
 export const hexToDecimal = (hex) => parseInt(hex, 16)
 
 export const providerOptions: Partial<IProviderOptions> = {
@@ -238,6 +233,12 @@ export async function getBalanceOfFunc() {
   return balance
 }
 
+/**
+ * @description: withdraw the $omo from the pool
+ * @param {number} amount $omo amount
+ * @param {string} contractAddress pool contract address
+ * @return {*}
+ */
 export async function withdrawBidTokenFunc(amount: number, contractAddress: string = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR) {
   const web3Modal = new Web3Modal({
     cacheProvider: true,
@@ -246,15 +247,21 @@ export async function withdrawBidTokenFunc(amount: number, contractAddress: stri
   const provider = await web3Modal.connect()
   const library = new ethers.providers.Web3Provider(provider)
   const signer = library.getSigner()
-  const contract = new ethers.Contract(
+  const flContract = new ethers.Contract(
     contractAddress,
-    PoolContractABI,
+    fl419ABI,
     signer,
   )
-  const transaction = await contract.withdrawBidToken(EtherToWei(String(amount)))
+  const transaction = await flContract.withdrawBidToken(ethers.utils.parseEther(String(amount)))
   return await transaction.wait()
 }
 
+/**
+ * @description: deposit $omo to the pool
+ * @param {number} amount $omo amount
+ * @param {string} contractAddress pool contract address
+ * @return {*}
+ */
 export async function depositBidTokenFunc(amount: number, contractAddress: string = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR) {
   const web3Modal = new Web3Modal({
     cacheProvider: true,
@@ -265,14 +272,20 @@ export async function depositBidTokenFunc(amount: number, contractAddress: strin
   const signer = library.getSigner()
   const contract = new ethers.Contract(
     contractAddress,
-    fl417ABI,
+    fl419ABI,
     signer,
   )
-  const transaction = await contract.depositBidToken(EtherToWei(String(amount)))
+  const transaction = await contract.depositBidToken(ethers.utils.parseEther(String(amount)))
   return await transaction.wait()
 }
 
-export async function convertKeyToToken(gameIds: number[], userAddress: string) {
+/**
+ * @description: covet the keys to $OMO
+ * @param {number} gameIds
+ * @param {string} userAddress
+ * @return {*}
+ */
+export async function convertKeyToToken(gameIds: number[]) {
   const web3Modal = new Web3Modal({
     cacheProvider: true,
     providerOptions, // required
@@ -280,12 +293,82 @@ export async function convertKeyToToken(gameIds: number[], userAddress: string) 
   const provider = await web3Modal.connect()
   const library = new ethers.providers.Web3Provider(provider)
   const signer = library.getSigner()
+  const address = await signer.getAddress()
   const contract = new ethers.Contract(
     process.env.NEXT_PUBLIC_FL_CONTRACT_ADR,
-    PoolContractABI,
+    fl419ABI,
     signer,
   )
-  const transaction = await contract.convertKeyToToken(gameIds, userAddress)
+  const transaction = await contract.convertKeyToToken(gameIds, address)
+  return await transaction.wait()
+}
+
+/**
+ * @description: claim the unclaimed keys
+ * @param {number} gameIds game ids
+ * @return {*}
+ */
+export async function claimBonusFunc(gameIds: number[]) {
+  const web3Modal = new Web3Modal({
+    cacheProvider: true,
+    providerOptions, // required
+  })
+  const provider = await web3Modal.connect()
+  const library = new ethers.providers.Web3Provider(provider)
+  const signer = library.getSigner()
+  const address = await signer.getAddress()
+  const contract = new ethers.Contract(
+    process.env.NEXT_PUBLIC_FL_CONTRACT_ADR,
+    fl419ABI,
+    signer,
+  )
+  const transaction = await contract.claimBonus(gameIds, address)
+  return await transaction.wait()
+}
+
+/**
+ * @description: claim the unclaimed final winner prize
+ * @param {number} gameIds game ids
+ * @return {*}
+ */
+export async function withdrawLastplayerPrizeFunc(gameIds: number[]) {
+  const web3Modal = new Web3Modal({
+    cacheProvider: true,
+    providerOptions, // required
+  })
+  const provider = await web3Modal.connect()
+  const library = new ethers.providers.Web3Provider(provider)
+  const signer = library.getSigner()
+  const address = await signer.getAddress()
+  const contract = new ethers.Contract(
+    process.env.NEXT_PUBLIC_FL_CONTRACT_ADR,
+    fl419ABI,
+    signer,
+  )
+  const transaction = await contract.withdrawLastplayerPrize(gameIds, address)
+  return await transaction.wait()
+}
+
+/**
+ * @description: claim the unclaimed NFTs
+ * @param {number} gameIds game ids
+ * @return {*}
+ */
+export async function withdrawSaleRevenueFunc(gameIds: number[]) {
+  const web3Modal = new Web3Modal({
+    cacheProvider: true,
+    providerOptions, // required
+  })
+  const provider = await web3Modal.connect()
+  const library = new ethers.providers.Web3Provider(provider)
+  const signer = library.getSigner()
+  const address = await signer.getAddress()
+  const contract = new ethers.Contract(
+    process.env.NEXT_PUBLIC_FL_CONTRACT_ADR,
+    fl419ABI,
+    signer,
+  )
+  const transaction = await contract.withdrawSaleRevenue(gameIds, address)
   return await transaction.wait()
 }
 
@@ -303,7 +386,7 @@ export async function depositFunc(poolContractAddress: string, amount: number) {
     signer,
   )
   const transaction = await contract.deposit({
-    value: EtherToWei(String(amount)),
+    value: ethers.utils.parseEther(String(amount)),
   })
   return await transaction.wait()
 }
@@ -421,7 +504,7 @@ export async function withdrawFunc(
     PoolContractABI,
     signer,
   )
-  const transaction = await contract.withdraw(EtherToWei(String(amount)))
+  const transaction = await contract.withdraw(ethers.utils.parseEther(String(amount)))
   return await transaction.wait()
 }
 
@@ -600,7 +683,7 @@ export async function makeOfferFunc(
     PoolContractABI,
     signer,
   )
-  const transaction = await contract.makeOffer({ value: EtherToWei(amount) })
+  const transaction = await contract.makeOffer({ value: ethers.utils.parseEther(amount) })
   return await transaction.wait()
 }
 

@@ -212,7 +212,7 @@ const Header: FC = () => {
     if (isConnect === 'false' && pathname.includes('/account')) {
       router.push('/404')
     }
-  }, [])
+  }, [pathname, router])
 
   // A `provider` should come with EIP-1193 events. We'll listen for those events
   // here so that when a user switches accounts or networks, we can update the

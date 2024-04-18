@@ -1,6 +1,14 @@
 import { lazy, useEffect, useState } from 'react'
 
-import { Box, Button, Flex, Heading, Image, Text } from '@chakra-ui/react'
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Image,
+  Text,
+  useToast,
+} from '@chakra-ui/react'
 
 import TabsCommon from '@components/TabsCommon'
 
@@ -17,7 +25,12 @@ import {
 } from 'packages/service/api/types'
 import useStore from 'packages/store'
 import useFomoStore from 'packages/store/fomo'
-import { checkApprovalFunc } from 'packages/web3'
+import {
+  checkApprovalFunc,
+  claimBonusFunc,
+  withdrawLastplayerPrizeFunc,
+  withdrawSaleRevenueFunc,
+} from 'packages/web3'
 
 const ListItems = lazy(() => import('@modules/Profile/ListItems'))
 const Sidebar = lazy(() => import('@modules/Profile/Sidebar'))
@@ -26,7 +39,11 @@ const RedeemModal = lazy(() => import('@modules/Profile/RedeemModal'))
 const OmoModal = lazy(() => import('@modules/Profile/OmoModal'))
 
 export default function Main() {
+  const toast = useToast()
   const { userHeaderInfo, getUserHeaderInfo } = useFomoStore()
+  const [claimKeysLoading, setClaimKeysLoading] = useState(false)
+  const [claimFinalWinnerLoading, setClaimFinalWinnerLoading] = useState(false)
+  const [claimNftLoading, setClaimNftLoading] = useState(false)
 
   const handleHistoricalPageChange = (page: number) => {
     setCurrentHistoricalPage(page)
@@ -58,6 +75,96 @@ export default function Main() {
     } else {
       setOmoType(type)
       setOpenOmo(true)
+    }
+  }
+
+  const handleClaim = (type: number) => {
+    // claim key dividends
+    if (type === 0) {
+      setClaimKeysLoading(true)
+      claimBonusFunc(profit.unclaimedKeyGameIds)
+        .then((res) => {
+          if (res) {
+            toast({
+              title: `Success to claim key dividends.`,
+              status: 'success',
+              duration: 3000,
+              isClosable: false,
+              position: 'top',
+            })
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+          toast({
+            title: `Failed to claim key dividends.`,
+            status: 'error',
+            duration: 3000,
+            isClosable: false,
+            position: 'top',
+          })
+        })
+        .finally(() => {
+          setClaimKeysLoading(false)
+        })
+    }
+    // claim final winner prize
+    else if (type === 1) {
+      setClaimFinalWinnerLoading(true)
+      withdrawLastplayerPrizeFunc(profit.unclaimedFinalWinnerGameIds)
+        .then((res) => {
+          if (res) {
+            toast({
+              title: `Success to claim final winner prize.`,
+              status: 'success',
+              duration: 3000,
+              isClosable: false,
+              position: 'top',
+            })
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+          toast({
+            title: `Failed to claim final winner prize.`,
+            status: 'error',
+            duration: 3000,
+            isClosable: false,
+            position: 'top',
+          })
+        })
+        .finally(() => {
+          setClaimFinalWinnerLoading(false)
+        })
+    }
+    // claim nft dividends
+    else if (type === 2) {
+      setClaimNftLoading(true)
+      withdrawSaleRevenueFunc(profit.unclaimedNftGameIds)
+        .then((res) => {
+          if (res) {
+            toast({
+              title: `Success to claim nft dividends.`,
+              status: 'success',
+              duration: 3000,
+              isClosable: false,
+              position: 'top',
+            })
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+          toast({
+            title: `Failed to claim nft dividends.`,
+            status: 'error',
+            duration: 3000,
+            isClosable: false,
+            position: 'top',
+          })
+        })
+        .finally(() => {
+          setClaimNftLoading(false)
+        })
     }
   }
 
@@ -181,6 +288,7 @@ export default function Main() {
     },
   ]
 
+  // header info
   const refreshUserHeaderInfo = () => {
     getUserHeaderInfo(address).then((res) => {
       if (res) {
@@ -264,7 +372,7 @@ export default function Main() {
                   {profit.keys}
                 </Text>
                 <Text fontSize="16px" lineHeight="24px">
-                  keys
+                  KEYS
                 </Text>
               </Flex>
               {/* <Text>0.056 ETH</Text> */}
@@ -393,6 +501,8 @@ export default function Main() {
               </Text>
               <Button
                 disabled={profit.unclaimedKeyGameIds.length === 0}
+                isLoading={claimKeysLoading}
+                onClick={() => handleClaim(0)}
                 mt="8px"
                 bgColor="#00DAB3"
                 w="100%"
@@ -434,6 +544,8 @@ export default function Main() {
               </Text>
               <Button
                 disabled={profit.unclaimedFinalWinnerGameIds.length === 0}
+                isLoading={claimFinalWinnerLoading}
+                onClick={() => handleClaim(1)}
                 mt="8px"
                 bgColor="#00DAB3"
                 w="100%"
@@ -479,6 +591,8 @@ export default function Main() {
               </Text>
               <Button
                 disabled={profit.unclaimedNftGameIds.length === 0}
+                isLoading={claimNftLoading}
+                onClick={() => handleClaim(2)}
                 mt="8px"
                 bgColor="#00DAB3"
                 w="100%"

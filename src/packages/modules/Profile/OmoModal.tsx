@@ -51,7 +51,6 @@ const OmoModal = ({
       approveBidTokenFunc()
         .then((res) => {
           if (res) {
-            setApprove(true)
             toast({
               title: `Success to approve $OMO.`,
               status: 'success',
@@ -68,7 +67,6 @@ const OmoModal = ({
               position: 'top',
             })
           }
-          setLoading(false)
         })
         .catch((err) => {
           console.log(err)
@@ -79,6 +77,8 @@ const OmoModal = ({
             isClosable: false,
             position: 'top',
           })
+        })
+        .finally(() => {
           setLoading(false)
         })
     } else if (type === 1 && approve) {
@@ -102,7 +102,6 @@ const OmoModal = ({
               position: 'top',
             })
           }
-          setLoading(false)
         })
         .catch((err) => {
           console.log(err)
@@ -113,6 +112,8 @@ const OmoModal = ({
             isClosable: false,
             position: 'top',
           })
+        })
+        .finally(() => {
           setLoading(false)
         })
     } else {
@@ -136,7 +137,6 @@ const OmoModal = ({
               position: 'top',
             })
           }
-          setLoading(false)
         })
         .catch((err) => {
           console.log(err)
@@ -147,6 +147,8 @@ const OmoModal = ({
             isClosable: false,
             position: 'top',
           })
+        })
+        .finally(() => {
           setLoading(false)
         })
     }
@@ -238,10 +240,20 @@ const OmoModal = ({
               fontSize="20px"
               border="none"
               value={amount}
+              max={balance - useAmount}
               onChange={(e) => setAmount(e.target.value)}
             />
             <Text
-              onClick={() => setAmount(balance)}
+              onClick={() => {
+                if (type === 1) {
+                  setAmount((balance - useAmount).toString())
+                } else {
+                  setAmount(
+                    Number(ethers.utils.formatEther(withdrawalAmount)) +
+                      useAmount,
+                  )
+                }
+              }}
               cursor="pointer"
               color="#7E4AF1"
               fontSize="16px"
