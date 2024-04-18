@@ -12,6 +12,7 @@ import useAuctions, { ActivityStatus } from 'packages/store/auctions'
 import { useRouter } from 'next/router'
 import { toastWarning } from '@utils/toast'
 import useStore from 'packages/store'
+import { getSysBrief } from 'packages/service/api'
 // import BidderModal from '@modules/Market/Main/BidderModal'
 
 const BidderModal = lazy(() => import('@modules/Market/Main/BidderModal'))
@@ -166,6 +167,10 @@ export default function Main() {
     setOpen(true)
   }
   
+  const fetchSysBrief = async () => {
+    const data = await getSysBrief()
+    
+  }
 
   useEffect(() => {
     getAuctionInfo()

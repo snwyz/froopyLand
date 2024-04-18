@@ -56,6 +56,8 @@ export const getUserNftList = (address: string) => http.get<Promise<any>>(`/fl/n
 
 export const getBidderForm = () => http.get<Promise<any>>('/fl/game/getBidderForm')
 
+export const getSysBrief = () => http.get<Promise<any>>('/fl/game/getSysBrief')
+
 export const getNftAuctions = () => http.get<Promise<any>>('/fl/nft/getNftAuctions/1')
 
 export const getGameDetailById = (userAddress: string, gameId: string) => http.get<Promise<any>>(`/fl/user/gameDetail/${userAddress}/${gameId}`)
