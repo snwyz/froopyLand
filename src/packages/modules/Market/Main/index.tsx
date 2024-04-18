@@ -89,6 +89,8 @@ export default function Main() {
 
   const { auctionInfo, getAuctionInfo }= useAuctions()
 
+  const [sysInfo, setSysInfo] = useState<any>()
+
   const List = () => {
     
     if (gameList.length === 0) return <NoData />
@@ -169,12 +171,13 @@ export default function Main() {
   
   const fetchSysBrief = async () => {
     const data = await getSysBrief()
-    
+    setSysInfo(data)
   }
 
   useEffect(() => {
     getAuctionInfo()
     getNftAuctions()
+    fetchSysBrief()
   }, []) 
 
   if (!auctionInfo) return null
@@ -192,26 +195,30 @@ export default function Main() {
               w={{ base: '1118px' }}
               height="171px"
             />
-            <Flex gap="20px" mb="50px">
-              <Flex flexDir="column">
-                <Text color="#FFA8FE" fontSize="24px" lineHeight="36px">$OMO Price</Text>
-                <Text color="#fff" fontWeight="700" fontSize="32px" lineHeight="48px">$5.40</Text>
-              </Flex>
-              <Flex flexDir="column">
-                <Text color="#FFA8FE" fontSize="24px" lineHeight="36px">Total Mint Fee</Text>
-                <Flex align="center"><Image src='/static/common/eth-index.svg' alt='ethereum' w="19px" h="32px" mr="8px"></Image><Text fontSize="32px" lineHeight="48px">5240</Text></Flex>
-                <Text color="#fff" fontWeight="700" fontSize="20px" lineHeight="30px">$78.48M</Text>
-              </Flex>
-              <Flex flexDir="column">
-                <Text color="#FFA8FE" fontSize="24px" lineHeight="36px">Total Prize & Dividends</Text>
-                <Flex align="center"><Image src='/static/common/eth-index.svg' alt='ethereum' w="19px" h="32px" mr="8px"></Image><Text fontSize="32px" lineHeight="48px">5240</Text></Flex>
-                <Text color="#fff" fontWeight="700" fontSize="20px" lineHeight="30px">$78.48M</Text>
-              </Flex>
-              <Flex flexDir="column">
-                <Text color="#FFA8FE" fontSize="24px" lineHeight="36px">Total NFTs Auctioned</Text>
-                <Text color="#fff" fontWeight="700" fontSize="32px" lineHeight="48px">$5.40</Text>
-              </Flex>
-            </Flex>
+            {
+              sysInfo && (
+                <Flex gap="20px" mb="50px">
+                  <Flex flexDir="column">
+                    <Text color="#FFA8FE" fontSize="24px" lineHeight="36px">$OMO Price</Text>
+                    <Text color="#fff" fontWeight="700" fontSize="32px" lineHeight="48px">${sysInfo?.tokenPrice || '-'}</Text>
+                  </Flex>
+                  <Flex flexDir="column">
+                    <Text color="#FFA8FE" fontSize="24px" lineHeight="36px">Total Mint Fee</Text>
+                    <Flex align="center"><Image src='/static/common/eth-index.svg' alt='ethereum' w="19px" h="32px" mr="8px"></Image><Text fontSize="32px" lineHeight="48px">{sysInfo?.totalKeyMinted || '-'}</Text></Flex>
+                    <Text color="#fff" fontWeight="700" fontSize="20px" lineHeight="30px">${sysInfo?.totalMintFee || '-'}</Text>
+                  </Flex>
+                  <Flex flexDir="column">
+                    <Text color="#FFA8FE" fontSize="24px" lineHeight="36px">Total Prize & Dividends</Text>
+                    <Flex align="center"><Image src='/static/common/eth-index.svg' alt='ethereum' w="19px" h="32px" mr="8px"></Image><Text fontSize="32px" lineHeight="48px">{sysInfo?.totalProfits || '-'}</Text></Flex>
+                    <Text color="#fff" fontWeight="700" fontSize="20px" lineHeight="30px">${sysInfo.totalPrize || '-'}</Text>
+                  </Flex>
+                  <Flex flexDir="column">
+                    <Text color="#FFA8FE" fontSize="24px" lineHeight="36px">Total NFTs Auctioned</Text>
+                    <Text color="#fff" fontWeight="700" fontSize="32px" lineHeight="48px">{sysInfo.totalGames || '-'}</Text>
+                  </Flex>
+                </Flex>
+              )
+            }
             <Flex alignItems="center" mb="20px">
               {
                 ActivityStatus.Staking === auctionInfo.status ? (
