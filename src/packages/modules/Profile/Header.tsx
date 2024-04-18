@@ -14,7 +14,7 @@ export default function Header({
   button,
   title,
   quantity,
-  noBorder = false
+  noBorder = false,
 }: HeaderProps) {
   const { width } = useWindowSize()
 
@@ -22,31 +22,27 @@ export default function Header({
     <Flex
       flexDirection={{ base: 'column', lg: 'row' }}
       gap={{ base: '10px', lg: '30px', xl: '110px' }}
-      borderBottom={noBorder ? 'none':"1px solid #704BEA80"} 
+      borderBottom={noBorder ? 'none' : '1px solid #704BEA80'}
       alignItems={{ xl: 'center' }}
       py={{ base: '5px', lg: 'none' }}
       h={{ base: 'none', lg: '60px', xl: '90px' }}>
-      {
-        title && (
-          <Flex
+      {title && (
+        <Flex
           flexDir={{ base: 'column', lg: 'column' }}
           ml={{ base: '20px', lg: 'none' }}>
-            <Box fontSize={`${width > 768 ? '20px' : '16px'}`} fontWeight="bold">
-              {title}
-            </Box>
-            {
-              quantity && (
-              <Text
-                fontSize={`${width > 768 ? '12px' : '10px'}`}
-                color="#FFA8FE"
-                justifyContent="center">
-                {`${quantity} total`}
-              </Text>
-              )
-            }
+          <Box fontSize={`${width > 768 ? '20px' : '16px'}`} fontWeight="bold">
+            {title}
+          </Box>
+          {quantity && (
+            <Text
+              fontSize={`${width > 768 ? '12px' : '10px'}`}
+              color="#FFA8FE"
+              justifyContent="center">
+              {`${quantity} total`}
+            </Text>
+          )}
         </Flex>
-        )
-      }
+      )}
 
       <Flex
         gap={{ md: '120px', lg: '40px', xl: '60px' }}
@@ -58,11 +54,23 @@ export default function Header({
             <Box fontSize={`${width > 768 ? '12px' : '10px'}`} color="#FFA8FE">
               {item.name}
             </Box>
-            <Box
+            <Flex
+              alignItems="center"
+              gap="4px"
               fontSize={`${width > 768 ? '14px' : '12px'}`}
               fontWeight="bold">
+              <Text
+                fontSize={`${width > 768 ? '12px' : '10px'}`}
+                color="#FFFFFF">
+                {idx === 0 && item.number && item.unit}
+              </Text>
               {item.number}
-            </Box>
+              <Text
+                fontSize={`${width > 768 ? '10px' : '8px'}`}
+                color="#FFFFFF">
+                {idx !== 0 && item.number && item.unit}
+              </Text>
+            </Flex>
           </Box>
         ))}
       </Flex>

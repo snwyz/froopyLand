@@ -30,18 +30,22 @@ const useFomoStore = create(immer<IState>(((set) => ({
     {
       name: '$OMO Price',
       number: '-',
+      unit: '$',
     },
     {
       name: 'My Historical Key Holder Dividends',
       number: '-',
+      unit: 'ETH',
     },
     {
       name: 'My Historical Final Winner Prize',
       number: '-',
+      unit: 'ETH',
     },
     {
       name: 'My Historical Final Winner Prize',
       number: '-',
+      unit: 'ETH',
     },
   ],
   loading: false,
@@ -159,18 +163,22 @@ const useFomoStore = create(immer<IState>(((set) => ({
           {
             name: '$OMO Price',
             number: profit.flPrice,
+            unit: '$',
           },
           {
             name: 'My Historical Key Holder Dividends',
             number: profit.keyDividends,
+            unit: 'ETH',
           },
           {
             name: 'My Historical Final Winner Prize',
             number: profit.finalWinPrice,
+            unit: 'ETH',
           },
           {
             name: 'My Historical Final Winner Prize',
             number: profit.nftDividends,
+            unit: 'ETH',
           },
         ]
       })
