@@ -140,9 +140,9 @@ const useFomoStore = create(immer<IState>(((set) => ({
   async getNftAuctions() {
     const { nftList } = await getNftAuctions()
 
-    const upcomingList = nftList.filter(v => v.status === '0')
-    const ongoingList = nftList.filter(v => v.status === '1')
-    const finishedList = nftList.filter(v => v.status === '2')
+    const upcomingList = nftList.filter(v => v.status === 0)
+    const ongoingList = nftList.filter(v => v.status === 1)
+    const finishedList = nftList.filter(v => v.status === 2)
 
     set({
       gameList: nftList,
