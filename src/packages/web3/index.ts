@@ -10,10 +10,11 @@ import axios from 'axios'
 import { ethers } from 'ethers'
 import moment from 'moment'
 import OriginNFT from 'packages/abis/contracts/OriginNFT.sol/OriginNFT.json'
+import ERC20ABI from 'packages/abis/ERC20.json'
+import fl417ABI from 'packages/abis/demo/fl417.json';
 import FactoryContractABI from 'packages/abis/FactoryContractABI.json'
 import GeneralNFTContractABI from 'packages/abis/GeneralNFTContractABI.json'
 import PoolContractABI from 'packages/abis/PoolContractABI.json'
-import ERC20ABI from 'packages/abis/ERC20.json'
 import { isProd } from 'packages/constants'
 import { timeFromNow, weiToEtherString } from 'packages/lib/utilities'
 import {
@@ -159,6 +160,10 @@ export async function getLicenseOwnerListFunc(poolContractAddress: string) {
     ?.map((address) => address.toLowerCase())
 }
 
+/**
+ * @description: check if the user has approved the pool contract to spend $omo
+ * @return {*}
+ */
 export async function checkApprovalFunc(
   contractAddress: string = FROOPYLAND_CONTRACT_ADDRESS,
 ) {
@@ -169,18 +174,26 @@ export async function checkApprovalFunc(
   const provider = await web3Modal.connect()
   const library = new ethers.providers.Web3Provider(provider)
   const signer = library.getSigner()
+  const address = await signer.getAddress()
   const contract = new ethers.Contract(
-    contractAddress,
+    OMO_CONTRACT_ADDRESS,
     ERC20ABI,
     signer,
   )
-  const allowance = await contract.allowance(signer._address, contractAddress)
+
+  const allowance = await contract.allowance(address, contractAddress)
+  console.log(allowance.gt(0))
   if (allowance.gt(0)) {
     return true
   }
   return false
 }
 
+/**
+ * @description: approve the pool contract to spend $omo
+ * @param {string} contractAddress
+ * @return {*}
+ */
 export async function approveBidTokenFunc(contractAddress: string = FROOPYLAND_CONTRACT_ADDRESS) {
   const web3Modal = new Web3Modal({
     cacheProvider: true,
@@ -189,18 +202,42 @@ export async function approveBidTokenFunc(contractAddress: string = FROOPYLAND_C
   const provider = await web3Modal.connect()
   const library = new ethers.providers.Web3Provider(provider)
   const signer = library.getSigner()
+  const address = await signer.getAddress()
   const contract = new ethers.Contract(
-    contractAddress,
+    OMO_CONTRACT_ADDRESS,
     ERC20ABI,
     signer,
   )
   const transaction = await contract.approve(contractAddress, ethers.constants.MaxUint256)
   await transaction.wait()
-  const allowance = await contract.allowance(signer._address, contractAddress)
+  const allowance = await contract.allowance(address, contractAddress)
   if (allowance.gt(0)) {
     return true
   }
   return false
+}
+
+/**
+ * @description: get the balance of the user $omo
+ * @param {string} address
+ * @return {*}
+ */
+export async function getBalanceOfFunc() {
+  const web3Modal = new Web3Modal({
+    cacheProvider: true,
+    providerOptions,
+  })
+  const provider = await web3Modal.connect()
+  const library = new ethers.providers.Web3Provider(provider)
+  const signer = library.getSigner()
+  const address = await signer.getAddress()
+  const contract = new ethers.Contract(
+    OMO_CONTRACT_ADDRESS,
+    ERC20ABI,
+    signer,
+  )
+  const balance = await contract.balanceOf(address)
+  return balance
 }
 
 export async function withdrawBidTokenFunc(amount: number, contractAddress: string = FROOPYLAND_CONTRACT_ADDRESS) {
@@ -230,7 +267,7 @@ export async function depositBidTokenFunc(amount: number, contractAddress: strin
   const signer = library.getSigner()
   const contract = new ethers.Contract(
     contractAddress,
-    PoolContractABI,
+    fl417ABI,
     signer,
   )
   const transaction = await contract.depositBidToken(EtherToWei(String(amount)))
@@ -389,6 +426,26 @@ export async function withdrawFunc(
   const transaction = await contract.withdraw(EtherToWei(String(amount)))
   return await transaction.wait()
 }
+
+/**
+ * @description: Get the balance of the user bidding in the pool
+ * @return {*}
+ */
+export async function getBidderInfoOfFunc(
+  walletAddress: string,
+  contractAddress: string = FROOPYLAND_CONTRACT_ADDRESS,
+) {
+  try {
+    const contract = getPoolContract(contractAddress)
+    const balanceInfo = await contract.methods
+      .getBidderInfoOf(walletAddress)
+      .call()
+    return balanceInfo
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 
 export async function getBalanceFunc(
   walletAddress: string,

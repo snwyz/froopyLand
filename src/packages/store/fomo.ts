@@ -1,11 +1,11 @@
 import { faker } from '@faker-js/faker'
-import { ethers } from 'ethers'
-import create from 'zustand'
-import { immer } from 'zustand/middleware/immer'
-import FroopyABI from 'packages/abis/demo/fl417.json'
 import { generateTimestamp } from '@modules/Market/Main'
+import { ethers } from 'ethers'
+import FroopyABI from 'packages/abis/demo/fl417.json'
 import { getMyProfit, getNftAuctions } from 'packages/service/api'
 import { IProfit } from 'packages/service/api/types'
+import create from 'zustand'
+import { immer } from 'zustand/middleware/immer'
 
 
 interface IState {
@@ -28,7 +28,7 @@ const useFomoStore = create(immer<IState>(((set) => ({
   finishedList: [],
   userHeaderInfo: [
     {
-      name: 'FLT Price',
+      name: '$OMO Price',
       number: '-',
     },
     {
@@ -157,8 +157,8 @@ const useFomoStore = create(immer<IState>(((set) => ({
       set({
         userHeaderInfo: [
           {
-            name: 'FLT Price',
-            number: profit.flTokens,
+            name: '$OMO Price',
+            number: profit.flPrice,
           },
           {
             name: 'My Historical Key Holder Dividends',

@@ -151,20 +151,15 @@ const Header: FC = () => {
   const { pathname } = router
 
   const toast = useToast()
-  
+
   const [state, dispatch] = useReducer(reducer, initialState)
   const { provider, web3Provider, address, chainId } = state
 
   const connect = useCallback(
     async function () {
-      // This is the initial `provider` that is returned when
-      // using web3Modal to connect. Can be MetaMask or WalletConnect.
       let provider = null
       try {
         provider = await web3Modal.connect()
-        // We plug the initial `provider` into ethers.js and get back
-        // a Web3Provider. This will add on methods from ethers.js and
-        // event listeners such as `.on()` will be different.
         const web3Provider = new providers.Web3Provider(provider)
 
         const signer = web3Provider.getSigner()
@@ -173,7 +168,7 @@ const Header: FC = () => {
         setAddress(address)
         window.localStorage.setItem('isConnect', 'true')
         const network = await web3Provider.getNetwork()
-        
+
         dispatch({
           type: 'SET_WEB3_PROVIDER',
           provider,
@@ -259,7 +254,7 @@ const Header: FC = () => {
   useEffect(() => {
     try {
       if (chainId) {
-        const chainData = getChainData(chainId)        
+        const chainData = getChainData(chainId)
         const validChain = address && chainData?.network === NETWORK
         if (!validChain) {
           toast({
@@ -422,7 +417,7 @@ const Header: FC = () => {
               ml="12px"
               w="40px"
               h="40px"
-            // onClick={disconnect}
+              // onClick={disconnect}
             >
               <Menu>
                 <MenuButton
@@ -494,7 +489,7 @@ const DesktopNav = () => {
   const NAV_ITEMS = address
     ? NAV_ITEMS_CONNECTED_DESKTOP
     : NAV_ITEMS_DISCONNECTED
-    
+
   const isSubPath = (pathname, href) => {
     // 使用正则表达式构建匹配规则
     const regex = new RegExp(`^${href}(\/|$)`)
@@ -527,9 +522,7 @@ const DesktopNav = () => {
                 cursor="pointer"
                 minW={navItem.label === 'My NFTs' ? '120px' : '120px'}
                 textAlign="center"
-                color={
-                  isSubPath(pathname, navItem.href) ? '#00DAB3': 'white'
-                }
+                color={isSubPath(pathname, navItem.href) ? '#00DAB3' : 'white'}
                 lineHeight="64px"
                 paddingTop="3px">
                 {navItem.label}

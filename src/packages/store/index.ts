@@ -104,6 +104,15 @@ interface MyState {
 }
 
 const useStore = create<MyState>((set) => ({
+
+  bidderInfo: 0,
+  setBidderInfo: (value: any) => {
+    set((state) => ({
+      ...state,
+      bidderInfo: value,
+    }))
+  },
+
   balance: 0,
   setBalance: (value: number) => {
     set((state) => ({

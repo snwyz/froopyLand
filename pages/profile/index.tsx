@@ -4,8 +4,6 @@ import { Box, Button, Flex, Heading, Image, Text } from '@chakra-ui/react'
 
 import TabsCommon from '@components/TabsCommon'
 
-import { useWindowSize } from '@hooks/useWindowSize'
-
 import { MarketTabs, MyDividendsTabs } from '@ts'
 import { BigNumber, ethers } from 'ethers'
 import {
@@ -28,7 +26,6 @@ const RedeemModal = lazy(() => import('@modules/Profile/RedeemModal'))
 const OmoModal = lazy(() => import('@modules/Profile/OmoModal'))
 
 export default function Main() {
-  const { width } = useWindowSize()
   const { userHeaderInfo, getUserHeaderInfo } = useFomoStore()
 
   const handleHistoricalPageChange = (page: number) => {
@@ -51,9 +48,12 @@ export default function Main() {
     if (type === 1) {
       checkApprovalFunc().then((res) => {
         if (res) {
-          setOmoType(type)
-          setOpenOmo(true)
+          setIsApproval(true)
+        } else {
+          setIsApproval(false)
         }
+        setOmoType(type)
+        setOpenOmo(true)
       })
     } else {
       setOmoType(type)
@@ -66,12 +66,15 @@ export default function Main() {
   const [open, setOpen] = useState(false)
   const [oepnOmo, setOpenOmo] = useState(false)
   const [omoType, setOmoType] = useState<number>(0)
+  const [isApproval, setIsApproval] = useState<boolean>(false)
   const [historicalTab, setHistoricalTab] = useState<number>(0)
   const [currentHistoricalPage, setCurrentHistoricalPage] = useState(0)
   const [currentNFTPage, setCurrentNFTPage] = useState(0)
   const [profit, setProfit] = useState<IProfit>({
+    flPrice: '-',
     keys: '-',
     flTokens: '-',
+    withdrawalAmountTokens: '-',
     keyDividends: '-',
     unclaimedKeyDividends: '-',
     unclaimedKeyGameIds: [],
@@ -178,6 +181,14 @@ export default function Main() {
     },
   ]
 
+  const refreshUserHeaderInfo = () => {
+    getUserHeaderInfo(address).then((res) => {
+      if (res) {
+        setProfit(res)
+      }
+    })
+  }
+
   // profit
   useEffect(() => {
     getUserHeaderInfo(address).then((res) => {
@@ -279,10 +290,8 @@ export default function Main() {
               <Flex justify="space-between" align="center">
                 <Text fontSize="16px" color="#FFA8FE" lineHeight="24px">
                   My $OMO
-                  My $OMO
                 </Text>
                 <Flex align="center">
-                  Swap $OMO{' '}
                   Swap $OMO{' '}
                   <Image
                     src="/static/profile/share.svg"
@@ -305,10 +314,8 @@ export default function Main() {
                 </Text>
                 <Text fontSize="16px" lineHeight="24px">
                   $OMO
-                  $OMO
                 </Text>
               </Flex>
-              {/* <Text>$ 1117.8</Text> */}
               <Flex mt="33px" gap="12px">
                 <Button
                   disabled={profit.flTokens === '0' || profit.flTokens === '-'}
@@ -510,10 +517,15 @@ export default function Main() {
       </Box>
       <RedeemModal isOpen={open} onClose={() => setOpen(false)} />
       <OmoModal
+        omoAmount={profit.flTokens}
+        withdrawalAmount={profit.withdrawalAmountTokens}
         type={omoType}
         isOpen={oepnOmo}
-        isApproval={false}
-        onClose={() => setOpenOmo(false)}
+        isApproval={isApproval}
+        onClose={() => {
+          setOpenOmo(false)
+          refreshUserHeaderInfo()
+        }}
       />
     </Flex>
   )

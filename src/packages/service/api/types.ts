@@ -1,6 +1,8 @@
 export interface IProfit {
   keys: string;
+  flPrice: string;
   flTokens: string;
+  withdrawalAmountTokens: string;
   keyDividends: string;
   unclaimedKeyDividends: string;
   unclaimedKeyGameIds: number[];

@@ -11,17 +11,20 @@ import {
 } from '@chakra-ui/react'
 
 import BaseModal from '@components/Modal'
+import { ethers } from 'ethers'
 import useStore from 'packages/store'
 import {
   approveBidTokenFunc,
   depositBidTokenFunc,
-  getBalanceFunc,
+  getBalanceOfFunc,
   withdrawBidTokenFunc,
 } from 'packages/web3'
 import { useEffect, useState } from 'react'
 
 type SubmitOfferModalProps = {
   type: number
+  omoAmount: string
+  withdrawalAmount: string
   isApproval: boolean
   isOpen: boolean
   onClose: () => void
@@ -29,30 +32,55 @@ type SubmitOfferModalProps = {
 
 const OmoModal = ({
   type,
+  omoAmount,
+  withdrawalAmount,
   isApproval,
   isOpen,
   onClose,
 }: SubmitOfferModalProps) => {
   const toast = useToast()
+  const [loading, setLoading] = useState(false)
   const { address, balance, setBalance } = useStore()
-  const [amount, setAmount] = useState(0)
-  const [approve, setApprove] = useState(isApproval)
+  const [amount, setAmount] = useState(null)
+  const [useAmount, setUseAmount] = useState(0)
+  const [approve, setApprove] = useState(false)
 
   const handleAmountChange = (type: number) => {
+    setLoading(true)
     if (type === 1 && !approve) {
-      approveBidTokenFunc().then((res) => {
-        if (res) {
-          setApprove(true)
-        } else {
+      approveBidTokenFunc()
+        .then((res) => {
+          if (res) {
+            setApprove(true)
+            toast({
+              title: `Success to approve $OMO.`,
+              status: 'success',
+              duration: 3000,
+              isClosable: false,
+              position: 'top',
+            })
+          } else {
+            toast({
+              title: `Failed to approve $OMO.`,
+              status: 'error',
+              duration: 3000,
+              isClosable: false,
+              position: 'top',
+            })
+          }
+          setLoading(false)
+        })
+        .catch((err) => {
+          console.log(err)
           toast({
             title: `Failed to approve $OMO.`,
             status: 'error',
-            duration: null,
+            duration: 3000,
             isClosable: false,
             position: 'top',
           })
-        }
-      })
+          setLoading(false)
+        })
     } else if (type === 1 && approve) {
       depositBidTokenFunc(amount)
         .then((res) => {
@@ -60,29 +88,32 @@ const OmoModal = ({
             toast({
               title: `You have successfully deposited $OMO.`,
               status: 'success',
-              duration: null,
+              duration: 3000,
               isClosable: false,
               position: 'top',
             })
+            setUseAmount(amount)
           } else {
             toast({
               title: `You failed to deposited $OMO due to some error.`,
               status: 'error',
-              duration: null,
+              duration: 3000,
               isClosable: false,
               position: 'top',
             })
           }
+          setLoading(false)
         })
         .catch((err) => {
           console.log(err)
           toast({
             title: `You failed to deposited $OMO due to some error.`,
             status: 'error',
-            duration: null,
+            duration: 3000,
             isClosable: false,
             position: 'top',
           })
+          setLoading(false)
         })
     } else {
       withdrawBidTokenFunc(amount)
@@ -91,7 +122,7 @@ const OmoModal = ({
             toast({
               title: `You have successfully withdrew $OMO.`,
               status: 'success',
-              duration: null,
+              duration: 3000,
               isClosable: false,
               position: 'top',
             })
@@ -99,34 +130,40 @@ const OmoModal = ({
             toast({
               title: `You failed to withdrew $OMO due to some error.`,
               status: 'error',
-              duration: null,
+              duration: 3000,
               isClosable: false,
               position: 'top',
             })
           }
+          setLoading(false)
         })
         .catch((err) => {
           console.log(err)
           toast({
             title: `You failed to withdrew $OMO due to some error.`,
             status: 'error',
-            duration: null,
+            duration: 3000,
             isClosable: false,
             position: 'top',
           })
+          setLoading(false)
         })
     }
   }
 
   useEffect(() => {
-    getBalanceFunc(address)
+    getBalanceOfFunc()
       .then((res) => {
-        setBalance(res)
+        setBalance(Number(ethers.utils.formatEther(res)))
       })
       .catch((err) => {
         console.log(err)
       })
   }, [address, balance, setBalance])
+
+  useEffect(() => {
+    setApprove(isApproval)
+  }, [isApproval])
 
   return (
     <BaseModal
@@ -147,6 +184,7 @@ const OmoModal = ({
       buttons={
         <Button
           onClick={() => handleAmountChange(type)}
+          isLoading={loading}
           m="auto"
           my="20px"
           w="100%"
@@ -160,7 +198,12 @@ const OmoModal = ({
           {type === 1 ? (approve ? 'Deposit' : 'Approve') : 'Withdraw'}
         </Button>
       }
-      onClose={onClose}
+      onClose={() => {
+        if (loading) {
+          return
+        }
+        onClose()
+      }}
       bgColor={useColorModeValue ? '#fff' : '#fff'}>
       <VStack align="left">
         <Box mb="12px">
@@ -170,7 +213,7 @@ const OmoModal = ({
             </Flex>
           ) : null}
           <Flex alignItems="center" w="100%" justifyContent="flex-end">
-            <Text>Available: 12,000 $OMO</Text>
+            <Text>Available: {balance - useAmount} $OMO</Text>
           </Flex>
         </Box>
         <Flex alignItems="center" w="100%">
@@ -189,8 +232,8 @@ const OmoModal = ({
               fontWeight={700}
               fontSize="20px"
               border="none"
-              defaultValue={0}
               value={amount}
+              onChange={(e) => setAmount(e.target.value)}
             />
             <Text
               onClick={() => setAmount(balance)}
