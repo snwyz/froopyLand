@@ -126,6 +126,7 @@ const OmoModal = ({
               isClosable: false,
               position: 'top',
             })
+            setUseAmount(amount)
           } else {
             toast({
               title: `You failed to withdrew $OMO due to some error.`,
@@ -202,6 +203,7 @@ const OmoModal = ({
         if (loading) {
           return
         }
+        setUseAmount(0)
         onClose()
       }}
       bgColor={useColorModeValue ? '#fff' : '#fff'}>
@@ -209,7 +211,10 @@ const OmoModal = ({
         <Box mb="12px">
           {type === 0 ? (
             <Flex alignItems="center" w="100%" justifyContent="flex-end">
-              <Text>Locked to bid FROMO plot: 500 $OMO</Text>
+              <Text>
+                Locked to bid FROMO plot:{' '}
+                {Number(omoAmount) - Number(withdrawalAmount)} $OMO
+              </Text>
             </Flex>
           ) : null}
           <Flex alignItems="center" w="100%" justifyContent="flex-end">

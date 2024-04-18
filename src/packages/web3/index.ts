@@ -10,8 +10,8 @@ import axios from 'axios'
 import { ethers } from 'ethers'
 import moment from 'moment'
 import OriginNFT from 'packages/abis/contracts/OriginNFT.sol/OriginNFT.json'
+import fl417ABI from 'packages/abis/demo/fl417.json'
 import ERC20ABI from 'packages/abis/ERC20.json'
-import fl417ABI from 'packages/abis/demo/fl417.json';
 import FactoryContractABI from 'packages/abis/FactoryContractABI.json'
 import GeneralNFTContractABI from 'packages/abis/GeneralNFTContractABI.json'
 import PoolContractABI from 'packages/abis/PoolContractABI.json'
@@ -32,9 +32,6 @@ const INFURA_KEY = process.env.NEXT_PUBLIC_INFURA_KEY
 
 const network = isProd ? Network.ETH_MAINNET : Network.ETH_GOERLI
 
-const FROOPYLAND_CONTRACT_ADDRESS = "0x628fa547647B4B8D826fA2962aaec526c1DAD6d7"
-
-const OMO_CONTRACT_ADDRESS = "0x49b775262e272bED00B6Cf0d07a5083a7eeFe19E"
 
 const settings = {
   apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY, // Replace with your Alchemy API Key.
@@ -165,8 +162,10 @@ export async function getLicenseOwnerListFunc(poolContractAddress: string) {
  * @return {*}
  */
 export async function checkApprovalFunc(
-  contractAddress: string = FROOPYLAND_CONTRACT_ADDRESS,
+  contractAddress: string = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR,
 ) {
+  console.log(process.env.NEXT_PUBLIC_FLT_CONTRACT_ADR)
+
   const web3Modal = new Web3Modal({
     cacheProvider: true,
     providerOptions,
@@ -176,13 +175,12 @@ export async function checkApprovalFunc(
   const signer = library.getSigner()
   const address = await signer.getAddress()
   const contract = new ethers.Contract(
-    OMO_CONTRACT_ADDRESS,
+    process.env.NEXT_PUBLIC_FLT_CONTRACT_ADR,
     ERC20ABI,
     signer,
   )
 
   const allowance = await contract.allowance(address, contractAddress)
-  console.log(allowance.gt(0))
   if (allowance.gt(0)) {
     return true
   }
@@ -194,7 +192,7 @@ export async function checkApprovalFunc(
  * @param {string} contractAddress
  * @return {*}
  */
-export async function approveBidTokenFunc(contractAddress: string = FROOPYLAND_CONTRACT_ADDRESS) {
+export async function approveBidTokenFunc(contractAddress: string = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR) {
   const web3Modal = new Web3Modal({
     cacheProvider: true,
     providerOptions,
@@ -204,7 +202,7 @@ export async function approveBidTokenFunc(contractAddress: string = FROOPYLAND_C
   const signer = library.getSigner()
   const address = await signer.getAddress()
   const contract = new ethers.Contract(
-    OMO_CONTRACT_ADDRESS,
+    process.env.NEXT_PUBLIC_FLT_CONTRACT_ADR,
     ERC20ABI,
     signer,
   )
@@ -232,7 +230,7 @@ export async function getBalanceOfFunc() {
   const signer = library.getSigner()
   const address = await signer.getAddress()
   const contract = new ethers.Contract(
-    OMO_CONTRACT_ADDRESS,
+    process.env.NEXT_PUBLIC_FLT_CONTRACT_ADR,
     ERC20ABI,
     signer,
   )
@@ -240,7 +238,7 @@ export async function getBalanceOfFunc() {
   return balance
 }
 
-export async function withdrawBidTokenFunc(amount: number, contractAddress: string = FROOPYLAND_CONTRACT_ADDRESS) {
+export async function withdrawBidTokenFunc(amount: number, contractAddress: string = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR) {
   const web3Modal = new Web3Modal({
     cacheProvider: true,
     providerOptions, // required
@@ -257,7 +255,7 @@ export async function withdrawBidTokenFunc(amount: number, contractAddress: stri
   return await transaction.wait()
 }
 
-export async function depositBidTokenFunc(amount: number, contractAddress: string = FROOPYLAND_CONTRACT_ADDRESS) {
+export async function depositBidTokenFunc(amount: number, contractAddress: string = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR) {
   const web3Modal = new Web3Modal({
     cacheProvider: true,
     providerOptions, // required
@@ -283,7 +281,7 @@ export async function convertKeyToToken(gameIds: number[], userAddress: string) 
   const library = new ethers.providers.Web3Provider(provider)
   const signer = library.getSigner()
   const contract = new ethers.Contract(
-    FROOPYLAND_CONTRACT_ADDRESS,
+    process.env.NEXT_PUBLIC_FL_CONTRACT_ADR,
     PoolContractABI,
     signer,
   )
@@ -433,7 +431,7 @@ export async function withdrawFunc(
  */
 export async function getBidderInfoOfFunc(
   walletAddress: string,
-  contractAddress: string = FROOPYLAND_CONTRACT_ADDRESS,
+  contractAddress: string = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR,
 ) {
   try {
     const contract = getPoolContract(contractAddress)

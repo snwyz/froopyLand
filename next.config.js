@@ -12,7 +12,7 @@ const nextConfig = {
       },
       // {
       //   source: `/fl/:path*`,
-      //   destination: `http://localhost:8080/fl/:path*`,
+      //   destination: `http://localhost:10081/fl/:path*`,
       // },
     ]
   },
