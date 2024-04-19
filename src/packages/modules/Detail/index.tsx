@@ -222,6 +222,7 @@ const Details = () => {
         gasLimit: BigInt(500000)
       })
       await tx.wait()
+      init()
       toastSuccess('You have successfully purchased the NFT.')
     } catch (error) {
       toastError('You failed purchasing the NFT due to some error.')
