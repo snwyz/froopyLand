@@ -318,7 +318,7 @@ export default function Main() {
 
             {
               ActivityStatus.Staking === auctionInfo.status && (
-                <Box>
+                <>
                   {
                     auctionInfo.bidWinnerAddress === address ? (
                       <Flex pos="relative" _hover={{ cursor: 'pointer' }}  onClick={() => router.push('/stakeNFT')}>
@@ -347,7 +347,7 @@ export default function Main() {
                       </Flex>
                     )
                   }
-                </Box>
+                </>
               )
             }
           </Box>
