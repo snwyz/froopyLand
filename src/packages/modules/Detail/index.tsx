@@ -674,6 +674,7 @@ const Details = () => {
                       type='number'
                       borderColor="#704BEA"
                       onChange={(e: any) => setMintKey(e.target.value)}
+                      disabled={buyLoading || detailInfos.state === State.Upcoming }
                       placeholder={`Maximum: ${Math.ceil(detailInfos.totalKeyMinted.toNumber() / 10).toFixed(4)} keys`} />
                     <Button
                       fontSize="20px"
@@ -684,6 +685,7 @@ const Details = () => {
                       onClick={buyKey}
                       fontWeight="700"
                       color="#000"
+                      disabled={buyLoading || detailInfos.state === State.Upcoming }
                       isLoading={buyLoading}>
                       Mint Key
                     </Button>
