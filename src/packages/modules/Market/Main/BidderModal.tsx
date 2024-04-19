@@ -40,7 +40,7 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
   const [availableNums, setAvailableNums] = useState<any>()
 
   const scrollRef = useRef(null)
-
+  const [bidLoading, setBidLoading] = useState(false)
 
   const { address } = useStore()
   
@@ -54,7 +54,8 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
 
     if (isLowPrice) return toastError('Bid must be higher than the current highest bid.')
     
-    if (value > availableNums) return toastError('Bid must be lower than the current available $OMO Token')
+    
+    if (parseFloat(value) > parseFloat(availableNums)) return toastError('Bid must be lower than the current available $OMO Token')
 
     const provider = await web3Modal.connect()    
     const library = new ethers.providers.Web3Provider(provider)
@@ -62,8 +63,12 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
     const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
 
     try {
-      await contract.bidLand(value)
+      setBidLoading(true)
 
+      const tx = await contract.bidLand(ethers.utils.parseEther(value), {
+        gasLimit: BigInt(500000)
+      })
+      
       const existingItemIndex = bidList.findIndex(item => item.userAddress === address)
 
       if (existingItemIndex !== -1) {
@@ -79,6 +84,8 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
       setValue(null)
     } catch (error) {
       console.log(error, '<===')
+    } finally {
+      setBidLoading(false)
     }
   }
 
@@ -185,6 +192,7 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
               _hover={{ bg: "#704BEA" }}
               onClick={handleBid}
               disabled={availableNums <= 0}
+              isLoading={bidLoading}
             >
               Bid
             </Button>

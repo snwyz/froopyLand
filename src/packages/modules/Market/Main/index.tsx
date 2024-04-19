@@ -180,6 +180,11 @@ export default function Main() {
     fetchSysBrief()
   }, []) 
 
+  const onClose = () => {
+    getAuctionInfo()
+    setOpen(false)
+  }
+
   if (!auctionInfo) return null
   
   return (
@@ -374,7 +379,7 @@ export default function Main() {
         <List />
       </Suspense>
       <Suspense>
-        <BidderModal isOpen={open} onClose={() => setOpen(false)} />
+        <BidderModal isOpen={open} onClose={onClose} />
       </Suspense>
     </Box>
   )
