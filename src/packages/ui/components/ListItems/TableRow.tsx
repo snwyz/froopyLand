@@ -880,6 +880,7 @@ function Table({ item, isCustom }: { item: any; isCustom: boolean }) {
               textColor="#704BEA"
               fontSize="12px"
               fontWeight="500"
+              onClick={() => router.push(`/${item.gameNft.gameId}`)}
               bg="transparent">
               Detail
             </Button>
