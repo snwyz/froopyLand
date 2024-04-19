@@ -1,19 +1,12 @@
 import { lazy, useEffect, useState } from 'react'
 
-import {
-  Box,
-  Button,
-  Flex,
-  Heading,
-  Image,
-  Text,
-  useToast,
-} from '@chakra-ui/react'
+import { Box, Button, Flex, Heading, Image, Text } from '@chakra-ui/react'
 
 import TabsCommon from '@components/TabsCommon'
 
 import { MarketTabs, MyDividendsTabs } from '@ts'
-import { BigNumber, ethers } from 'ethers'
+import { toastError, toastSuccess } from '@utils/toast'
+import { ethers } from 'ethers'
 import {
   getHistoricalDividendsAndPrize,
   getMyPurchasedNfts,
@@ -28,6 +21,7 @@ import useFomoStore from 'packages/store/fomo'
 import {
   checkApprovalFunc,
   claimBonusFunc,
+  convertKeyToToken,
   withdrawLastplayerPrizeFunc,
   withdrawSaleRevenueFunc,
 } from 'packages/web3'
@@ -39,11 +33,11 @@ const RedeemModal = lazy(() => import('@modules/Profile/RedeemModal'))
 const OmoModal = lazy(() => import('@modules/Profile/OmoModal'))
 
 export default function Main() {
-  const toast = useToast()
   const { userHeaderInfo, getUserHeaderInfo } = useFomoStore()
   const [claimKeysLoading, setClaimKeysLoading] = useState(false)
   const [claimFinalWinnerLoading, setClaimFinalWinnerLoading] = useState(false)
   const [claimNftLoading, setClaimNftLoading] = useState(false)
+  const [convertKeysLoading, setConvertKeysLoading] = useState(false)
 
   const handleHistoricalPageChange = (page: number) => {
     setCurrentHistoricalPage(page)
@@ -85,24 +79,12 @@ export default function Main() {
       claimBonusFunc(profit.unclaimedKeyGameIds)
         .then((res) => {
           if (res) {
-            toast({
-              title: `Success to claim key dividends.`,
-              status: 'success',
-              duration: 3000,
-              isClosable: false,
-              position: 'top',
-            })
+            toastSuccess('Success to claim key dividends.')
           }
         })
         .catch((err) => {
           console.log(err)
-          toast({
-            title: `Failed to claim key dividends.`,
-            status: 'error',
-            duration: 3000,
-            isClosable: false,
-            position: 'top',
-          })
+          toastError('Failed to claim key dividends.')
         })
         .finally(() => {
           setClaimKeysLoading(false)
@@ -114,24 +96,12 @@ export default function Main() {
       withdrawLastplayerPrizeFunc(profit.unclaimedFinalWinnerGameIds)
         .then((res) => {
           if (res) {
-            toast({
-              title: `Success to claim final winner prize.`,
-              status: 'success',
-              duration: 3000,
-              isClosable: false,
-              position: 'top',
-            })
+            toastSuccess('Success to claim final winner prize.')
           }
         })
         .catch((err) => {
           console.log(err)
-          toast({
-            title: `Failed to claim final winner prize.`,
-            status: 'error',
-            duration: 3000,
-            isClosable: false,
-            position: 'top',
-          })
+          toastError('Failed to claim final winner prize.')
         })
         .finally(() => {
           setClaimFinalWinnerLoading(false)
@@ -143,29 +113,36 @@ export default function Main() {
       withdrawSaleRevenueFunc(profit.unclaimedNftGameIds)
         .then((res) => {
           if (res) {
-            toast({
-              title: `Success to claim nft dividends.`,
-              status: 'success',
-              duration: 3000,
-              isClosable: false,
-              position: 'top',
-            })
+            toastSuccess('Success to claim nft dividends.')
           }
         })
         .catch((err) => {
           console.log(err)
-          toast({
-            title: `Failed to claim nft dividends.`,
-            status: 'error',
-            duration: 3000,
-            isClosable: false,
-            position: 'top',
-          })
+          toastError('Failed to claim nft dividends.')
         })
         .finally(() => {
           setClaimNftLoading(false)
         })
     }
+  }
+
+  const redeemKeys = () => {
+    setConvertKeysLoading(true)
+    convertKeyToToken(profit.unconvertedGameIds)
+      .then((res) => {
+        if (res) {
+          toastSuccess('You have successfully redeemed your Keys.')
+        } else {
+          toastError('You failed to redeem your Keys due to some error.')
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+        toastError('You failed to redeem your Keys due to some error.')
+      })
+      .finally(() => {
+        setConvertKeysLoading(false)
+      })
   }
 
   const { address } = useStore()
@@ -183,6 +160,9 @@ export default function Main() {
     flTokens: '-',
     withdrawalAmountTokens: '-',
     keyDividends: '-',
+    convertedGameIds: [],
+    unconvertedGameIds: [],
+    canConvert: 0,
     unclaimedKeyDividends: '-',
     unclaimedKeyGameIds: [],
     finalWinPrice: '-',
@@ -377,7 +357,12 @@ export default function Main() {
               </Flex>
               {/* <Text>0.056 ETH</Text> */}
               <Button
-                disabled={profit.keys === '0' || profit.keys === '-'}
+                disabled={
+                  profit.keys === '0' ||
+                  profit.keys === '-' ||
+                  profit.canConvert === 0
+                }
+                isLoading={convertKeysLoading}
                 mt="33px"
                 bgColor="#00DAB3"
                 w="100%"
@@ -385,7 +370,7 @@ export default function Main() {
                 color="#000"
                 fontSize="20px"
                 lineHeight="30px"
-                onClick={() => setOpen(true)}>
+                onClick={redeemKeys}>
                 Redeem
               </Button>
             </Box>
@@ -417,7 +402,9 @@ export default function Main() {
                   fontWeight="900"
                   mr="10px">
                   {profit.flTokens && profit.flTokens !== '-'
-                    ? ethers.utils.formatEther(profit.flTokens)
+                    ? Number(ethers.utils.formatEther(profit.flTokens)).toFixed(
+                        4,
+                      )
                     : '-'}
                 </Text>
                 <Text fontSize="16px" lineHeight="24px">
@@ -473,7 +460,7 @@ export default function Main() {
             {/* Key Holder Dividends */}
             <Box flexBasis="33.33%" pr="30px">
               <Text fontSize="16px" color="#FFA8FE" lineHeight="24px">
-                My Key Holder Dividends
+                My Historical Key Holder Dividends
               </Text>
               <Flex alignItems="baseline" mb="16px">
                 <Text
@@ -483,9 +470,11 @@ export default function Main() {
                   fontWeight="900"
                   mr="10px">
                   {profit.keyDividends !== '-'
-                    ? BigNumber.from(profit.keyDividends)
-                        .add(BigNumber.from(profit.unclaimedKeyDividends))
-                        .toString()
+                    ? // ? BigNumber.from(profit.keyDividends)
+                      //     .add(BigNumber.from(profit.unclaimedKeyDividends))
+                      //     .toString()
+                      Number(profit.keyDividends) +
+                      Number(profit.unclaimedKeyDividends)
                     : '-'}
                 </Text>
                 <Text fontSize="16px" lineHeight="24px">
@@ -516,7 +505,7 @@ export default function Main() {
             {/* Final Winner Prize */}
             <Box borderLeft="1px solid #704BEA" pl="30px" flexBasis="33.33%">
               <Text fontSize="16px" color="#FFA8FE" lineHeight="24px">
-                My Final Winner Prize
+                My Historical Final Winner Prize
               </Text>
               <Flex alignItems="baseline" mb="16px">
                 <Text
@@ -526,9 +515,11 @@ export default function Main() {
                   fontWeight="900"
                   mr="10px">
                   {profit.finalWinPrice !== '-'
-                    ? BigNumber.from(profit.finalWinPrice)
-                        .add(BigNumber.from(profit.unclaimedFinalWinPrice))
-                        .toString()
+                    ? // ? BigNumber.from(profit.finalWinPrice)
+                      //     .add(BigNumber.from(profit.unclaimedFinalWinPrice))
+                      //     .toString()
+                      Number(profit.unclaimedFinalWinPrice) +
+                      Number(profit.finalWinPrice)
                     : '-'}
                 </Text>
                 <Text fontSize="16px" lineHeight="24px">
@@ -563,7 +554,7 @@ export default function Main() {
               m="0 100px"
               flexBasis="33.33%">
               <Text fontSize="16px" color="#FFA8FE" lineHeight="24px">
-                My NFT Provider Dividends
+                My Historical NFT Provider Dividends
               </Text>
               <Flex alignItems="baseline" mb="16px">
                 <Text
@@ -573,9 +564,11 @@ export default function Main() {
                   fontWeight="900"
                   mr="10px">
                   {profit.nftDividends !== '-'
-                    ? BigNumber.from(profit.nftDividends)
-                        .add(BigNumber.from(profit.unclaimedNftDividends))
-                        .toString()
+                    ? // ? BigNumber.from(profit.nftDividends)
+                      //     .add(BigNumber.from(profit.unclaimedNftDividends))
+                      //     .toString()
+                      Number(profit.nftDividends) +
+                      Number(profit.unclaimedNftDividends)
                     : '-'}
                 </Text>
                 <Text fontSize="16px" lineHeight="24px">
@@ -629,7 +622,11 @@ export default function Main() {
           </Box>
         </Box>
       </Box>
-      <RedeemModal isOpen={open} onClose={() => setOpen(false)} />
+      <RedeemModal
+        unconvertedGameIds={profit.unconvertedGameIds}
+        isOpen={open}
+        onClose={() => setOpen(false)}
+      />
       <OmoModal
         omoAmount={profit.flTokens}
         withdrawalAmount={profit.withdrawalAmountTokens}

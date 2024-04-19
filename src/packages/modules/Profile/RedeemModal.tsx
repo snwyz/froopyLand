@@ -1,58 +1,48 @@
 import {
+  Box,
   Button,
-  useColorModeValue,
-  VStack,
-  Heading,
   Flex,
+  Heading,
   Input,
   Text,
-  Box,
-  useToast,
+  VStack,
+  useColorModeValue,
 } from '@chakra-ui/react'
 
 import BaseModal from '@components/Modal'
-import useStore from 'packages/store'
+import { toastError, toastSuccess } from '@utils/toast'
 import { convertKeyToToken } from 'packages/web3'
+import { useState } from 'react'
 
 type SubmitOfferModalProps = {
+  unconvertedGameIds: number[]
   isOpen: boolean
   onClose: () => void
 }
 
-const RedeemModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
-  const toast = useToast()
-  const { address } = useStore()
+const RedeemModal = ({
+  unconvertedGameIds,
+  isOpen,
+  onClose,
+}: SubmitOfferModalProps) => {
+  const [loading, setLoading] = useState(false)
 
   const redeemKeys = () => {
-    convertKeyToToken(null, address)
+    setLoading(true)
+    convertKeyToToken(unconvertedGameIds)
       .then((res) => {
         if (res) {
-          toast({
-            title: `You have successfully redeemed your Keys.`,
-            status: 'success',
-            duration: null,
-            isClosable: false,
-            position: 'top',
-          })
+          toastSuccess('You have successfully redeemed your Keys.')
         } else {
-          toast({
-            title: `You failed to redeem your Keys due to some error.`,
-            status: 'error',
-            duration: null,
-            isClosable: false,
-            position: 'top',
-          })
+          toastError('You failed to redeem your Keys due to some error.')
         }
       })
       .catch((err) => {
         console.log(err)
-        toast({
-          title: `You failed to redeem your Keys due to some error.`,
-          status: 'error',
-          duration: null,
-          isClosable: false,
-          position: 'top',
-        })
+        toastError('You failed to redeem your Keys due to some error.')
+      })
+      .finally(() => {
+        setLoading(false)
       })
   }
 
@@ -64,6 +54,7 @@ const RedeemModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
       buttons={
         <Button
           onClick={redeemKeys}
+          isLoading={loading}
           m="auto"
           my="20px"
           w="576px"
@@ -77,7 +68,12 @@ const RedeemModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
           Redeem
         </Button>
       }
-      onClose={onClose}
+      onClose={() => {
+        if (loading) {
+          return
+        }
+        onClose()
+      }}
       bgColor={useColorModeValue ? '#fff' : '#fff'}>
       <VStack align="left">
         <Heading fontSize="22px" lineHeight="32px" mb="60px">
@@ -100,7 +96,7 @@ const RedeemModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
                 fontWeight={700}
                 fontSize="20px"
                 border="none"
-                value="56"
+                value={0}
               />
             </Flex>
             <Text

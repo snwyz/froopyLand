@@ -4,6 +4,9 @@ export interface IProfit {
   flTokens: string;
   withdrawalAmountTokens: string;
   keyDividends: string;
+  convertedGameIds: number[];
+  unconvertedGameIds: number[];
+  canConvert: number;
   unclaimedKeyDividends: string;
   unclaimedKeyGameIds: number[];
   finalWinPrice: string;

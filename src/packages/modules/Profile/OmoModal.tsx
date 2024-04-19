@@ -11,6 +11,7 @@ import {
 } from '@chakra-ui/react'
 
 import BaseModal from '@components/Modal'
+import { toastError, toastSuccess } from '@utils/toast'
 import { ethers } from 'ethers'
 import useStore from 'packages/store'
 import {
@@ -51,32 +52,14 @@ const OmoModal = ({
       approveBidTokenFunc()
         .then((res) => {
           if (res) {
-            toast({
-              title: `Success to approve $OMO.`,
-              status: 'success',
-              duration: 3000,
-              isClosable: false,
-              position: 'top',
-            })
+            toastSuccess("You've successfully approved $OMO.")
           } else {
-            toast({
-              title: `Failed to approve $OMO.`,
-              status: 'error',
-              duration: 3000,
-              isClosable: false,
-              position: 'top',
-            })
+            toastError('Failed to approve $OMO.')
           }
         })
         .catch((err) => {
           console.log(err)
-          toast({
-            title: `Failed to approve $OMO.`,
-            status: 'error',
-            duration: 3000,
-            isClosable: false,
-            position: 'top',
-          })
+          toastError('Failed to approve $OMO.')
         })
         .finally(() => {
           setLoading(false)
@@ -85,33 +68,15 @@ const OmoModal = ({
       depositBidTokenFunc(amount)
         .then((res) => {
           if (res) {
-            toast({
-              title: `You have successfully deposited $OMO.`,
-              status: 'success',
-              duration: 3000,
-              isClosable: false,
-              position: 'top',
-            })
+            toastSuccess(`You have successfully deposited $OMO.`)
             setUseAmount(amount)
           } else {
-            toast({
-              title: `You failed to deposited $OMO due to some error.`,
-              status: 'error',
-              duration: 3000,
-              isClosable: false,
-              position: 'top',
-            })
+            toastError(`You failed to deposited $OMO due to some error.`)
           }
         })
         .catch((err) => {
           console.log(err)
-          toast({
-            title: `You failed to deposited $OMO due to some error.`,
-            status: 'error',
-            duration: 3000,
-            isClosable: false,
-            position: 'top',
-          })
+          toastError(`You failed to deposited $OMO due to some error.`)
         })
         .finally(() => {
           setLoading(false)
@@ -120,33 +85,15 @@ const OmoModal = ({
       withdrawBidTokenFunc(amount)
         .then((res) => {
           if (res) {
-            toast({
-              title: `You have successfully withdrew $OMO.`,
-              status: 'success',
-              duration: 3000,
-              isClosable: false,
-              position: 'top',
-            })
+            toastSuccess(`You have successfully withdrew $OMO.`)
             setUseAmount(amount)
           } else {
-            toast({
-              title: `You failed to withdrew $OMO due to some error.`,
-              status: 'error',
-              duration: 3000,
-              isClosable: false,
-              position: 'top',
-            })
+            toastError(`You failed to withdrew $OMO due to some error.`)
           }
         })
         .catch((err) => {
           console.log(err)
-          toast({
-            title: `You failed to withdrew $OMO due to some error.`,
-            status: 'error',
-            duration: 3000,
-            isClosable: false,
-            position: 'top',
-          })
+          toastError(`You failed to withdrew $OMO due to some error.`)
         })
         .finally(() => {
           setLoading(false)
