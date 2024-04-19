@@ -674,7 +674,7 @@ const Details = () => {
                       type='number'
                       borderColor="#704BEA"
                       onChange={(e: any) => setMintKey(e.target.value)}
-                      disabled={buyLoading || detailInfos.state === State.Upcoming }
+                      disabled={buyLoading || detailInfos.state === State.Upcoming || detailInfos.state === State.Finished }
                       placeholder={`Maximum: ${Math.ceil(detailInfos.totalKeyMinted.toNumber() / 10).toFixed(4)} keys`} />
                     <Button
                       fontSize="20px"

@@ -116,7 +116,7 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
     // TODO: 考虑到后续服务端压力，比如 Ddos，需要从合约侧返回的新数据去组装列表
     
     contract.on('NewBids', (Bidder, amount, bidId) => {
-      // console.log(Bidder, amount.toString(), bidId.toString(), 'Bidder, amount, bidId')
+      console.log(Bidder, amount.toString(), bidId.toString(), 'Bidder, amount, bidId')
       getBidList().then(() => setBidLoading(false))
     })
   }
