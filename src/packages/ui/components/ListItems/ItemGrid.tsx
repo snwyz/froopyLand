@@ -24,6 +24,7 @@ import { State } from '@modules/Detail'
 import moment from 'moment'
 import useStore from 'packages/store'
 import { myNFTUnlicensedData } from './FakeData'
+import { ethers } from 'ethers'
 
 function ItemGrid({ item, gridName }: { item: any; gridName?: string }) {
   const router = useRouter()
@@ -165,7 +166,7 @@ function ItemGrid({ item, gridName }: { item: any; gridName?: string }) {
                 fontWeight={900}
                 fontSize={{ base: '14px', md: '14px' }}
                 color="#00DAB3">
-                {item.status === 0 ? '--' : item?.totalKeyMinted || '--'} ETH
+                {item.status === 0 ? '--' : item?.totalMintFee || '--'} ETH
               </Box>
             </Flex>
             <Flex flexDir="column">
@@ -183,7 +184,7 @@ function ItemGrid({ item, gridName }: { item: any; gridName?: string }) {
                 fontWeight={900}
                 fontSize={{ base: '14px', md: '14px' }}
                 color="#00DAB3">
-                {item.status === 0 ? '--' : item?.finalPrice || '--'} ETH
+                {item.status === 0 ? '--' : ethers.utils.formatEther(item?.finalPrice) || '--'} ETH
               </Box>
             </Flex>
           </Flex>

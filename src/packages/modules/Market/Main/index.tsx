@@ -277,7 +277,7 @@ export default function Main() {
                   p="20px 24px"
                   h="66px"
                   backgroundColor="rgba(112, 75, 234, 0.5);">
-                  <Text>Highest Bid： {auctionInfo.highestBid || '--'} $OMO</Text>
+                  <Text>Highest Bid： {auctionInfo?.highestBid || '--'} $OMO</Text>
                   <Text
                     w="1px"
                     h="100%"
@@ -341,7 +341,7 @@ export default function Main() {
                           <Text w="1px" h="100%" bg="rgba(255, 255, 255, 0.5)" m="0 16px"></Text>
                           <Text>0 Bidders</Text>
                           <Text w="1px" h="100%" bg="rgba(255, 255, 255, 0.5)" m="0 16px"></Text>
-                          <Text color="rgba(255, 255, 255, 0.5)">Close on April 14, 12am</Text>
+                          <Text color="rgba(255, 255, 255, 0.5)">Close on {moment(auctionInfo.startTimestamp).add(8, 'hours').format('MMMM DD, ha')}</Text>
                           {/* <Image src='./static/market/start.svg' alt='start' w="28px" h="28px" ml="30px"></Image> */}
                         </Flex>
                       </Flex>

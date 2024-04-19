@@ -15,7 +15,7 @@ export enum ActivityStatus {
   NotStarted = 0,
   Bidding = 1,
   Staking = 2,
-  Playing = 3
+  End = 3
 }
 
 type IAuctionInfo = {

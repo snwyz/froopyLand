@@ -118,7 +118,7 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
     // TODO: 考虑到后续服务端压力，比如 Ddos，需要从合约侧返回的新数据去组装列表
     
     contract.on('NewBids', (from, to, value) => {
-      console.log(from, to, value, 'from, to, value')
+      console.log(from, to, value.toString(), 'from, to, value')
       
       getBidList()
     })
@@ -147,22 +147,22 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
         <Text fontSize="14px" lineHeight="20px" color="rgba(0, 0, 0, 0.7)" mb="40px">The highest bidder will have the opportunity to auction their NFT in the next round.</Text>
         <Box>
           <Flex p="10px 20px">
-            <Text w="178px" align="left" mr="60px" fontSize="13px" color="rgba(0, 0, 0, 0.6)">BIDDER</Text>
+            <Text w="178px" align="left" mr="82px" fontSize="13px" color="rgba(0, 0, 0, 0.6)">BIDDER</Text>
             <Text fontSize="13px" color="rgba(0, 0, 0, 0.6)">BID</Text>
           </Flex>
-         <Box overflowY="auto" height="220px" ref={scrollRef}>
+         <Box overflowY="auto" height={bidList.length === 0 ? 0 : '220px'} ref={scrollRef}>
          {
           bidList.map((item,v) => (
             <Flex key={item.userAddress} p="10px 20px" border="1px solid #F2F2F2" borderRadius="10px" align="center" mb="10px">
-              <Flex align="center" mr="60px">
+              <Flex align="center" w="200px" mr="60px">
                 <Image mr="10px" borderRadius="37px" border="1px solid #F2F2F2" src="/static/account/sidebar/avatar.svg" alt='avatar' w="37px" h="37px"></Image>
                 <Box fontSize="16px" w="160px">
                   {ellipseAddress(item.userAddress, 6)}
                 </Box>
               </Flex>
-              <Text align="left" w="200px" fontSize="16px" color="rgb(0, 0, 0)" mr="164px">{item.amount} $OMO Token</Text>
+              <Text align="left" flex={1} fontSize="16px" color="rgb(0, 0, 0)">{item.amount} $OMO Token</Text>
               {
-                item.userAddress === address && (<Text fontSize="14px" color="#7E4AF1">ME</Text>)
+                item.userAddress === address && (<Text fontSize="14px" color="#7E4AF1" w="30px">ME</Text>)
               }
             </Flex>
           ))

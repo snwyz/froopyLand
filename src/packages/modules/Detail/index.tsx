@@ -42,7 +42,7 @@ const Details = () => {
   const router = useRouter()
   
   // const { pool: id } = router.query 
-  const id = 0
+  const id = 1
 
   const { address } = useStore()
   const [claims, setClaims] = useState(0)
@@ -54,7 +54,7 @@ const Details = () => {
   const [retrieveNftLoading, setRetrieveNftLoading] = useState(false)
   const [detailInfos, setDetailInfos] = useState(null)
   const [mintKey, setMintKey] = useState('')
-  const [keyDividends, setKeyDividends] = useState('')
+  const [keyDividends, setKeyDividends] = useState(0)
 
   // TODO: 未登录情况，拦截链接钱包？
   useEffect(() => {
@@ -70,7 +70,7 @@ const Details = () => {
 
   const fetchGameDetailById = async () => {
     if (!address) return null
-    const { keyDividends } = await getGameDetailById(address, id as any)
+    const keyDividends = await getGameDetailById(address, id as any)
     setKeyDividends(keyDividends)
   }
 
@@ -136,9 +136,9 @@ const Details = () => {
       const errorEvent = events.find(event => event.name === 'ErrorEvent')
 
       console.log('Error:', errorEvent)
-
+      init()
       // await setGameList(library)
-      toastSuccess('Buy success')
+      toastSuccess('Mint key success')
     } catch (error) {
       console.log(error, 'buyKey')
     } finally {
@@ -160,6 +160,7 @@ const Details = () => {
       })
       await tx.wait()
       toastSuccess('Claim success')
+      init()
     } catch (error) {
       console.log(error, 'claim')
     } finally {
@@ -168,7 +169,6 @@ const Details = () => {
   }
 
   const withdrawSaleRevenue = async () => {
-
     const provider = await web3Modal.connect()
     const library = new ethers.providers.Web3Provider(provider)
     const signer = library.getSigner()
@@ -234,10 +234,7 @@ const Details = () => {
     const library = new ethers.providers.Web3Provider(provider)
     const signer = library.getSigner()
     const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
-    contract.on('NewBids', (from, to, value) => {
-      init()
-    })
-
+    contract.on('GameJoined', () => init())
   }
 
   // game detailInfo count down
@@ -292,8 +289,8 @@ const Details = () => {
         <ArrowBackIcon mr="10px" />
         <Text fontSize="20px">Back</Text>
       </Flex>
-      {/* {
-        detailInfos.state === State.Finished && detailInfos.lastPlayer === address && (
+      {
+        detailInfos.state === State.Finished && detailInfos.lastPlayer.toLowerCase() === address && (
           <Box
             m="0 auto;"
             borderRadius="20px 20px 0px 0px"
@@ -306,22 +303,27 @@ const Details = () => {
             You won the final prize！
           </Box>
         )
-      } */}
+      }
         <Box
         borderRadius={
-          detailInfos?.state === State.Finished && detailInfos?.lastPlayer === address ? '0 0 20px 20px' : '20px'
+          detailInfos?.state === State.Finished && detailInfos?.lastPlayer.toLowerCase() === address ? '0 0 20px 20px' : '20px'
         }
         p="48px"
         w={{ lg: '1280px', md: '1120px' }}
         className={styles.box}>
-        {/* <Flex align="center" justify="center" border="1px solid rgba(112, 75, 234, 1)" w="100%" borderRadius="20px" p="24px 32px" mb="20px">
-          <Image mr="12px" src='/static/common/finished.svg' alt='f' w="24px" h="24px"></Image>
-          <Text fontSize="24px" color="#9A7CFF">NFT sold</Text>
-        </Flex> */}
+
+        {
+          detailInfos.state === State.Finished && detailInfos.nftAddress === ethers.constants.AddressZero && (
+            <Flex align="center" justify="center" border="1px solid rgba(112, 75, 234, 1)" w="100%" borderRadius="20px" p="24px 32px" mb="20px">
+              <Image mr="12px" src='/static/common/finished.svg' alt='f' w="24px" h="24px"></Image>
+              <Text fontSize="24px" color="#9A7CFF">NFT sold</Text>
+            </Flex>
+          )
+        }
         {/* top keys holder 优先赎回权 && 时间小于 24 小时 */}
         {
           detailInfos.state === State.Finished 
-            && detailInfos.mostKeyHolder === address 
+            && detailInfos.mostKeyHolder.toLowerCase() === address 
             && moment().isBefore(moment(detailInfos.endTimestamp * 1000).add(24, 'hours'))
             && (
             <Flex border="1px solid rgba(112, 75, 234, 1)" w="100%" borderRadius="20px" p="24px 32px" mb="20px">
@@ -393,12 +395,12 @@ const Details = () => {
               <Flex alignItems="center">
                 <Text className={styles.name}>NFT Address：</Text>
                 <Link fontWeight={600} color="#00DAB3">
-                  {detailInfos.nftAddress || address}
+                  {detailInfos.nftAddress || '--'}
                 </Link>
               </Flex>
               <Flex alignItems="center">
                 <Text className={styles.name}>NFT ID：</Text>
-                <Text fontWeight={600}>{detailInfos?.nftId?.toNumber() || '122'}</Text>
+                <Text fontWeight={600}>{detailInfos?.nftId?.toNumber() || '--'}</Text>
               </Flex>
               <Flex alignItems="center">
                 <Text className={styles.name}>Auction Duration：</Text>
@@ -531,7 +533,7 @@ const Details = () => {
                       color="#00DAB3"
                       fontSize="40px"
                       lineHeight="60px">
-                      { detailInfos.state === 0 ? '--' : ethers.utils.formatEther(detailInfos.salesRevenue.toString()) || '--'}
+                      { detailInfos.state === 0 ? '--' : parseFloat(ethers.utils.formatEther(detailInfos.salesRevenue.toString())).toFixed(4) || '--'}
                     </Text>
                   </Flex>
                   <Text
@@ -564,7 +566,7 @@ const Details = () => {
                       color="#00DAB3"
                       fontSize="40px"
                       lineHeight="60px">
-                      { detailInfos.state === 0 ? '--' : ethers.utils.formatEther(detailInfos.salesRevenue.mul(2).div(10)) || '--'}
+                      { detailInfos.state === 0 ? '--' : parseFloat(ethers.utils.formatEther(detailInfos.salesRevenue.mul(2).div(10))).toFixed(4) || '--'}
                     </Text>
                   </Flex>
                   <Text
@@ -586,7 +588,7 @@ const Details = () => {
                 </Box>
                 <Flex mt="20px">
                   <Text color="#00DAB3" fontSize="16px" lineHeight="20px">
-                    { detailInfos.state === 0 ? '--' : ellipseAddress(detailInfos.lastPlayer)}
+                    { detailInfos.state === 0 ? '--' : ellipseAddress(detailInfos.lastPlayer.toLowerCase())}
                   </Text>
                 </Flex>
               </Flex>
@@ -665,7 +667,7 @@ const Details = () => {
                       type='number'
                       borderColor="#704BEA"
                       onChange={(e: any) => setMintKey(e.target.value)}
-                      placeholder={`Maximum: ${Math.ceil(detailInfos.totalKeyMinted.toNumber() / 10)} keys`} />
+                      placeholder={`Maximum: ${Math.ceil(detailInfos.totalKeyMinted.toNumber() / 10).toFixed(4)} keys`} />
                     <Button
                       fontSize="20px"
                       colorScheme="primary"
@@ -682,7 +684,7 @@ const Details = () => {
                   <Text fontSize="14px" lineHeight="20px" mt="12px">
                     {/* Mint Fee：Mint Fee： 0.001 ETH/KEY */}
                     <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
-                    Mint Fee：{detailInfos.state === 0 ? '--': ethers.utils.formatEther(detailInfos.keyPrice?.toString())} ETH/KEY | Total： 0.002 ETH
+                    Mint Fee：{detailInfos.state === 0 ? '--': parseFloat(ethers.utils.formatEther(detailInfos.keyPrice?.toString())).toFixed(4)} ETH/KEY | Total： 0.002 ETH
                     </span>
                   </Text>
                 </>
@@ -695,7 +697,7 @@ const Details = () => {
                 <Text fontSize="16px" lineHeight="24px">
                  Total：
                   <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
-                    { Number(claims) === 0 ? '--' : keyDividends || '--'}
+                    {(Number(keyDividends) + Number(ethers.utils.formatEther(claims))).toFixed(4)}
                   </span>
                   ETH
                 </Text>
@@ -708,7 +710,7 @@ const Details = () => {
                   border="none"
                   readOnly
                   value={`Unclaimed: ${
-                    Number(claims) === 0 ? '--': Number(ethers.utils.formatEther(claims)).toFixed(3) || '--'
+                    Number(claims) === 0 ? '--': Number(ethers.utils.formatEther(claims)).toFixed(4)
                   } ETH`}
                 />
                 <Button
@@ -727,7 +729,7 @@ const Details = () => {
               </Flex>
               {/* My NFT Provider Dividends */}
               {
-                detailInfos.principal === address && (
+                detailInfos.principal.toLowerCase() === address && (
                   <>
                     <Flex mt="36px" mb="12px" justifyContent="space-between">
                       <Text fontSize="20px" lineHeight="30px" fontWeight={700}>
@@ -736,7 +738,7 @@ const Details = () => {
                       <Text fontSize="16px" lineHeight="24px">
                         Total：
                         <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
-                        {detailInfos.principal === ethers.constants.AddressZero ? '--': ethers.utils.formatEther(detailInfos.salesRevenue.mul(5).div(10))}
+                        {detailInfos.principal === ethers.constants.AddressZero ? '--': parseFloat(ethers.utils.formatEther(detailInfos.salesRevenue.mul(5).div(10))).toFixed(4)}
                         </span>
                         ETH
                       </Text>
@@ -748,7 +750,7 @@ const Details = () => {
                         bgColor="rgba(112, 75, 234, 0.5)"
                         border="none"
                         readOnly
-                        value={`Unclaimed: ${detailInfos.principal === ethers.constants.AddressZero ? '--': ethers.utils.formatEther(detailInfos.salesRevenue.mul(5).div(10))} ETH`}
+                        value={`Unclaimed: ${detailInfos.principal === ethers.constants.AddressZero ? '--': parseFloat(ethers.utils.formatEther(detailInfos.salesRevenue.mul(5).div(10))).toFixed(4)} ETH`}
                       />
                       <Button
                         fontSize="20px"
@@ -770,7 +772,7 @@ const Details = () => {
                 )
               }
               {/* My Final Winner Prize */}
-              {detailInfos.state === State.Finished && detailInfos.lastPlayer === address && (
+              {detailInfos.state === State.Finished && detailInfos.lastPlayer.toLowerCase() === address && (
                 <>
                   <Flex mt="36px" mb="12px" justifyContent="space-between">
                     <Text fontSize="20px" lineHeight="30px" fontWeight={700}>
@@ -779,7 +781,7 @@ const Details = () => {
                     <Text fontSize="16px" lineHeight="24px">
                       Total：
                       <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
-                        {detailInfos.lastPlayer === ethers.constants.AddressZero ? '--': ethers.utils.formatEther(detailInfos.salesRevenue.mul(2).div(10)) }
+                        {detailInfos.lastPlayer === ethers.constants.AddressZero ? '--': parseFloat(ethers.utils.formatEther(detailInfos.salesRevenue.mul(2).div(10))).toFixed(4) }
                       </span>
                       ETH
                     </Text>
@@ -791,7 +793,7 @@ const Details = () => {
                       bgColor="rgba(112, 75, 234, 0.5)"
                       border="none"
                       readOnly
-                      value={`Unclaimed: ${detailInfos.lastPlayer === ethers.constants.AddressZero ? '--' : ethers.utils.formatEther(detailInfos.salesRevenue.mul(2).div(10))} ETH`}
+                      value={`Unclaimed: ${detailInfos.lastPlayer === ethers.constants.AddressZero ? '--' : parseFloat(ethers.utils.formatEther(detailInfos.salesRevenue.mul(2).div(10))).toFixed(4)} ETH`}
                     />
                     <Button
                       fontSize="20px"
