@@ -116,7 +116,12 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
     const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
     
     // TODO: 考虑到后续服务端压力，比如 Ddos，需要从合约侧返回的新数据去组装列表
-    contract.on('NewBids', (from, to, value) => getBidList())
+    
+    contract.on('NewBids', (from, to, value) => {
+      console.log(from, to, value, 'from, to, value')
+      
+      getBidList()
+    })
   }
 
   const getBidList = async () => {

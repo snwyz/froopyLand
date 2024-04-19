@@ -57,7 +57,7 @@ const supportedChains: IChainData[] = [
     network: 'sepolia_test',
     chain_id: 11155111,
     network_id: 11155111,
-    rpc_url: 'https://rpc.sepolia.org',
+    rpc_url: 'https://eth-sepolia.g.alchemy.com/v2/bRqDWPHTbD00nR0f1XR6nFw3iWaiJ41l',
     native_currency: {
       symbol: 'SepoliaETH',
       name: 'SepoliaETH',
