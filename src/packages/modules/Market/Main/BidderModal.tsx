@@ -65,28 +65,26 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
     try {
       setBidLoading(true)
 
-      const tx = await contract.bidLand(ethers.utils.parseEther(value), {
+      const data = await contract.bidLand(ethers.utils.parseEther(value), {
         gasLimit: BigInt(500000)
       })
-      
-      const existingItemIndex = bidList.findIndex(item => item.userAddress === address)
 
-      if (existingItemIndex !== -1) {
-        const updatedBidList = [...bidList]
-        updatedBidList[existingItemIndex].amount = parseFloat(value)
-        setList(updatedBidList)
-      } else {
-        setList(prevList => [...prevList, {
-          amount: parseFloat(value),
-          userAddress: address,
-        }])
-      }
-      setValue(null)
+      // const existingItemIndex = bidList.findIndex(item => item.userAddress === address)
+
+      // if (existingItemIndex !== -1) {
+      //   const updatedBidList = [...bidList]
+      //   updatedBidList[existingItemIndex].amount = parseFloat(value)
+      //   setList(updatedBidList)
+      // } else {
+      //   setList(prevList => [...prevList, {
+      //     amount: parseFloat(value),
+      //     userAddress: address,
+      //   }])
+      // }
     } catch (error) {
-      console.log(error, '<===')
-    } finally {
       setBidLoading(false)
-    }
+      console.log(error, '<===')
+    } 
   }
 
 
@@ -117,10 +115,9 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
     
     // TODO: 考虑到后续服务端压力，比如 Ddos，需要从合约侧返回的新数据去组装列表
     
-    contract.on('NewBids', (from, to, value) => {
-      console.log(from, to, value.toString(), 'from, to, value')
-      
-      getBidList()
+    contract.on('NewBids', (Bidder, amount, bidId) => {
+      // console.log(Bidder, amount.toString(), bidId.toString(), 'Bidder, amount, bidId')
+      getBidList().then(() => setBidLoading(false))
     })
   }
 
@@ -196,7 +193,7 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
               bg="#704BEA"
               _hover={{ bg: "#704BEA" }}
               onClick={handleBid}
-              disabled={availableNums <= 0}
+              disabled={availableNums <= 0 || bidLoading}
               isLoading={bidLoading}
             >
               Bid

@@ -136,7 +136,7 @@ function ItemGrid({ item, gridName }: { item: any; gridName?: string }) {
             borderRadius="20px"
             bgColor="rgba(255, 255, 255, 0.5)">
             <Text fontSize="12px" color="#2A0668">
-              {item.biddersCount || '--'} Player
+              {item.biddersCount || '--'} Players
             </Text>
           </Flex>
         )}
