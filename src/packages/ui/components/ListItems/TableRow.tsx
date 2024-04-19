@@ -718,7 +718,7 @@ function Table({ item, isCustom }: { item: any; isCustom: boolean }) {
                 textOverflow="ellipsis"
                 overflow="hidden"
                 whiteSpace="nowrap">
-                {item.name} # {item.tokenId}
+                {item.name} #{item.tokenId}
               </Text>
             </Flex>
           </Td>
@@ -738,9 +738,7 @@ function Table({ item, isCustom }: { item: any; isCustom: boolean }) {
               <Box mr="6px" fontSize="12px" fontWeight="400">
                 <Image
                   onClick={() =>
-                    window.open(
-                      process.env.NEXT_PUBLIC_CHAIN_URL + item.gameNft.txHash,
-                    )
+                    window.open(process.env.NEXT_PUBLIC_CHAIN_URL + item.tx)
                   }
                   _hover={{ cursor: 'pointer' }}
                   mr="20px"
@@ -759,6 +757,7 @@ function Table({ item, isCustom }: { item: any; isCustom: boolean }) {
             borderBottomColor={borderBottomColor}>
             <Flex align="center">
               <Button
+                onClick={() => router.push(`/${item.gameId}`)}
                 h="35px"
                 minW="170px"
                 border="1px solid"
@@ -811,7 +810,7 @@ function Table({ item, isCustom }: { item: any; isCustom: boolean }) {
               textOverflow="ellipsis"
               overflow="hidden"
               whiteSpace="nowrap">
-              {item.gameNft.name} # {item.gameNft.tokenId}
+              {item.gameNft.name} #{item.gameNft.tokenId}
             </Text>
           </Flex>
         </Td>
@@ -849,18 +848,20 @@ function Table({ item, isCustom }: { item: any; isCustom: boolean }) {
         <Td borderBottomColor={borderBottomColor} borderBottom="1px solid">
           <Flex mr="95px" align="center" color="#fff">
             <Box mr="6px" fontSize="12px" fontWeight="400">
-              <Image
-                onClick={() =>
-                  window.open(
-                    process.env.NEXT_PUBLIC_CHAIN_URL + item.gameNft.txHash,
-                  )
-                }
-                _hover={{ cursor: 'pointer' }}
-                mr="20px"
-                src="/static/profile/link.svg"
-                alt="link"
-                w="16px"
-                h="16px"></Image>
+              {item.status === '1' ? (
+                <Image
+                  onClick={() =>
+                    window.open(
+                      process.env.NEXT_PUBLIC_CHAIN_URL + item.gameNft.tx,
+                    )
+                  }
+                  _hover={{ cursor: 'pointer' }}
+                  mr="20px"
+                  src="/static/profile/link.svg"
+                  alt="link"
+                  w="16px"
+                  h="16px"></Image>
+              ) : null}
             </Box>
           </Flex>
         </Td>

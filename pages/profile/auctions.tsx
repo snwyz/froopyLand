@@ -54,19 +54,19 @@ export default function Main() {
     },
     {
       id: 1,
-      title: 'Queuing Auctions',
+      title: `Queuing Auctions (${upcomingList.length})`,
       value: 'queuing',
       render: (
         <SimpleGrid mt="20px" columns={[1, 2, 3, 4, 5]} spacing="20px">
           {upcomingList.map((item, idx) => {
-            return <ItemGrid gridName="all" item={item} key={idx} />
+            return <ItemGrid gridName="queuing" item={item} key={idx} />
           })}
         </SimpleGrid>
       ),
     },
     {
       id: 2,
-      title: 'Ongoing Auctions',
+      title: `Ongoing Auctions (${ongoingList.length})`,
       value: 'ongoing',
       render: (
         <SimpleGrid mt="20px" columns={[1, 2, 3, 4, 5]} spacing="20px">
@@ -78,7 +78,7 @@ export default function Main() {
     },
     {
       id: 3,
-      title: 'Finished Auctions',
+      title: `Finished Auctions (${finishedList.length})`,
       value: 'finished',
       render: (
         <SimpleGrid mt="20px" columns={[1, 2, 3, 4, 5]} spacing="20px">

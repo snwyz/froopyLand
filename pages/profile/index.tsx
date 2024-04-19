@@ -489,7 +489,10 @@ export default function Main() {
                 ETH
               </Text>
               <Button
-                disabled={profit.unclaimedKeyGameIds.length === 0}
+                disabled={
+                  profit.unclaimedKeyGameIds.length === 0 ||
+                  profit.unclaimedKeyDividends === '0.0000'
+                }
                 isLoading={claimKeysLoading}
                 onClick={() => handleClaim(0)}
                 mt="8px"
@@ -583,7 +586,10 @@ export default function Main() {
                 ETH
               </Text>
               <Button
-                disabled={profit.unclaimedNftGameIds.length === 0}
+                disabled={
+                  profit.unclaimedNftGameIds.length === 0 ||
+                  profit.unclaimedNftDividends === '0.0000'
+                }
                 isLoading={claimNftLoading}
                 onClick={() => handleClaim(2)}
                 mt="8px"
