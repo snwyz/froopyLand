@@ -691,9 +691,8 @@ const Details = () => {
                     </Button>
                   </Flex>
                   <Text fontSize="14px" lineHeight="20px" mt="12px">
-                    {/* Mint Fee：Mint Fee： 0.001 ETH/KEY */}
                     <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
-                    Mint Fee：{detailInfos.state === 0 ? '--': parseFloat(ethers.utils.formatEther(detailInfos.keyPrice?.toString())).toFixed(4)} ETH/KEY | Total： 0.002 ETH
+                    Mint Fee：{detailInfos.state === 0 ? '--': parseFloat(ethers.utils.formatEther(detailInfos.keyPrice?.toString())).toFixed(4)} ETH/KEY | Total： {mintKey && detailInfos.keyPrice ? (parseFloat(ethers.utils.formatEther(detailInfos.keyPrice)) * parseInt(mintKey)).toFixed(4) : '--' } ETH
                     </span>
                   </Text>
                 </>
