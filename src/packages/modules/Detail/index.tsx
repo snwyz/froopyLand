@@ -41,12 +41,12 @@ const FL_CONTRACT_ADR = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR
 const Details = () => {
   const router = useRouter()
   
-  // const { pool: id } = router.query 
-  const id = 1
+  const { pool: id } = router.query 
+  // const id = 1
 
   const { address } = useStore()
-  const [claims, setClaims] = useState(0)
-  const [keys, setKeys] = useState(0)
+  const [claims, setClaims] = useState('0')
+  const [keys, setKeys] = useState('0')
   const [claimLoading, setClaimLoading] = useState(false)
   const [buyLoading, setBuyLoading] = useState(false)
   const [withDrawNFTLoading, setWithDrawNFTLoading] = useState(false)
@@ -179,6 +179,7 @@ const Details = () => {
         gasLimit: BigInt(500000)
       })
       await tx.wait()
+      init()
       toastSuccess('Withdraw success')
     } catch (error) {
       console.log(error, 'claim')
@@ -200,6 +201,7 @@ const Details = () => {
         gasLimit: BigInt(500000)
       })
       await tx.wait()
+      init()
       toastSuccess('Claim success')
     } catch (error) {
       console.log(error, 'claim')
@@ -220,9 +222,10 @@ const Details = () => {
         gasLimit: BigInt(500000)
       })
       await tx.wait()
-      toastSuccess('Claim success')
+      toastSuccess('You have successfully purchased the NFT.')
     } catch (error) {
-      console.log(error, 'claim')
+      toastError('You failed purchasing the NFT due to some error.')
+      console.log(error, 'retrieveNft')
     } finally {
       setRetrieveNftLoading(false)
     }
@@ -263,7 +266,7 @@ const Details = () => {
     const purchaseTimer = moment(detailInfos.endTimestamp * 1000).add(24, 'hours').format('YYYY-MM-DD HH:mm:ss')
     const { hours, minutes, seconds } = useCountDown(purchaseTimer, () => init())
     return (
-      <Flex fontSize="16px" color="#00DAB3">
+      <Flex fontSize="16px" color="#00DAB3" w="180px">
         <Text mr="4px">{hours || '0'}</Text>
         <Text mr="4px">Hrs</Text>
         <Text mr="4px">{minutes || '0'}</Text>
@@ -290,7 +293,9 @@ const Details = () => {
         <Text fontSize="20px">Back</Text>
       </Flex>
       {
-        detailInfos.state === State.Finished && detailInfos.lastPlayer.toLowerCase() === address && (
+        detailInfos.state === State.Finished 
+          && detailInfos.lastPlayer.toLowerCase() === address 
+          && (
           <Box
             m="0 auto;"
             borderRadius="20px 20px 0px 0px"
@@ -333,7 +338,7 @@ const Details = () => {
                   </Flex>
                   <Flex fontSize="14px" color="#fff" flex={1} mr="40px" align="center">
                     <Text fontSize="16px" color="#FFA8FE" mr="20px">NFT Price:</Text>
-                    <Text fontSize="16px">{detailInfos.totalKeyMinted.toNumber() * 1.1} $OMO Token</Text>
+                    <Text fontSize="16px">{(detailInfos.totalKeyMinted.toString() * 1.1).toFixed(4)} $OMO Token</Text>
                   </Flex>
                 </Flex>
 
@@ -346,6 +351,7 @@ const Details = () => {
                     isLoading={retrieveNftLoading}
                     onClick={retrieveNft}
                     fontWeight="700"
+                    disabled={detailInfos.mostKeyHolder === ethers.constants.AddressZero}
                     color="#000">
                     Purchase NFT
                   </Button>
@@ -395,7 +401,7 @@ const Details = () => {
               <Flex alignItems="center">
                 <Text className={styles.name}>NFT Address：</Text>
                 <Link fontWeight={600} color="#00DAB3">
-                  {detailInfos.nftAddress || '--'}
+                  {detailInfos.nftAddress === ethers.constants.AddressZero ? 'The Nft has sold' : detailInfos.nftAddress || '--'}
                 </Link>
               </Flex>
               <Flex alignItems="center">

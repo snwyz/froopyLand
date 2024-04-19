@@ -13,6 +13,7 @@ import { useRouter } from 'next/router'
 import { toastWarning } from '@utils/toast'
 import useStore from 'packages/store'
 import { getSysBrief } from 'packages/service/api'
+import { ethers } from 'ethers'
 // import BidderModal from '@modules/Market/Main/BidderModal'
 
 const BidderModal = lazy(() => import('@modules/Market/Main/BidderModal'))
@@ -205,21 +206,21 @@ export default function Main() {
                 <Flex gap="20px" mb="50px">
                   <Flex flexDir="column">
                     <Text color="#FFA8FE" fontSize="24px" lineHeight="36px">$OMO Price</Text>
-                    <Text color="#fff" fontWeight="700" fontSize="32px" lineHeight="48px">${sysInfo?.tokenPrice || '-'}</Text>
+                    <Text color="#fff" fontWeight="700" fontSize="32px" lineHeight="48px">${parseFloat(sysInfo?.tokenPrice).toFixed(4) || '-'}</Text>
                   </Flex>
                   <Flex flexDir="column">
                     <Text color="#FFA8FE" fontSize="24px" lineHeight="36px">Total Mint Fee</Text>
-                    <Flex align="center"><Image src='/static/common/eth-index.svg' alt='ethereum' w="19px" h="32px" mr="8px"></Image><Text fontSize="32px" lineHeight="48px">{sysInfo?.totalKeyMinted || '-'}</Text></Flex>
-                    <Text color="#fff" fontWeight="700" fontSize="20px" lineHeight="30px">${sysInfo?.totalMintFee || '-'}</Text>
+                    <Flex align="center"><Image src='/static/common/eth-index.svg' alt='ethereum' w="19px" h="32px" mr="8px"></Image><Text fontSize="32px" lineHeight="48px">{parseFloat(ethers.utils.formatEther(sysInfo?.totalKeyMinted)).toFixed(4) || '-'}</Text></Flex>
+                    <Text color="#fff" fontWeight="700" fontSize="20px" lineHeight="30px">${parseFloat(sysInfo?.totalMintFee).toFixed(4) || '-'}</Text>
                   </Flex>
                   <Flex flexDir="column">
                     <Text color="#FFA8FE" fontSize="24px" lineHeight="36px">Total Prize & Dividends</Text>
-                    <Flex align="center"><Image src='/static/common/eth-index.svg' alt='ethereum' w="19px" h="32px" mr="8px"></Image><Text fontSize="32px" lineHeight="48px">{sysInfo?.totalProfits || '-'}</Text></Flex>
-                    <Text color="#fff" fontWeight="700" fontSize="20px" lineHeight="30px">${sysInfo.totalPrize || '-'}</Text>
+                    <Flex align="center"><Image src='/static/common/eth-index.svg' alt='ethereum' w="19px" h="32px" mr="8px"></Image><Text fontSize="32px" lineHeight="48px">{ parseFloat(ethers.utils.formatEther(sysInfo?.totalProfits)).toFixed(4) || '-'}</Text></Flex>
+                    <Text color="#fff" fontWeight="700" fontSize="20px" lineHeight="30px">${parseFloat(sysInfo?.totalPrize).toFixed(4) || '-'}</Text>
                   </Flex>
                   <Flex flexDir="column">
                     <Text color="#FFA8FE" fontSize="24px" lineHeight="36px">Total NFTs Auctioned</Text>
-                    <Text color="#fff" fontWeight="700" fontSize="32px" lineHeight="48px">{sysInfo.totalGames || '-'}</Text>
+                    <Text color="#fff" fontWeight="700" fontSize="32px" lineHeight="48px">{parseFloat(sysInfo?.totalGames).toFixed(4) || '-'}</Text>
                   </Flex>
                 </Flex>
               )
