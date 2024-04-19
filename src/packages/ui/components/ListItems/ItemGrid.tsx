@@ -136,7 +136,7 @@ function ItemGrid({ item, gridName }: { item: any; gridName?: string }) {
             borderRadius="20px"
             bgColor="rgba(255, 255, 255, 0.5)">
             <Text fontSize="12px" color="#2A0668">
-              {item.biddersCount || '--'} Bidders
+              {item.biddersCount || '--'} Player
             </Text>
           </Flex>
         )}
@@ -166,7 +166,7 @@ function ItemGrid({ item, gridName }: { item: any; gridName?: string }) {
                 fontWeight={900}
                 fontSize={{ base: '14px', md: '14px' }}
                 color="#00DAB3">
-                {item.status === 0 ? '--' : item?.totalMintFee || '--'} ETH
+                {item.status === 0 ? '--' : parseFloat(item?.totalMintFee).toFixed(4) || '--'} ETH
               </Box>
             </Flex>
             <Flex flexDir="column">
@@ -184,7 +184,7 @@ function ItemGrid({ item, gridName }: { item: any; gridName?: string }) {
                 fontWeight={900}
                 fontSize={{ base: '14px', md: '14px' }}
                 color="#00DAB3">
-                {item.status === 0 ? '--' : ethers.utils.formatEther(item?.finalPrice) || '--'} ETH
+                {item.status === 0 ? '--' : parseFloat(ethers.utils.formatEther(item?.finalPrice)).toFixed(4) || '--'} ETH
               </Box>
             </Flex>
           </Flex>

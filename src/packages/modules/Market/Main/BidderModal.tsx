@@ -160,7 +160,7 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
                   {ellipseAddress(item.userAddress, 6)}
                 </Box>
               </Flex>
-              <Text align="left" flex={1} fontSize="16px" color="rgb(0, 0, 0)">{item.amount} $OMO Token</Text>
+              <Text align="left" flex={1} fontSize="16px" color="rgb(0, 0, 0)">{parseFloat(`${item.amount}`).toFixed(4)} $OMO Token</Text>
               {
                 item.userAddress === address && (<Text fontSize="14px" color="#7E4AF1" w="30px">ME</Text>)
               }

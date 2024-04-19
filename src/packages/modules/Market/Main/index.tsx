@@ -102,7 +102,7 @@ export default function Main() {
         ongoingList.length > 0 && (
           <Box>
             <Box padding='0 42px' marginTop="90px">
-              <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Ongoing Auctions</Text><Text >({ongoingList.length})</Text></Flex>
+              <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Ongoing NFT Auctions</Text><Text >({ongoingList.length})</Text></Flex>
               <Box h='1px' backgroundColor="rgba(112, 75, 234, 0.5)"></Box>
             </Box>
             <Box padding='0 42px'>
@@ -123,7 +123,7 @@ export default function Main() {
         upcomingList.length > 0 && (
           <>
             <Box padding='0 42px' marginTop="55px">
-              <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Upcoming Auctions</Text>({upcomingList.length}) - Queuing</Flex>
+              <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Upcoming NFT Auctions</Text>({upcomingList.length}) - Queuing</Flex>
               <Box h='1px' backgroundColor="rgba(112, 75, 234, 0.5)"></Box>
             </Box>
             <Box padding='0 42px'>
@@ -144,7 +144,7 @@ export default function Main() {
         finishedList.length > 0 && (
           <>
             <Box padding='0 42px' marginTop="55px">
-              <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Finished Auctions</Text>({finishedList.length})</Flex>
+              <Flex color="#00DAB3" fontSize='24px' height='40px' marginBottom="22px"><Text fontWeight={900} textShadow='0px 0px 10px rgba(0, 218, 179, 1)'>Finished NFT Auctions</Text>({finishedList.length})</Flex>
               <Box h='1px' backgroundColor="rgba(112, 75, 234, 0.5)"></Box>
             </Box>
             <Box padding='0 42px'>
@@ -210,7 +210,7 @@ export default function Main() {
                   </Flex>
                   <Flex flexDir="column">
                     <Text color="#FFA8FE" fontSize="24px" lineHeight="36px">Total Mint Fee</Text>
-                    <Flex align="center"><Image src='/static/common/eth-index.svg' alt='ethereum' w="19px" h="32px" mr="8px"></Image><Text fontSize="32px" lineHeight="48px">{parseFloat(ethers.utils.formatEther(sysInfo?.totalKeyMinted)).toFixed(4) || '-'}</Text></Flex>
+                    <Flex align="center"><Image src='/static/common/eth-index.svg' alt='ethereum' w="19px" h="32px" mr="8px"></Image><Text fontSize="32px" lineHeight="48px">{parseFloat(sysInfo?.totalKeyMinted).toFixed(4) || '-'}</Text></Flex>
                     <Text color="#fff" fontWeight="700" fontSize="20px" lineHeight="30px">${parseFloat(sysInfo?.totalMintFee).toFixed(4) || '-'}</Text>
                   </Flex>
                   <Flex flexDir="column">
@@ -278,13 +278,13 @@ export default function Main() {
                   p="20px 24px"
                   h="66px"
                   backgroundColor="rgba(112, 75, 234, 0.5);">
-                  <Text>Highest Bid： {auctionInfo?.highestBid || '--'} $OMO</Text>
+                  <Text>Highest Bid： {parseFloat(`${auctionInfo?.highestBid}`).toFixed(4) || '--'} $OMO</Text>
                   <Text
                     w="1px"
                     h="100%"
                     bg="rgba(255, 255, 255, 0.5)"
                     m="0 16px"></Text>
-                  <Text>{auctionInfo.biddersCount || '--'} Bidders</Text>
+                  <Text>{Number(auctionInfo.biddersCount) === 0 ? 0 : auctionInfo.biddersCount || '--'} Bidders</Text>
                   <Text
                     w="1px"
                     h="100%"
@@ -325,7 +325,7 @@ export default function Main() {
                       <Flex pos="relative" _hover={{ cursor: 'pointer' }}  onClick={() => router.push('/stakeNFT')}>
                         <Button zIndex="1" fontSize='22px' fontWeight='bold' w="240px" color='#000' h='66px' backgroundColor='#00DAB3'>Stake NFT</Button>
                         <Flex borderRadius="10px" alignItems="center" position="absolute" color="#fff" fontSize="16px" zIndex="0" left="210px" ml="20px" p="20px 24px" h='66px' backgroundColor='rgba(112, 75, 234, 0.5);'>
-                          <Text>Highest Bid： {auctionInfo.highestBid || '--'} $OMO</Text>
+                          <Text>Highest Bid： {parseFloat(`${auctionInfo?.highestBid}`).toFixed(4) || '--'} $OMO</Text>
                           <Text w="1px" h="100%" bg="rgba(255, 255, 255, 0.5)" m="0 16px"></Text>
                           <Text>{auctionInfo.biddersCount || '--'} Bidders</Text>
                           <Text w="1px" h="100%" bg="rgba(255, 255, 255, 0.5)" m="0 16px"></Text>
@@ -338,9 +338,9 @@ export default function Main() {
                         <Flex borderRadius="10px" alignItems="center"  color="#fff" fontSize="16px" zIndex="0" p="20px 24px" h='66px' backgroundColor='rgba(112, 75, 234, 0.5);'>
                           <Text fontWeight="700" fontSize="18px" color="#9A7CFF">Bidding Closed</Text>
                           <Text w="1px" h="100%" bg="rgba(255, 255, 255, 0.5)" m="0 16px"></Text>
-                          <Text>Highest Bid：- - $OMO</Text>
+                          <Text>Highest Bid： {parseFloat(`${auctionInfo?.highestBid}`).toFixed(4) || '--'} $OMO</Text>
                           <Text w="1px" h="100%" bg="rgba(255, 255, 255, 0.5)" m="0 16px"></Text>
-                          <Text>0 Bidders</Text>
+                          <Text>{auctionInfo.biddersCount || '--'} Bidders</Text>
                           <Text w="1px" h="100%" bg="rgba(255, 255, 255, 0.5)" m="0 16px"></Text>
                           <Text color="rgba(255, 255, 255, 0.5)">Close on {moment(auctionInfo.startTimestamp).add(8, 'hours').format('MMMM DD, ha')}</Text>
                           {/* <Image src='./static/market/start.svg' alt='start' w="28px" h="28px" ml="30px"></Image> */}
