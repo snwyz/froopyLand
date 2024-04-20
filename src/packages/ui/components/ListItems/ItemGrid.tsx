@@ -166,7 +166,10 @@ function ItemGrid({ item, gridName }: { item: any; gridName?: string }) {
                 fontWeight={900}
                 fontSize={{ base: '14px', md: '14px' }}
                 color="#00DAB3">
-                {item.status === 0 ? '--' : parseFloat(item?.totalMintFee).toFixed(4) || '--'} ETH
+                {item.status === 0
+                  ? '--'
+                  : parseFloat(item?.totalMintFee).toFixed(4) || '--'}{' '}
+                ETH
               </Box>
             </Flex>
             <Flex flexDir="column">
@@ -184,7 +187,12 @@ function ItemGrid({ item, gridName }: { item: any; gridName?: string }) {
                 fontWeight={900}
                 fontSize={{ base: '14px', md: '14px' }}
                 color="#00DAB3">
-                {item.status === 0 ? '--' : parseFloat(ethers.utils.formatEther(item?.finalPrice)).toFixed(4) || '--'} ETH
+                {item.status === 0
+                  ? '--'
+                  : parseFloat(
+                      ethers.utils.formatEther(item?.finalPrice),
+                    ).toFixed(4) || '--'}{' '}
+                ETH
               </Box>
             </Flex>
           </Flex>
@@ -437,7 +445,7 @@ function ItemGrid({ item, gridName }: { item: any; gridName?: string }) {
           borderRadius="20px"
           bgColor="rgba(255, 255, 255, 0.5)">
           <Text fontSize="12px" color="#2A0668">
-            {item.biddersCount !== null ? item.biddersCount : '--'} Bidders
+            {item.biddersCount !== null ? item.biddersCount : '--'} Players
           </Text>
         </Flex>
       )}
@@ -463,6 +471,7 @@ function ItemGrid({ item, gridName }: { item: any; gridName?: string }) {
             </Box>
             <Box
               w={{ lg: '100%' }}
+              textAlign="left"
               lineHeight="20px"
               fontWeight={900}
               fontSize={{ base: '14px', md: '14px' }}
@@ -481,6 +490,7 @@ function ItemGrid({ item, gridName }: { item: any; gridName?: string }) {
             </Box>
             <Box
               w={{ lg: '100%' }}
+              textAlign="left"
               lineHeight="20px"
               fontWeight={900}
               fontSize={{ base: '14px', md: '14px' }}
