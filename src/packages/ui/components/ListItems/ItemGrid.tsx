@@ -190,7 +190,7 @@ function ItemGrid({ item, gridName }: { item: any; gridName?: string }) {
                 {item.status === 0
                   ? '--'
                   : parseFloat(
-                      ethers.utils.formatEther(item?.finalPrice),
+                      ethers.formatEther(item?.finalPrice),
                     ).toFixed(4) || '--'}{' '}
                 ETH
               </Box>

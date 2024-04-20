@@ -22,7 +22,6 @@ import {
   generateTimeString,
   sleep,
 } from 'packages/utils'
-import Web3Modal, { IProviderOptions } from 'web3modal'
 
 import { NftDeployInfoType } from '@ts'
 
@@ -31,6 +30,8 @@ import { NFT } from './type'
 const INFURA_KEY = process.env.NEXT_PUBLIC_INFURA_KEY
 
 const network = isProd ? Network.ETH_MAINNET : Network.ETH_GOERLI
+
+const signer = null
 
 const settings = {
   apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY, // Replace with your Alchemy API Key.
@@ -46,43 +47,15 @@ const alchemy = initializeAlchemy(settings)
 
 export const hexToDecimal = (hex) => parseInt(hex, 16)
 
-export const providerOptions: Partial<IProviderOptions> = {
-  injected: {
-    display: {
-      logo: 'https://metamask.io/img/metamask-fox.svg',
-      name: 'MetaMask',
-    },
-    package: 'metamask',
-  },
-  // walletconnect: {
-  //   package: WalletConnectProvider, // required
-  //   options: {
-  //     infuraId: INFURA_KEY, // required
-  //   },
-  // },
-  // 'custom-walletlink': {
-  //   display: {
-  //     logo: 'https://play-lh.googleusercontent.com/PjoJoG27miSglVBXoXrxBSLveV6e3EeBPpNY55aiUUBM9Q1RCETKCOqdOkX2ZydqVf0',
-  //     name: 'Coinbase',
-  //     description: 'Connect to Coinbase Wallet (not Coinbase App)',
-  //   },
-  //   options: {
-  //     appName: 'Coinbase', // Your app name
-  //     networkUrl: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
-  //     chainId: 1,
-  //   },
-  //   package: WalletLink,
-  //   connector: async (_: any, options: any) => {
-  //     const { appName, networkUrl, chainId } = options
-  //     const walletLink = new WalletLink({
-  //       appName,
-  //     })
-  //     const provider = walletLink.makeWeb3Provider(networkUrl, chainId)
-  //     await provider.enable()
-  //     return provider
-  //   },
-  // },
-}
+// export const providerOptions: Partial<IProviderOptions> = {
+//   injected: {
+//     display: {
+//       logo: 'https://metamask.io/img/metamask-fox.svg',
+//       name: 'MetaMask',
+//     },
+//     package: 'metamask',
+//   },
+// }
 // Factory contract
 export const getFactoryContract = () => {
   return new web3.eth.Contract(
@@ -103,13 +76,6 @@ export const getPoolContract = (PoolContractAddress: string) => {
 
 // Create new public pool
 export async function createPublicPoolFunc(contractAddress: string) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const contract = new ethers.Contract(
     String(process.env.NEXT_PUBLIC_FACTORY_ADDRESS),
     FactoryContractABI,
@@ -121,13 +87,6 @@ export async function createPublicPoolFunc(contractAddress: string) {
 }
 
 export async function mintFreeLicenseFunc(poolContractAddress: string) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const contract = new ethers.Contract(
     poolContractAddress,
     PoolContractABI,
@@ -159,15 +118,6 @@ export async function getLicenseOwnerListFunc(poolContractAddress: string) {
 export async function checkApprovalFunc(
   contractAddress: string = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR,
 ) {
-  console.log(process.env.NEXT_PUBLIC_FLT_CONTRACT_ADR)
-
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions,
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const address = await signer.getAddress()
   const contract = new ethers.Contract(
     process.env.NEXT_PUBLIC_FLT_CONTRACT_ADR,
@@ -188,20 +138,13 @@ export async function checkApprovalFunc(
  * @return {*}
  */
 export async function approveBidTokenFunc(contractAddress: string = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions,
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const address = await signer.getAddress()
   const contract = new ethers.Contract(
     process.env.NEXT_PUBLIC_FLT_CONTRACT_ADR,
     ERC20ABI,
     signer,
   )
-  const transaction = await contract.approve(contractAddress, ethers.constants.MaxUint256)
+  const transaction = await contract.approve(contractAddress, ethers.MaxUint256)
   await transaction.wait()
   const allowance = await contract.allowance(address, contractAddress)
   if (allowance.gt(0)) {
@@ -216,13 +159,6 @@ export async function approveBidTokenFunc(contractAddress: string = process.env.
  * @return {*}
  */
 export async function getBalanceOfFunc() {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions,
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const address = await signer.getAddress()
   const contract = new ethers.Contract(
     process.env.NEXT_PUBLIC_FLT_CONTRACT_ADR,
@@ -240,19 +176,12 @@ export async function getBalanceOfFunc() {
  * @return {*}
  */
 export async function withdrawBidTokenFunc(amount: number, contractAddress: string = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const flContract = new ethers.Contract(
     contractAddress,
     fl419ABI,
     signer,
   )
-  const transaction = await flContract.withdrawBidToken(ethers.utils.parseEther(String(amount)))
+  const transaction = await flContract.withdrawBidToken(ethers.parseEther(String(amount)))
   return await transaction.wait()
 }
 
@@ -263,19 +192,12 @@ export async function withdrawBidTokenFunc(amount: number, contractAddress: stri
  * @return {*}
  */
 export async function depositBidTokenFunc(amount: number, contractAddress: string = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const contract = new ethers.Contract(
     contractAddress,
     fl419ABI,
     signer,
   )
-  const transaction = await contract.depositBidToken(ethers.utils.parseEther(String(amount)))
+  const transaction = await contract.depositBidToken(ethers.parseEther(String(amount)))
   return await transaction.wait()
 }
 
@@ -286,13 +208,6 @@ export async function depositBidTokenFunc(amount: number, contractAddress: strin
  * @return {*}
  */
 export async function convertKeyToToken(gameIds: number[]) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const address = await signer.getAddress()
   const contract = new ethers.Contract(
     process.env.NEXT_PUBLIC_FL_CONTRACT_ADR,
@@ -309,13 +224,6 @@ export async function convertKeyToToken(gameIds: number[]) {
  * @return {*}
  */
 export async function claimBonusFunc(gameIds: number[]) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const address = await signer.getAddress()
   const contract = new ethers.Contract(
     process.env.NEXT_PUBLIC_FL_CONTRACT_ADR,
@@ -332,13 +240,6 @@ export async function claimBonusFunc(gameIds: number[]) {
  * @return {*}
  */
 export async function withdrawLastplayerPrizeFunc(gameIds: number[]) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const address = await signer.getAddress()
   const contract = new ethers.Contract(
     process.env.NEXT_PUBLIC_FL_CONTRACT_ADR,
@@ -355,13 +256,6 @@ export async function withdrawLastplayerPrizeFunc(gameIds: number[]) {
  * @return {*}
  */
 export async function withdrawSaleRevenueFunc(gameIds: number[]) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const address = await signer.getAddress()
   const contract = new ethers.Contract(
     process.env.NEXT_PUBLIC_FL_CONTRACT_ADR,
@@ -373,20 +267,13 @@ export async function withdrawSaleRevenueFunc(gameIds: number[]) {
 }
 
 export async function depositFunc(poolContractAddress: string, amount: number) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const contract = new ethers.Contract(
     poolContractAddress,
     PoolContractABI,
     signer,
   )
   const transaction = await contract.deposit({
-    value: ethers.utils.parseEther(String(amount)),
+    value: ethers.parseEther(String(amount)),
   })
   return await transaction.wait()
 }
@@ -414,13 +301,6 @@ export async function getAllOwnedNFTsFunc(address: any) {
 }
 
 export async function stakeFunc(poolContractAddress: string, tokenId: string) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions,
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const contract = new ethers.Contract(
     poolContractAddress,
     PoolContractABI,
@@ -434,13 +314,6 @@ export async function unstakeFunc(
   poolContractAddress: string,
   tokenId: string,
 ) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions,
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const contract = new ethers.Contract(
     poolContractAddress,
     PoolContractABI,
@@ -454,13 +327,6 @@ export async function approveFunc(
   poolContractAddress: string,
   originalNFTContract: string,
 ) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions,
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const contract = new ethers.Contract(
     originalNFTContract,
     GeneralNFTContractABI,
@@ -492,19 +358,12 @@ export async function withdrawFunc(
   poolContractAddress: string,
   amount: number,
 ) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const contract = new ethers.Contract(
     poolContractAddress,
     PoolContractABI,
     signer,
   )
-  const transaction = await contract.withdraw(ethers.utils.parseEther(String(amount)))
+  const transaction = await contract.withdraw(ethers.parseEther(String(amount)))
   return await transaction.wait()
 }
 
@@ -565,13 +424,6 @@ export async function getOffersFromBidderFunc(
 }
 
 export async function acceptOfferFunc(poolContractAddress: string) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const contract = new ethers.Contract(
     poolContractAddress,
     PoolContractABI,
@@ -585,13 +437,6 @@ export async function cancelOfferFunc(
   poolContractAddress: string,
   offerId: string,
 ) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const contract = new ethers.Contract(
     poolContractAddress,
     PoolContractABI,
@@ -623,13 +468,6 @@ export async function upgradeFunc(
   poolContractAddress: string,
   tokenID: string,
 ) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const contract = new ethers.Contract(
     poolContractAddress,
     PoolContractABI,
@@ -671,19 +509,12 @@ export async function makeOfferFunc(
   poolContractAddress: string,
   amount: string,
 ) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const contract = new ethers.Contract(
     poolContractAddress,
     PoolContractABI,
     signer,
   )
-  const transaction = await contract.makeOffer({ value: ethers.utils.parseEther(amount) })
+  const transaction = await contract.makeOffer({ value: ethers.parseEther(amount) })
   return await transaction.wait()
 }
 
@@ -707,14 +538,14 @@ export async function getNFTCollectionMetadata(NFTCollectionAddress: string) {
   }
 }
 
-export let web3Modal: any
-if (typeof window !== 'undefined') {
-  web3Modal = new Web3Modal({
-    network: 'mainnet', // optional
-    cacheProvider: true,
-    providerOptions, // required
-  })
-}
+// export let web3Modal: any
+// if (typeof window !== 'undefined') {
+//   web3Modal = new Web3Modal({
+//     network: 'mainnet', // optional
+//     cacheProvider: true,
+//     providerOptions, // required
+//   })
+// }
 
 type StateType = {
   provider?: any
@@ -1109,13 +940,6 @@ export async function getMintType(
   mintType: number,
 ) {
   try {
-    const web3Modal = new Web3Modal({
-      cacheProvider: true,
-      providerOptions, // required
-    })
-    const provider = await web3Modal.connect()
-    const library = new ethers.providers.Web3Provider(provider)
-    const signer = library.getSigner()
     const contract = new ethers.Contract(
       poolContractAddress,
       PoolContractABI,
@@ -1254,13 +1078,6 @@ export async function approve(
   originalNFTContract: string,
   poolContractAddress: string,
 ) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const contract = new ethers.Contract(
     originalNFTContract,
     OriginNFT.abi,
@@ -1276,13 +1093,6 @@ export async function approve(
 }
 
 export async function unstake(poolContractAddress: string) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const contract = new ethers.Contract(
     poolContractAddress,
     PoolContractABI,
@@ -1304,20 +1114,13 @@ export async function addMintType(
   mediaUri: string,
   enableSale: boolean,
 ) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const contract = new ethers.Contract(
     poolContractAddress,
     PoolContractABI,
     signer,
   )
 
-  price = Web3.utils.toWei(price.toString())
+  price = Web3.toWei(price.toString())
   const transaction = await contract.addMintType(
     totalLicenses,
     price,
@@ -1338,13 +1141,6 @@ export async function addMintType(
 }
 
 export async function stake(poolContractAddress: string) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const contract = new ethers.Contract(
     poolContractAddress,
     PoolContractABI,
@@ -1459,13 +1255,6 @@ export async function oldGetALlNFTAndLicense() {
 // }
 
 export async function enableSale(poolContractAddress: string, id: number) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const contract = new ethers.Contract(
     poolContractAddress,
     PoolContractABI,
@@ -1477,13 +1266,6 @@ export async function enableSale(poolContractAddress: string, id: number) {
 }
 
 export async function disableSale(poolContractAddress: string, id: number) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const contract = new ethers.Contract(
     poolContractAddress,
     PoolContractABI,
@@ -1501,13 +1283,6 @@ export async function modify(
   mediaUri: string,
   id: number,
 ) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const contract = new ethers.Contract(
     poolContractAddress,
     PoolContractABI,
@@ -1527,13 +1302,6 @@ export async function modify(
 }
 
 export async function collect(poolContractAddress: string, tokenId: number) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const contract = new ethers.Contract(
     poolContractAddress,
     PoolContractABI,
@@ -1548,13 +1316,6 @@ export async function collect(poolContractAddress: string, tokenId: number) {
 }
 
 export async function collectAll(poolContractAddress: string) {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions, // required
-  })
-  const provider = await web3Modal.connect()
-  const library = new ethers.providers.Web3Provider(provider)
-  const signer = library.getSigner()
   const contract = new ethers.Contract(
     poolContractAddress,
     PoolContractABI,
@@ -1824,13 +1585,6 @@ export async function getNFTOwnerV1(
 
 export async function checkIsOwner(poolContractAddress: string) {
   try {
-    const web3Modal = new Web3Modal({
-      cacheProvider: true,
-      providerOptions, // required
-    })
-    const provider = await web3Modal.connect()
-    const library = new ethers.providers.Web3Provider(provider)
-    const signer = library.getSigner()
     const owner = await signer.getAddress()
     const lowercaseOwner = owner.toLowerCase()
 

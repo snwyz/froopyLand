@@ -1,5 +1,4 @@
-import { FC, memo } from 'react'
-import { useCallback, useEffect, useReducer } from 'react'
+import { FC, memo, useEffect, useReducer } from 'react'
 
 import { useRouter } from 'next/router'
 
@@ -33,12 +32,18 @@ import {
   useMediaQuery,
   useToast,
 } from '@chakra-ui/react'
-import { providers } from 'ethers'
+// import { providers } from 'ethers'
 import { getChainData } from 'packages/lib/utilities'
 import useStore from 'packages/store'
-import { initialState, reducer, web3Modal } from 'packages/web3'
+import { initialState, reducer } from 'packages/web3'
 
 import { ellipseAddress } from '@utils'
+import {
+  useDisconnect,
+  useWeb3Modal,
+  useWeb3ModalAccount,
+  useWeb3ModalProvider,
+} from '@web3modal/ethers/react'
 
 // TODO 生产
 const NETWORK = 'sepolia_test'
@@ -149,62 +154,66 @@ const Header: FC = () => {
   const { isOpen, onToggle } = useDisclosure()
   const router = useRouter()
   const { pathname } = router
+  const { open } = useWeb3Modal()
+  const { walletProvider } = useWeb3ModalProvider()
+  const { address, chainId, isConnected } = useWeb3ModalAccount()
+  const { disconnect } = useDisconnect()
 
   const toast = useToast()
 
   const [state, dispatch] = useReducer(reducer, initialState)
-  const { provider, web3Provider, address, chainId } = state
+  // const { provider, web3Provider, address, chainId } = state
 
-  const connect = useCallback(
-    async function () {
-      let provider = null
-      try {
-        provider = await web3Modal.connect()
-        const web3Provider = new providers.Web3Provider(provider)
+  // const connect = useCallback(
+  //   async function () {
+  //     let provider = null
+  //     try {
+  //       provider = await web3Modal.connect()
+  //       const web3Provider = new BrowserProvider(walletProvider)
 
-        const signer = web3Provider.getSigner()
-        const address = await signer.getAddress()
+  //       // const signer = web3Provider.getSigner()
+  //       // const address = await signer.getAddress()
 
-        setAddress(address.toLowerCase())
-        window.localStorage.setItem('isConnect', 'true')
-        const network = await web3Provider.getNetwork()
+  //       setAddress(address.toLowerCase())
+  //       window.localStorage.setItem('isConnect', 'true')
+  //       const network = await web3Provider.getNetwork()
 
-        dispatch({
-          type: 'SET_WEB3_PROVIDER',
-          provider,
-          web3Provider,
-          address,
-          chainId: network.chainId,
-        })
-      } catch (error) {
-        console.log(error)
-      }
-    },
-    [setAddress],
-  )
+  //       dispatch({
+  //         type: 'SET_WEB3_PROVIDER',
+  //         provider,
+  //         web3Provider,
+  //         address,
+  //         chainId: Number(network.chainId),
+  //       })
+  //     } catch (error) {
+  //       console.log(error)
+  //     }
+  //   },
+  //   [setAddress],
+  // )
 
-  const disconnect = useCallback(
-    async function () {
-      await web3Modal.clearCachedProvider()
-      if (provider?.disconnect && typeof provider.disconnect === 'function') {
-        await provider.disconnect()
-      }
-      setAddress('')
-      window.localStorage.setItem('isConnect', 'false')
-      dispatch({
-        type: 'RESET_WEB3_PROVIDER',
-      })
-      window.location.reload()
-    },
-    [provider, setAddress],
-  )
+  // const disconnect = useCallback(
+  //   async function () {
+  //     await web3Modal.clearCachedProvider()
+  //     if (provider?.disconnect && typeof provider.disconnect === 'function') {
+  //       await provider.disconnect()
+  //     }
+  //     setAddress('')
+  //     window.localStorage.setItem('isConnect', 'false')
+  //     dispatch({
+  //       type: 'RESET_WEB3_PROVIDER',
+  //     })
+  //     window.location.reload()
+  //   },
+  //   [provider, setAddress],
+  // )
 
   // Auto connect to the cached provider
-  useEffect(() => {
-    if (web3Modal.cachedProvider) {
-      connect()
-    }
-  }, [connect])
+  // useEffect(() => {
+  //   if (web3Modal.cachedProvider) {
+  //     connect()
+  //   }
+  // }, [connect])
 
   useEffect(() => {
     const isConnect = window.localStorage.getItem('isConnect')
@@ -217,39 +226,39 @@ const Header: FC = () => {
   // A `provider` should come with EIP-1193 events. We'll listen for those events
   // here so that when a user switches accounts or networks, we can update the
   // local React state with that new information.
-  useEffect(() => {
-    if (provider?.on) {
-      const handleAccountsChanged = (accounts: string[]) => {
-        dispatch({
-          type: 'SET_ADDRESS',
-          address: accounts[0],
-        })
-        window.location.reload()
-      }
+  // useEffect(() => {
+  //   if (provider?.on) {
+  //     const handleAccountsChanged = (accounts: string[]) => {
+  //       dispatch({
+  //         type: 'SET_ADDRESS',
+  //         address: accounts[0],
+  //       })
+  //       window.location.reload()
+  //     }
 
-      // https://docs.ethers.io/v5/concepts/best-practices/#best-practices--network-changes
-      const handleChainChanged = (_hexChainId: string) => {
-        window.location.reload()
-      }
+  //     // https://docs.ethers.io/v5/concepts/best-practices/#best-practices--network-changes
+  //     const handleChainChanged = (_hexChainId: string) => {
+  //       window.location.reload()
+  //     }
 
-      const handleDisconnect = (error: { code: number; message: string }) => {
-        disconnect()
-      }
+  //     const handleDisconnect = (error: { code: number; message: string }) => {
+  //       disconnect()
+  //     }
 
-      provider.on('accountsChanged', handleAccountsChanged)
-      provider.on('chainChanged', handleChainChanged)
-      provider.on('disconnect', handleDisconnect)
+  //     provider.on('accountsChanged', handleAccountsChanged)
+  //     provider.on('chainChanged', handleChainChanged)
+  //     provider.on('disconnect', handleDisconnect)
 
-      // Subscription Cleanup
-      return () => {
-        if (provider.removeListener) {
-          provider.removeListener('accountsChanged', handleAccountsChanged)
-          provider.removeListener('chainChanged', handleChainChanged)
-          provider.removeListener('disconnect', handleDisconnect)
-        }
-      }
-    }
-  }, [provider, disconnect, address])
+  //     // Subscription Cleanup
+  //     return () => {
+  //       if (provider.removeListener) {
+  //         provider.removeListener('accountsChanged', handleAccountsChanged)
+  //         provider.removeListener('chainChanged', handleChainChanged)
+  //         provider.removeListener('disconnect', handleDisconnect)
+  //       }
+  //     }
+  //   }
+  // }, [provider, disconnect, address])
 
   useEffect(() => {
     try {
@@ -312,13 +321,13 @@ const Header: FC = () => {
           </Flex>
 
           <Box display={{ base: 'none', lg: 'flex' }}>
-            {!web3Provider && isLargerThan960 ? (
+            {!address && isLargerThan960 ? (
               <Button
                 fontSize="14px"
                 border="1px solid white"
                 bg={bgWallet}
                 fontWeight={400}
-                onClick={connect}
+                onClick={() => open()}
                 borderRadius="full"
                 className="connect-wallet-btn">
                 Connect Wallet
@@ -376,7 +385,7 @@ const Header: FC = () => {
           ) : (
             <SunIcon cursor="pointer" onClick={toggleColorMode} />
           )} */}
-          {!web3Provider && !isLargerThan960 ? (
+          {!address && !isLargerThan960 ? (
             <Flex
               display={{ base: 'flex', lg: 'none' }}
               bgColor="white"
@@ -403,7 +412,7 @@ const Header: FC = () => {
                   />
                 </MenuButton>
                 <MenuList borderRadius="8px">
-                  <MenuItem onClick={connect}>Connect Wallet</MenuItem>
+                  <MenuItem onClick={() => open()}>Connect Wallet</MenuItem>
                 </MenuList>
               </Menu>
             </Flex>

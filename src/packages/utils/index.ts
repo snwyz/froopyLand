@@ -6,7 +6,7 @@ import { BigNumber, BigNumberish } from "@ethersproject/bignumber"
 import { formatFixed, parseFixed } from "@ethersproject/bignumber"
 
 import { ErrorMetamask } from '@ts'
-import { logger } from 'ethers/lib/ethers'
+// import { logger } from 'ethers/lib/ethers'
 
 const names = [
   "wei",
@@ -147,7 +147,9 @@ export function formatUnits(value: BigNumberish, unitName?: string | BigNumberis
 
 export function parseUnits(value: string, unitName?: BigNumberish): BigNumber {
   if (typeof(value) !== "string") {
-      logger.throwArgumentError("value must be a string", "value", value)
+      // logger.throwArgumentError("value must be a string", "value", value)
+      console.log("value must be a string", "value", value);
+
   }
   if (typeof(unitName) === "string") {
       const index = names.indexOf(unitName)
@@ -167,7 +169,7 @@ export function parseEther(ether: string): BigNumber {
 
 export function formatNumberWithCommas(num: number): string {
   if (!num) return '0'
-  
+
   if (typeof num === 'string') {
     num =  parseFloat(num)
   }

@@ -5,7 +5,7 @@ import { ChakraProvider } from '@chakra-ui/react'
 
 import customTheme from '@styles/customTheme'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-
+import { Web3ModalProvider } from '../src/packages/web3/Web3Modal'
 
 import { isProd } from 'packages/constants'
 
@@ -34,12 +34,14 @@ const App = ({ Component, pageProps }: any) => {
 
   return (
     <ChakraProvider theme={customTheme}>
-        <DefaultLayout>
-          <QueryClientProvider client={queryClient}>
+      <DefaultLayout>
+        <QueryClientProvider client={queryClient}>
+          <Web3ModalProvider>
             <Component {...pageProps} />
-          </QueryClientProvider>
-        </DefaultLayout>
-        <ToastContainer autoClose={3000} theme="colored" />
+          </Web3ModalProvider>
+        </QueryClientProvider>
+      </DefaultLayout>
+      <ToastContainer autoClose={3000} theme="colored" />
     </ChakraProvider>
   )
 }
