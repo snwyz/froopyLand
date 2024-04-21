@@ -160,7 +160,10 @@ const Register = () => {
                 borderColor="#704BEA"
                 h="52px">
                 {nftList.map((nft) => (
-                  <option key={nft.nftAddress} value={JSON.stringify(nft)}>
+                  <option
+                    disabled={nft.status === 1}
+                    key={nft.nftAddress}
+                    value={JSON.stringify(nft)}>
                     {nft.name ? nft.name : nft.tokenId}&nbsp;&nbsp; (
                     {nft.status === 1
                       ? 'In Use'
