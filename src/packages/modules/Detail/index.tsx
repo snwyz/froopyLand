@@ -1,31 +1,31 @@
-import styles from './index.module.scss'
+import { ArrowBackIcon } from '@chakra-ui/icons'
 import {
   Box,
-  Image,
-  List,
-  Link,
-  Heading,
-  Flex,
-  Text,
-  Progress,
   Button,
+  Flex,
   Grid,
-  Input
+  Heading,
+  Image,
+  Input,
+  Link,
+  List,
+  Progress,
+  Text,
 } from '@chakra-ui/react'
-import { ArrowBackIcon } from '@chakra-ui/icons'
-import useCountDown from '@hooks/useCountDown'
-import { web3Modal } from 'packages/web3'
-import { ethers } from 'ethers'
-import { useRouter } from 'next/router'
-import moment from 'moment'
-import { memo, useEffect, useMemo, useState } from 'react'
-import FroopyABI from 'packages/abis/demo/fl417.json'
-import { toastError, toastSuccess } from '@utils/toast'
-import useStore from 'packages/store'
-import { ellipseAddress } from '@utils'
 import { faker } from '@faker-js/faker'
-import PurchaseNFTModal from './PurchaseNFTModal'
+import useCountDown from '@hooks/useCountDown'
+import { ellipseAddress } from '@utils'
+import { toastError, toastSuccess } from '@utils/toast'
+import { ethers } from 'ethers'
+import moment from 'moment'
+import { useRouter } from 'next/router'
+import FroopyABI from 'packages/abis/demo/fl417.json'
 import { getGameDetailById } from 'packages/service/api'
+import useStore from 'packages/store'
+import { web3Modal } from 'packages/web3'
+import { memo, useEffect, useMemo, useState } from 'react'
+import PurchaseNFTModal from './PurchaseNFTModal'
+import styles from './index.module.scss'
 
 export enum State {
   Upcoming = 0,
@@ -37,11 +37,10 @@ const COUNT = faker.number.int({ min: 101, max: 1000 })
 
 const FL_CONTRACT_ADR = process.env.NEXT_PUBLIC_FL_CONTRACT_ADR
 
-
 const Details = () => {
   const router = useRouter()
-  
-  const { pool: id } = router.query 
+
+  const { pool: id } = router.query
   // const id = 1
 
   const { address } = useStore()
@@ -74,7 +73,6 @@ const Details = () => {
     setKeyDividends(keyDividends)
   }
 
-
   // 获取详细信息 - sol
   const getGameInfoOfGameIds = async () => {
     const provider = await web3Modal.connect()
@@ -82,20 +80,22 @@ const Details = () => {
     const signer = library.getSigner()
     const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
     const [data] = await contract.getGameInfoOfGameIds([id])
-    console.log(data, 'data')
     setDetailInfos(data)
   }
 
- // 获取 claims 信息以及 mykey sol
-  const fetchGameState = async () => { 
+  // 获取 claims 信息以及 mykey sol
+  const fetchGameState = async () => {
     const provider = await web3Modal.connect()
     const library = new ethers.providers.Web3Provider(provider)
     const signer = library.getSigner()
     const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
     const address = await signer.getAddress()
     try {
-      const data  = await contract.getPlayerStateOfGameIds(address, [id])
+      const data = await contract.getPlayerStateOfGameIds(address, [id])
       setClaims(data.unclaimBonusList.toString())
+      if (data.keyAmountList && data.keyAmountList.toString().length >= 18) {
+        data.keyAmountList = 0
+      }
       setKeys(data.keyAmountList.toString())
     } catch (error) {
       console.log(error, '<=-===fetchGameState')
@@ -103,17 +103,27 @@ const Details = () => {
   }
 
   const memoPercent = useMemo(() => {
-    if (!detailInfos?.totalKeyMinted || keys === 0) return 0
-    const percentage = (keys / detailInfos.totalKeyMinted.toNumber()) * 100
-    const formattedPercent = Number(percentage.toFixed(2)).toString().replace(/(\.\d*?[1-9])0+$|\.0*$/, '$1')
+    if (!detailInfos?.totalKeyMinted || Number(keys) === 0) return 0
+    const percentage =
+      (Number(keys) / detailInfos.totalKeyMinted.toNumber()) * 100
+    const formattedPercent = Number(percentage.toFixed(2))
+      .toString()
+      .replace(/(\.\d*?[1-9])0+$|\.0*$/, '$1')
     return formattedPercent
   }, [detailInfos, keys])
 
   const buyKey = async () => {
-    if (!/^[0-9]+$/.test(mintKey)) return toastError('Integer value is required.')
+    if (!/^[0-9]+$/.test(mintKey))
+      return toastError('Integer value is required.')
 
-    if (Number(mintKey) > Math.ceil(detailInfos.totalKeyMinted.toNumber() / 10)) {
-      toastError(`Input numbers must be less than ${Math.ceil(detailInfos.totalKeyMinted.toNumber() / 10)} keys`)
+    if (
+      Number(mintKey) > Math.ceil(detailInfos.totalKeyMinted.toNumber() / 10)
+    ) {
+      toastError(
+        `Input numbers must be less than ${Math.ceil(
+          detailInfos.totalKeyMinted.toNumber() / 10,
+        )} keys`,
+      )
       return
     }
 
@@ -124,39 +134,40 @@ const Details = () => {
 
     try {
       setBuyLoading(true)
-      const eth = parseFloat(ethers.utils.formatEther(detailInfos.keyPrice)) * parseInt(mintKey)
+      const eth =
+        parseFloat(ethers.utils.formatEther(detailInfos.keyPrice)) *
+        parseInt(mintKey)
       const tx = await contract.purchaseKeyOfGameId(id, {
         value: ethers.utils.parseUnits(`${eth}`, 'ether'),
-        gasLimit: BigInt(500000)
+        gasLimit: BigInt(500000),
       })
 
-
       const receipt = await tx.wait()
-      const events = receipt.logs.map(log => contract.interface.parseLog(log))
-      const errorEvent = events.find(event => event.name === 'ErrorEvent')
+      const events = receipt.logs.map((log) => contract.interface.parseLog(log))
+      const errorEvent = events.find((event) => event.name === 'ErrorEvent')
 
       console.log('Error:', errorEvent)
       init()
       // await setGameList(library)
-      toastSuccess('Mint key success')
+      toastSuccess('You have successfully minted keys.')
     } catch (error) {
       console.log(error, 'buyKey')
+      toastError('You failed to mint keys due to some error.')
     } finally {
       setBuyLoading(false)
     }
   }
 
   const claim = async () => {
-
     const provider = await web3Modal.connect()
     const library = new ethers.providers.Web3Provider(provider)
     const signer = library.getSigner()
     const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
     const address = await signer.getAddress()
-    setClaimLoading(true)    
+    setClaimLoading(true)
     try {
       const tx = await contract.claimBonus([id], address, {
-        gasLimit: BigInt(500000)
+        gasLimit: BigInt(500000),
       })
       await tx.wait()
       toastSuccess('Claim success')
@@ -176,7 +187,7 @@ const Details = () => {
     setWithDrawNFTLoading(true)
     try {
       const tx = await contract.withdrawSaleRevenue([id], {
-        gasLimit: BigInt(500000)
+        gasLimit: BigInt(500000),
       })
       await tx.wait()
       init()
@@ -189,21 +200,21 @@ const Details = () => {
   }
 
   const claimsFinalPrize = async () => {
-
     const provider = await web3Modal.connect()
     const library = new ethers.providers.Web3Provider(provider)
     const signer = library.getSigner()
     const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
     setClaimsFinalLoading(true)
-    
+
     try {
       const tx = await contract.withdrawLastplayerPrize([id], {
-        gasLimit: BigInt(500000)
+        gasLimit: BigInt(500000),
       })
       await tx.wait()
       init()
-      toastSuccess('Claim success')
+      toastSuccess('You have successfully claimed dividends or prize.')
     } catch (error) {
+      toastError('You failed to claim dividends or prize due to some error.')
       console.log(error, 'claim')
     } finally {
       setClaimsFinalLoading(false)
@@ -216,10 +227,10 @@ const Details = () => {
     const signer = library.getSigner()
     const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
     setRetrieveNftLoading(true)
-    
+
     try {
       const tx = await contract.retrieveNft([id], {
-        gasLimit: BigInt(500000)
+        gasLimit: BigInt(500000),
       })
       await tx.wait()
       init()
@@ -234,7 +245,7 @@ const Details = () => {
 
   // todo 刷新 监听游戏是否有人买入 key
   const listenerGame = async () => {
-    const provider = await web3Modal.connect()    
+    const provider = await web3Modal.connect()
     const library = new ethers.providers.Web3Provider(provider)
     const signer = library.getSigner()
     const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
@@ -244,11 +255,16 @@ const Details = () => {
   // game detailInfo count down
   const localTimeFormatted = useMemo(() => {
     if (!detailInfos) return null
-    const date =  detailInfos.state === State.Upcoming ? detailInfos['startTimestamp'] : detailInfos['endTimestamp']
-    return moment(date*1000).format('YYYY-MM-DD HH:mm:ss')
+    const date =
+      detailInfos.state === State.Upcoming
+        ? detailInfos['startTimestamp']
+        : detailInfos['endTimestamp']
+    return moment(date * 1000).format('YYYY-MM-DD HH:mm:ss')
   }, [detailInfos])
 
-  const { hours, minutes, seconds } = useCountDown(localTimeFormatted, () => init())
+  const { hours, minutes, seconds } = useCountDown(localTimeFormatted, () =>
+    init(),
+  )
 
   const ActivityCountDown = () => {
     return (
@@ -259,13 +275,17 @@ const Details = () => {
         <div className={styles.symbol}>Mins</div>
         <div className={styles.unit}>{seconds || '0'}</div>
         <div className={styles.symbol}>Secs</div>
-     </div>
+      </div>
     )
   }
-  
+
   const PurchaseNFTCountDown = () => {
-    const purchaseTimer = moment(detailInfos.endTimestamp * 1000).add(24, 'hours').format('YYYY-MM-DD HH:mm:ss')
-    const { hours, minutes, seconds } = useCountDown(purchaseTimer, () => init())
+    const purchaseTimer = moment(detailInfos.endTimestamp * 1000)
+      .add(24, 'hours')
+      .format('YYYY-MM-DD HH:mm:ss')
+    const { hours, minutes, seconds } = useCountDown(purchaseTimer, () =>
+      init(),
+    )
     return (
       <Flex fontSize="16px" color="#00DAB3" w="180px">
         <Text mr="4px">{hours || '0'}</Text>
@@ -274,12 +294,12 @@ const Details = () => {
         <Text mr="4px">Mins</Text>
         <Text mr="4px">{seconds || '0'}</Text>
         <Text>Secs</Text>
-     </Flex>
+      </Flex>
     )
   }
 
   if (!detailInfos) return null
-  
+
   return (
     <>
       <Flex
@@ -293,10 +313,8 @@ const Details = () => {
         <ArrowBackIcon mr="10px" />
         <Text fontSize="20px">Back</Text>
       </Flex>
-      {
-        detailInfos.state === State.Finished 
-          && detailInfos.lastPlayer.toLowerCase() === address 
-          && (
+      {detailInfos.state === State.Finished &&
+        detailInfos.lastPlayer.toLowerCase() === address && (
           <Box
             m="0 auto;"
             borderRadius="20px 20px 0px 0px"
@@ -304,87 +322,142 @@ const Details = () => {
             fontSize="28px"
             w={{ lg: '1280px', md: '1120px' }}
             h="80px"
+            fontWeight={900}
             textAlign="center"
             lineHeight="80px">
-            You won the final prize！
+            YOU WON THE FINAL PRIZE！
           </Box>
-        )
-      }
-        <Box
+        )}
+      <Box
         borderRadius={
-          detailInfos?.state === State.Finished && detailInfos?.lastPlayer.toLowerCase() === address ? '0 0 20px 20px' : '20px'
+          detailInfos?.state === State.Finished &&
+          detailInfos?.lastPlayer.toLowerCase() === address
+            ? '0 0 20px 20px'
+            : '20px'
         }
         p="48px"
         w={{ lg: '1280px', md: '1120px' }}
         className={styles.box}>
-
-        {
-          detailInfos.state === State.Finished && detailInfos.nftAddress === ethers.constants.AddressZero && (
-            <Flex align="center" justify="center" border="1px solid rgba(112, 75, 234, 1)" w="100%" borderRadius="20px" p="24px 32px" mb="20px">
-              <Image mr="12px" src='/static/common/finished.svg' alt='f' w="24px" h="24px"></Image>
-              <Text fontSize="24px" color="#9A7CFF">NFT sold</Text>
+        {detailInfos.state === State.Finished &&
+          detailInfos.nftAddress === ethers.constants.AddressZero && (
+            <Flex
+              align="center"
+              justify="center"
+              border="1px solid rgba(112, 75, 234, 1)"
+              w="100%"
+              borderRadius="20px"
+              p="24px 32px"
+              mb="20px">
+              <Image
+                mr="12px"
+                src="/static/common/finished.svg"
+                alt="f"
+                w="24px"
+                h="24px"></Image>
+              <Text fontSize="24px" color="#9A7CFF">
+                NFT sold
+              </Text>
             </Flex>
-          )
-        }
+          )}
         {/* top keys holder 优先赎回权 && 时间小于 24 小时 */}
-        {
-          detailInfos.state === State.Finished 
-            && detailInfos.mostKeyHolder.toLowerCase() === address 
-            && moment().isBefore(moment(detailInfos.endTimestamp * 1000).add(24, 'hours'))
-            && (
-            <Flex border="1px solid rgba(112, 75, 234, 1)" w="100%" borderRadius="20px" p="24px 32px" mb="20px">
-                <Flex flexDir="column">
-                  <Flex fontSize="14px" color="#fff" flex={1} mr="40px" align="center">
-                    <Text mr="8px">The top key holder has priority to purchase the NFT in</Text><PurchaseNFTCountDown />.
-                  </Flex>
-                  <Flex fontSize="14px" color="#fff" flex={1} mr="40px" align="center">
-                    <Text fontSize="16px" color="#FFA8FE" mr="20px">NFT Price:</Text>
-                    <Text fontSize="16px">{(detailInfos.totalKeyMinted.toString() * 1.1).toFixed(4)} $OMO Token</Text>
-                  </Flex>
+        {detailInfos.state === State.Finished &&
+          detailInfos.mostKeyHolder.toLowerCase() === address &&
+          moment().isBefore(
+            moment(detailInfos.endTimestamp * 1000).add(24, 'hours'),
+          ) && (
+            <Flex
+              border="1px solid rgba(112, 75, 234, 1)"
+              w="100%"
+              borderRadius="20px"
+              p="24px 32px"
+              justifyContent="space-between"
+              mb="20px">
+              <Flex flexDir="column">
+                <Flex
+                  fontSize="14px"
+                  color="#fff"
+                  flex={1}
+                  mr="40px"
+                  align="center">
+                  <Text mr="8px">
+                    The top key holder has priority to purchase the NFT in
+                  </Text>
+                  <PurchaseNFTCountDown />.
                 </Flex>
+                <Flex
+                  fontSize="14px"
+                  color="#fff"
+                  flex={1}
+                  mr="40px"
+                  align="center">
+                  <Text fontSize="16px" color="#FFA8FE" mr="20px">
+                    NFT Price:
+                  </Text>
+                  <Text fontSize="16px">
+                    {(detailInfos.totalKeyMinted.toNumber() * 1.1).toFixed(4)}{' '}
+                    $OMO Token
+                  </Text>
+                </Flex>
+              </Flex>
 
-                <Button
-                    fontSize="20px"
-                    colorScheme="primary"
-                    w="272px"
-                    h="52px"
-                    ml="24px"
-                    isLoading={retrieveNftLoading}
-                    onClick={retrieveNft}
-                    fontWeight="700"
-                    disabled={detailInfos.mostKeyHolder === ethers.constants.AddressZero}
-                    color="#000">
-                    Purchase NFT
-                  </Button>
+              <Button
+                fontSize="20px"
+                colorScheme="primary"
+                w="272px"
+                h="52px"
+                ml="24px"
+                isLoading={retrieveNftLoading}
+                onClick={retrieveNft}
+                fontWeight="700"
+                disabled={
+                  detailInfos.mostKeyHolder === ethers.constants.AddressZero
+                }
+                color="#000">
+                Purchase NFT
+              </Button>
             </Flex>
-          )
-        }
+          )}
 
         {/* 24 小时以外 */}
-        {
-          detailInfos.state === State.Finished 
-            && moment().isAfter(moment(detailInfos.endTimestamp * 1000).add(24, 'hours')) 
-            && (
-              <Flex border="1px solid rgba(112, 75, 234, 1)" w="100%" borderRadius="20px" p="24px 32px" mb="20px">
-              <Flex fontSize="14px" color="#fff" flex={1} mr="40px" align="center">
-                  <Text fontSize="16px" color="#FFA8FE" mr="20px">NFT Price:</Text>
-                  <Text fontSize="16px">{detailInfos.totalKeyMinted.toNumber() * 1.1} $OMO Token</Text>
-                </Flex>
+        {detailInfos.state === State.Finished &&
+          moment().isAfter(
+            moment(detailInfos.endTimestamp * 1000).add(24, 'hours'),
+          ) && (
+            <Flex
+              border="1px solid rgba(112, 75, 234, 1)"
+              w="100%"
+              borderRadius="20px"
+              p="24px 32px"
+              justifyContent="space-between"
+              mb="20px">
+              <Flex
+                fontSize="14px"
+                color="#fff"
+                flex={1}
+                mr="40px"
+                align="center">
+                <Text fontSize="16px" color="#FFA8FE" mr="20px">
+                  NFT Price:
+                </Text>
+                <Text fontSize="16px">
+                  {(detailInfos.totalKeyMinted.toNumber() * 1.1).toFixed(4)}{' '}
+                  $OMO Token
+                </Text>
+              </Flex>
               <Button
-                  fontSize="20px"
-                  colorScheme="primary"
-                  w="272px"
-                  h="52px"
-                  ml="24px"
-                  fontWeight="700"
-                  isLoading={retrieveNftLoading}
-                  onClick={retrieveNft}
-                  color="#000">
-                  Purchase NFT
-                </Button>
-          </Flex>
-            )
-        }
+                fontSize="20px"
+                colorScheme="primary"
+                w="272px"
+                h="52px"
+                ml="24px"
+                fontWeight="700"
+                isLoading={retrieveNftLoading}
+                onClick={retrieveNft}
+                color="#000">
+                Purchase NFT
+              </Button>
+            </Flex>
+          )}
 
         <Flex>
           <Box className={styles.nft}>
@@ -402,21 +475,23 @@ const Details = () => {
               <Flex alignItems="center">
                 <Text className={styles.name}>NFT Address：</Text>
                 <Link fontWeight={600} color="#00DAB3">
-                  {detailInfos.nftAddress === ethers.constants.AddressZero ? 'The Nft has sold' : detailInfos.nftAddress || '--'}
+                  {detailInfos.nftAddress === ethers.constants.AddressZero
+                    ? 'The Nft has sold'
+                    : detailInfos.nftAddress || '--'}
                 </Link>
               </Flex>
               <Flex alignItems="center">
                 <Text className={styles.name}>NFT ID：</Text>
-                <Text fontWeight={600}>{detailInfos?.nftId?.toNumber() || '--'}</Text>
+                <Text fontWeight={600}>
+                  {detailInfos?.nftId?.toNumber() || '--'}
+                </Text>
               </Flex>
               <Flex alignItems="center">
                 <Text className={styles.name}>Auction Duration：</Text>
                 <Text fontWeight={600}>
                   {moment(detailInfos.startTimestamp * 1000).format('hA')}{' '}
-                  {moment(detailInfos.startTimestamp * 1000).format(
-                    'MMM DD',
-                  )}{' '}
-                  - {moment(detailInfos.endTimestamp * 1000).format('hA')}{' '}
+                  {moment(detailInfos.startTimestamp * 1000).format('MMM DD')} -{' '}
+                  {moment(detailInfos.endTimestamp * 1000).format('hA')}{' '}
                   {moment(detailInfos.endTimestamp * 1000).format('MMM DD')}
                 </Text>
               </Flex>
@@ -430,7 +505,11 @@ const Details = () => {
             </Text>
             <List spacing={3}>
               <Flex>
-                <Text color="#FFA8FE" fontSize="16px" lineHeight="20px" w="172px">
+                <Text
+                  color="#FFA8FE"
+                  fontSize="16px"
+                  lineHeight="20px"
+                  w="172px">
                   Final Winner prize：
                 </Text>
                 <Text w="290px" fontSize="16px" lineHeight="24px">
@@ -439,27 +518,40 @@ const Details = () => {
                 </Text>
               </Flex>
               <Flex>
-                <Text color="#FFA8FE" fontSize="16px" lineHeight="20px" w="172px">
+                <Text
+                  color="#FFA8FE"
+                  fontSize="16px"
+                  lineHeight="20px"
+                  w="172px">
                   Key Holder Dividends：
                 </Text>
                 <Text w="290px" fontSize="16px" lineHeight="24px">
-                  Key holders share 20% of following mint fee depends on held key
-                  share. The dividends can be claimed during and after the game.
+                  Key holders share 20% of following mint fee depends on held
+                  key share. The dividends can be claimed during and after the
+                  game.
                 </Text>
               </Flex>
               <Flex>
-                <Text color="#FFA8FE" fontSize="16px" lineHeight="20px" w="172px">
+                <Text
+                  color="#FFA8FE"
+                  fontSize="16px"
+                  lineHeight="20px"
+                  w="172px">
                   NFT Provider Dividends：
                 </Text>
                 <Text w="290px" fontSize="16px" lineHeight="24px">
-                  The NFT provider shares 50% of the total mint fee. The dividends
-                  can be claimed after the game.{' '}
+                  The NFT provider shares 50% of the total mint fee. The
+                  dividends can be claimed after the game.{' '}
                 </Text>
               </Flex>
             </List>
           </Box>
           <Box className={styles.info}>
-            <Heading fontSize="24px" lineHeight="36px" fontWeight={700} mb="16px">
+            <Heading
+              fontSize="24px"
+              lineHeight="36px"
+              fontWeight={700}
+              mb="16px">
               {detailInfos.state === State.Ongoing
                 ? 'Auction Count Down'
                 : detailInfos.state === State.Upcoming
@@ -476,8 +568,9 @@ const Details = () => {
               )}
               {State.Finished === detailInfos.state && (
                 <Text fontSize="24px" lineHeight="36px">
-                  Auction ends {moment(detailInfos.endTimestamp * 1000).format('MMMM DD')}{' '}
-                  at {moment(detailInfos.endTimestamp * 1000).format('h:mm A')}
+                  Auction ends{' '}
+                  {moment(detailInfos.endTimestamp * 1000).format('MMMM DD')} at{' '}
+                  {moment(detailInfos.endTimestamp * 1000).format('h:mm A')}
                 </Text>
               )}
             </Box>
@@ -512,7 +605,9 @@ const Details = () => {
                     color="#00DAB3"
                     fontSize="40px"
                     lineHeight="60px">
-                      { detailInfos.state === 0 ? '--' : detailInfos.totalKeyMinted.toNumber() || '-'}
+                    {detailInfos.state === 0
+                      ? '--'
+                      : detailInfos.totalKeyMinted.toNumber() || '-'}
                   </Text>
                   <Text fontWeight={700} fontSize="16px" lineHeight="24px">
                     KEYS
@@ -540,7 +635,13 @@ const Details = () => {
                       color="#00DAB3"
                       fontSize="40px"
                       lineHeight="60px">
-                      { detailInfos.state === 0 ? '--' : parseFloat(ethers.utils.formatEther(detailInfos.salesRevenue.toString())).toFixed(4) || '--'}
+                      {detailInfos.state === 0
+                        ? '--'
+                        : parseFloat(
+                            ethers.utils.formatEther(
+                              detailInfos.salesRevenue.toString(),
+                            ),
+                          ).toFixed(4) || '--'}
                     </Text>
                   </Flex>
                   <Text
@@ -573,7 +674,13 @@ const Details = () => {
                       color="#00DAB3"
                       fontSize="40px"
                       lineHeight="60px">
-                      { detailInfos.state === 0 ? '--' : parseFloat(ethers.utils.formatEther(detailInfos.salesRevenue.mul(2).div(10))).toFixed(4) || '--'}
+                      {detailInfos.state === 0
+                        ? '--'
+                        : parseFloat(
+                            ethers.utils.formatEther(
+                              detailInfos.salesRevenue.mul(2).div(10),
+                            ),
+                          ).toFixed(4) || '--'}
                     </Text>
                   </Flex>
                   <Text
@@ -595,7 +702,9 @@ const Details = () => {
                 </Box>
                 <Flex mt="20px">
                   <Text color="#00DAB3" fontSize="16px" lineHeight="20px">
-                    { detailInfos.state === 0 ? '--' : ellipseAddress(detailInfos.lastPlayer.toLowerCase())}
+                    {detailInfos.state === 0
+                      ? '--'
+                      : ellipseAddress(detailInfos.lastPlayer.toLowerCase())}
                   </Text>
                 </Flex>
               </Flex>
@@ -613,7 +722,11 @@ const Details = () => {
               padding="32px"
               borderRadius="20px"
               border="1px solid rgba(112, 75, 234, 1)">
-              <Text fontSize="20px" lineHeight="30px" fontWeight={700} mb="16px">
+              <Text
+                fontSize="20px"
+                lineHeight="30px"
+                fontWeight={700}
+                mb="16px">
                 My Owned Keys
               </Text>
               <Progress
@@ -630,7 +743,7 @@ const Details = () => {
                     lineHeight="36px"
                     color="#00DAB3"
                     fontWeight={700}>
-                    {detailInfos.state === 0 ? '--' : (keys || '--')}
+                    {detailInfos.state === 0 ? '--' : keys || '--'}
                   </Text>
                   <Text ml="8px" color="#fff" fontSize="16px" lineHeight="24px">
                     Keys
@@ -648,7 +761,7 @@ const Details = () => {
                     lineHeight="36px"
                     color="#00DAB3"
                     fontWeight={700}>
-                    {detailInfos.state === 0 ? '--': memoPercent || '--'}%
+                    {detailInfos.state === 0 ? '--' : memoPercent || '--'}%
                   </Text>
                   <Text ml="8px" color="#fff" fontSize="16px" lineHeight="24px">
                     {' '}
@@ -669,13 +782,22 @@ const Details = () => {
                     Mint Key
                   </Text>
                   <Flex>
-                    <Input w="272px"
+                    <Input
+                      w="272px"
                       h="52px"
-                      type='number'
+                      type="number"
                       borderColor="#704BEA"
                       onChange={(e: any) => setMintKey(e.target.value)}
-                      disabled={buyLoading || detailInfos.state === State.Upcoming || detailInfos.state === State.Finished }
-                      placeholder={`Maximum: ${Math.ceil(detailInfos.totalKeyMinted.toNumber() / 10).toFixed(4)} keys`} />
+                      disabled={
+                        buyLoading ||
+                        detailInfos.state === State.Upcoming ||
+                        detailInfos.state === State.Finished
+                      }
+                      placeholder={`Maximum: ${(
+                        Math.floor(detailInfos.totalKeyMinted.toNumber() / 10) +
+                        1
+                      ).toFixed(4)} keys`}
+                    />
                     <Button
                       fontSize="20px"
                       colorScheme="primary"
@@ -685,14 +807,32 @@ const Details = () => {
                       onClick={buyKey}
                       fontWeight="700"
                       color="#000"
-                      disabled={buyLoading || detailInfos.state === State.Upcoming }
+                      disabled={
+                        buyLoading || detailInfos.state === State.Upcoming
+                      }
                       isLoading={buyLoading}>
                       Mint Key
                     </Button>
                   </Flex>
                   <Text fontSize="14px" lineHeight="20px" mt="12px">
                     <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
-                    Mint Fee：{detailInfos.state === 0 ? '--': parseFloat(ethers.utils.formatEther(detailInfos.keyPrice?.toString())).toFixed(4)} ETH/KEY | Total： {mintKey && detailInfos.keyPrice ? (parseFloat(ethers.utils.formatEther(detailInfos.keyPrice)) * parseInt(mintKey)).toFixed(4) : '--' } ETH
+                      Mint Fee：
+                      {detailInfos.state === 0
+                        ? '--'
+                        : parseFloat(
+                            ethers.utils.formatEther(
+                              detailInfos.keyPrice?.toString(),
+                            ),
+                          ).toFixed(4)}{' '}
+                      ETH/KEY | Total：{' '}
+                      {mintKey && detailInfos.keyPrice
+                        ? (
+                            parseFloat(
+                              ethers.utils.formatEther(detailInfos.keyPrice),
+                            ) * parseInt(mintKey)
+                          ).toFixed(4)
+                        : '--'}{' '}
+                      ETH
                     </span>
                   </Text>
                 </>
@@ -703,9 +843,12 @@ const Details = () => {
                   My Key Holder Dividends
                 </Text>
                 <Text fontSize="16px" lineHeight="24px">
-                 Total：
+                  Total：
                   <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
-                    {(Number(keyDividends) + Number(ethers.utils.formatEther(claims))).toFixed(4)}
+                    {(
+                      Number(keyDividends) +
+                      Number(ethers.utils.formatEther(claims))
+                    ).toFixed(4)}
                   </span>
                   ETH
                 </Text>
@@ -718,7 +861,9 @@ const Details = () => {
                   border="none"
                   readOnly
                   value={`Unclaimed: ${
-                    Number(claims) === 0 ? '--': Number(ethers.utils.formatEther(claims)).toFixed(4)
+                    Number(claims) === 0
+                      ? '--'
+                      : Number(ethers.utils.formatEther(claims)).toFixed(4)
                   } ETH`}
                 />
                 <Button
@@ -730,66 +875,32 @@ const Details = () => {
                   onClick={claim}
                   fontWeight="700"
                   color="#000"
-                  disabled={detailInfos.state === State.Upcoming || claimLoading || Number(claims) === 0}
+                  disabled={
+                    detailInfos.state === State.Upcoming ||
+                    claimLoading ||
+                    Number(claims) === 0
+                  }
                   isLoading={claimLoading}>
                   Claim
                 </Button>
               </Flex>
               {/* My NFT Provider Dividends */}
-              {
-                detailInfos.principal.toLowerCase() === address && (
-                  <>
-                    <Flex mt="36px" mb="12px" justifyContent="space-between">
-                      <Text fontSize="20px" lineHeight="30px" fontWeight={700}>
-                        My NFT Provider Dividends
-                      </Text>
-                      <Text fontSize="16px" lineHeight="24px">
-                        Total：
-                        <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
-                        {detailInfos.principal === ethers.constants.AddressZero ? '--': parseFloat(ethers.utils.formatEther(detailInfos.salesRevenue.mul(5).div(10))).toFixed(4)}
-                        </span>
-                        ETH
-                      </Text>
-                    </Flex>
-                    <Flex>
-                      <Input
-                        w="272px"
-                        h="52px"
-                        bgColor="rgba(112, 75, 234, 0.5)"
-                        border="none"
-                        readOnly
-                        value={`Unclaimed: ${detailInfos.principal === ethers.constants.AddressZero ? '--': parseFloat(ethers.utils.formatEther(detailInfos.salesRevenue.mul(5).div(10))).toFixed(4)} ETH`}
-                      />
-                      <Button
-                        fontSize="20px"
-                        colorScheme="primary"
-                        w="272px"
-                        h="52px"
-                        ml="24px"
-                        isLoading={withDrawNFTLoading}
-                        onClick={withdrawSaleRevenue}
-                        disabled={[State.Upcoming, State.Ongoing].includes(
-                          detailInfos.state,
-                        ) || detailInfos.principal === ethers.constants.AddressZero || withDrawNFTLoading}
-                        fontWeight="700"
-                        color="#000">
-                        Claim
-                      </Button>
-                    </Flex>
-                  </>
-                )
-              }
-              {/* My Final Winner Prize */}
-              {detailInfos.state === State.Finished && detailInfos.lastPlayer.toLowerCase() === address && (
+              {detailInfos.principal.toLowerCase() === address && (
                 <>
                   <Flex mt="36px" mb="12px" justifyContent="space-between">
                     <Text fontSize="20px" lineHeight="30px" fontWeight={700}>
-                      My Final Winner Prize
+                      My NFT Provider Dividends
                     </Text>
                     <Text fontSize="16px" lineHeight="24px">
                       Total：
                       <span style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
-                        {detailInfos.lastPlayer === ethers.constants.AddressZero ? '--': parseFloat(ethers.utils.formatEther(detailInfos.salesRevenue.mul(2).div(10))).toFixed(4) }
+                        {detailInfos.principal === ethers.constants.AddressZero
+                          ? '--'
+                          : parseFloat(
+                              ethers.utils.formatEther(
+                                detailInfos.salesRevenue.mul(5).div(10),
+                              ),
+                            ).toFixed(4)}
                       </span>
                       ETH
                     </Text>
@@ -801,7 +912,15 @@ const Details = () => {
                       bgColor="rgba(112, 75, 234, 0.5)"
                       border="none"
                       readOnly
-                      value={`Unclaimed: ${detailInfos.lastPlayer === ethers.constants.AddressZero ? '--' : parseFloat(ethers.utils.formatEther(detailInfos.salesRevenue.mul(2).div(10))).toFixed(4)} ETH`}
+                      value={`Unclaimed: ${
+                        detailInfos.principal === ethers.constants.AddressZero
+                          ? '--'
+                          : parseFloat(
+                              ethers.utils.formatEther(
+                                detailInfos.salesRevenue.mul(5).div(10),
+                              ),
+                            ).toFixed(4)
+                      } ETH`}
                     />
                     <Button
                       fontSize="20px"
@@ -809,16 +928,84 @@ const Details = () => {
                       w="272px"
                       h="52px"
                       ml="24px"
+                      isLoading={withDrawNFTLoading}
+                      onClick={withdrawSaleRevenue}
+                      disabled={
+                        [State.Upcoming, State.Ongoing].includes(
+                          detailInfos.state,
+                        ) ||
+                        detailInfos.principal ===
+                          ethers.constants.AddressZero ||
+                        withDrawNFTLoading
+                      }
                       fontWeight="700"
-                      onClick={claimsFinalPrize}
-                      isLoading={claimsFinalLoading}
-                      disabled={detailInfos.lastPlayer === ethers.constants.AddressZero}
                       color="#000">
                       Claim
                     </Button>
                   </Flex>
                 </>
               )}
+              {/* My Final Winner Prize */}
+              {detailInfos.state === State.Finished &&
+                detailInfos.lastPlayer.toLowerCase() === address && (
+                  <>
+                    <Flex mt="36px" mb="12px" justifyContent="space-between">
+                      <Text fontSize="20px" lineHeight="30px" fontWeight={700}>
+                        My Final Winner Prize
+                      </Text>
+                      <Text fontSize="16px" lineHeight="24px">
+                        Total：
+                        <span
+                          style={{ fontWeight: '700', margin: '0 2px 0 0' }}>
+                          {detailInfos.lastPlayer ===
+                          ethers.constants.AddressZero
+                            ? '--'
+                            : parseFloat(
+                                ethers.utils.formatEther(
+                                  detailInfos.salesRevenue.mul(2).div(10),
+                                ),
+                              ).toFixed(4)}
+                        </span>
+                        ETH
+                      </Text>
+                    </Flex>
+                    <Flex>
+                      <Input
+                        w="272px"
+                        h="52px"
+                        bgColor="rgba(112, 75, 234, 0.5)"
+                        border="none"
+                        readOnly
+                        value={`Unclaimed: ${
+                          detailInfos.lastPlayer ===
+                          ethers.constants.AddressZero
+                            ? '--'
+                            : parseFloat(
+                                ethers.utils.formatEther(
+                                  detailInfos.salesRevenue.mul(2).div(10),
+                                ),
+                              ).toFixed(4)
+                        } ETH`}
+                      />
+                      <Button
+                        fontSize="20px"
+                        colorScheme="primary"
+                        w="272px"
+                        h="52px"
+                        ml="24px"
+                        fontWeight="700"
+                        onClick={claimsFinalPrize}
+                        isLoading={claimsFinalLoading}
+                        disabled={
+                          detailInfos.lastPlayer ===
+                          ethers.constants.AddressZero
+                        }
+                        color="#000">
+                        Claim
+                      </Button>
+                    </Flex>
+                  </>
+                )}
             </Box>
           </Box>
         </Flex>

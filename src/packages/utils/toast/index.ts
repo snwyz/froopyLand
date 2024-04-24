@@ -1,41 +1,72 @@
-import { toast } from 'react-toastify'
+import { Flip, toast } from 'react-toastify'
 
-export const toastSuccess = (message: string): void => {
+export const toastSuccess = (message: string, delay?: number): void => {
   if (message) {
-    toast.success(message, {
-      position: toast.POSITION.TOP_CENTER,
-      delay: 2000,
-    })
+    if (delay) {
+      toast.success(message, {
+        position: toast.POSITION.TOP_CENTER,
+        pauseOnHover: true,
+        transition: Flip,
+        autoClose: delay
+      })
+    } else {
+      toast.success(message, {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: false
+      })
+    }
   }
 }
 
-export const toastWarning = (message: string): void => {
+export const toastWarning = (message: string, delay?: number): void => {
   if (message) {
-    toast.warning(message, {
-      position: toast.POSITION.TOP_CENTER,
-    })
+    if (delay) {
+      toast.warning(message, {
+        position: toast.POSITION.TOP_CENTER,
+        pauseOnHover: true,
+        transition: Flip,
+        autoClose: delay
+      })
+    } else {
+      toast.warning(message, {
+        position: toast.POSITION.TOP_CENTER,
+        transition: Flip,
+        autoClose: false
+      })
+    }
   }
 }
 
 type ErrorMsg = Error | string | string[]
 
-export const toastError = (error: ErrorMsg) => {
+export const toastError = (error: ErrorMsg, delay?: number) => {
   let toastData: any = ''
 
   if (typeof error === 'string' || (error && error instanceof Array)) {
     toastData = error
   }
-  // else if (typeof error === 'object' && error.message) {
-  //   toastData = error.message
-  // }
 
   if (toastData && typeof toastData === 'string' && toastData !== '') {
-    toast.error(toastData, {
-      position: toast.POSITION.TOP_CENTER,
-    })
+    if (delay) {
+      toast.error(toastData, {
+        position: toast.POSITION.TOP_CENTER,
+        pauseOnHover: true,
+        transition: Flip,
+        autoClose: delay
+      })
+    } else {
+      toast.error(toastData, {
+        position: toast.POSITION.TOP_CENTER,
+        pauseOnHover: true,
+        transition: Flip,
+        autoClose: false
+      })
+    }
   } else if (toastData && toastData instanceof Array) {
     toastData.forEach((err) => {
-      toastError(err)
+      if (delay) {
+        toastError(err)
+      }
     })
   }
 }

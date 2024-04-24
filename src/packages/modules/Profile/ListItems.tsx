@@ -11,12 +11,13 @@ import ReactPaginate from 'react-paginate'
 
 interface ListItemsProps {
   isLoading: boolean
-  isCustom?: boolean
   items: any[]
   haveGridMode?: boolean
   columnsGrid?: number[]
   currentPage: number
   setCurrentPage: (page: number) => void
+  isCustom?: boolean
+  total?: number
   columnsList?: Array<string>
 }
 
@@ -26,13 +27,11 @@ function ListItems({
   items,
   haveGridMode = true,
   columnsGrid = [1, 2, 3, 4, 5, 6],
+  total,
   currentPage,
   setCurrentPage,
   columnsList,
 }: ListItemsProps) {
-  // const { isGridMode, currentPage, itemOffset, setItemOffset, setCurrentPage } =
-  //   useStore()
-
   const itemsPerPage =
     useBreakpointValue(
       {
@@ -101,7 +100,7 @@ function ListItems({
           nextLabel=">"
           onPageChange={handlePageChange}
           pageRangeDisplayed={5}
-          pageCount={items.length / 5}
+          pageCount={total ? Math.ceil(total / 5) : Math.ceil(items.length / 5)}
           previousLabel="<"
           renderOnZeroPageCount={null}
           containerClassName="pagination_dark"

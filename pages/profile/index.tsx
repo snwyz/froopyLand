@@ -195,6 +195,7 @@ export default function Main() {
           columnsGrid={[1, 2, 3, 4, 5]}
           isLoading={false}
           isCustom={false}
+          total={historicalDividends ? historicalDividends.total : 0}
           currentPage={currentHistoricalPage}
           setCurrentPage={handleHistoricalPageChange}
           items={
@@ -223,6 +224,7 @@ export default function Main() {
           columnsGrid={[1, 2, 3, 4, 5, 6]}
           isLoading={false}
           isCustom={false}
+          total={historicalDividends ? historicalDividends.total : 0}
           currentPage={currentHistoricalPage}
           setCurrentPage={handleHistoricalPageChange}
           items={

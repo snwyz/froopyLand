@@ -24,8 +24,6 @@ type NFTItem = {
 
 
 
-// TODO LIST
-
 // 1. 出价列表 - API
 
 // 2. 监听日志，有新的日志拍卖，就前端直接更新列表 - 合约？
@@ -43,21 +41,21 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
   const [bidLoading, setBidLoading] = useState(false)
 
   const { address } = useStore()
-  
+
   const isLowPrice = useMemo(() => list.some(k => Number(value) <= Number(k.amount)), [list, value])
-  
+
   const bidList = useMemo(() => list.slice().sort((a, b) => b.amount - a.amount), [list])
 
   const handleBid = async () => {
     if (!value) return toastError('Please bid the price.')
-  
+
 
     if (isLowPrice) return toastError('Bid must be higher than the current highest bid.')
-    
-    
+
+
     if (parseFloat(value) > parseFloat(availableNums)) return toastError('Bid must be lower than the current available $OMO Token')
 
-    const provider = await web3Modal.connect()    
+    const provider = await web3Modal.connect()
     const library = new ethers.providers.Web3Provider(provider)
     const signer = library.getSigner()
     const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
@@ -84,12 +82,12 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
     } catch (error) {
       setBidLoading(false)
       console.log(error, '<===')
-    } 
+    }
   }
 
 
   const getAvailableFL = async () => {
-    const provider = await web3Modal.connect()    
+    const provider = await web3Modal.connect()
     const library = new ethers.providers.Web3Provider(provider)
     const signer = library.getSigner()
 
@@ -98,7 +96,7 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
     const address = await signer.getAddress()
 
     if (!address) return toastError('Please connect wallet first.')
-    
+
     try {
       const tx = await contract.getBidderInfoOf(address)
       setAvailableNums(ethers.utils.formatEther(tx.sysTokenBalance.toString()))
@@ -108,13 +106,13 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
   }
 
   const registerUpdateSOL = async () => {
-    const provider = await web3Modal.connect()    
+    const provider = await web3Modal.connect()
     const library = new ethers.providers.Web3Provider(provider)
     const signer = library.getSigner()
     const contract = new ethers.Contract(FL_CONTRACT_ADR, FroopyABI, signer)
-    
+
     // TODO: 考虑到后续服务端压力，比如 Ddos，需要从合约侧返回的新数据去组装列表
-    
+
     contract.on('NewBids', (Bidder, amount, bidId) => {
       console.log(Bidder, amount.toString(), bidId.toString(), 'Bidder, amount, bidId')
       getBidList().then(() => setBidLoading(false))
@@ -203,8 +201,8 @@ const BidModal = ({ isOpen, onClose }: SubmitOfferModalProps) => {
         <Flex bg="#F6BF324D" p='15px' borderRadius="8px" mt="24px">
             <Image src="/static/common/info.svg" alt="info" w='16px' h="16px" mr="10px" />
             <Text textAlign="justify" color="#000" fontSize="14px" lineHeight="21px" mt="-5px">
-              The $OMO you bid is used to purchase the FROMO plot. It will be locked until the bidding ends. 
-              If you lose the FROMO plot, it will be unlocked after the bidding ends. The FROMO plot winner who failed to stake NFT will lose the $OMO he/she bid. 
+              The $OMO you bid is used to purchase the FROMO plot. It will be locked until the bidding ends.
+              If you lose the FROMO plot, it will be unlocked after the bidding ends. The FROMO plot winner who failed to stake NFT will lose the $OMO he/she bid.
             </Text>
          </Flex>
       </VStack>

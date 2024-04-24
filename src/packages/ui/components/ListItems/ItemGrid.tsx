@@ -21,10 +21,10 @@ import { PathnameType } from '@ts'
 
 import useCountDown from '@hooks/useCountDown'
 import { State } from '@modules/Detail'
+import { ethers } from 'ethers'
 import moment from 'moment'
 import useStore from 'packages/store'
 import { myNFTUnlicensedData } from './FakeData'
-import { ethers } from 'ethers'
 
 function ItemGrid({ item, gridName }: { item: any; gridName?: string }) {
   const router = useRouter()
@@ -91,22 +91,24 @@ function ItemGrid({ item, gridName }: { item: any; gridName?: string }) {
               src={item.imageUrl}
               fallbackSrc="/static/license-template/template.png"
             />
-            {gridName === 'finishedList' && item?.lastAddress === address && (
-              <Box
-                pos="absolute"
-                bg="#7E4AF1"
-                left={0}
-                right={0}
-                bottom={0}
-                h="48px"
-                lineHeight="48px"
-                fontWeight="700"
-                textAlign="center"
-                fontSize="18px"
-                borderRadius="0 0 15px 15px">
-                You won!
-              </Box>
-            )}
+            {gridName === 'finishedList' &&
+              item?.lastAddress &&
+              item?.lastAddress.toLocaleLowerCase() === address && (
+                <Box
+                  pos="absolute"
+                  bg="#7E4AF1"
+                  left={0}
+                  right={0}
+                  bottom={0}
+                  h="48px"
+                  lineHeight="48px"
+                  fontWeight="700"
+                  textAlign="center"
+                  fontSize="18px"
+                  borderRadius="0 0 15px 15px">
+                  YOU WON!
+                </Box>
+              )}
           </Box>
         </AspectRatio>
         {localTimeFormatted && (
@@ -146,7 +148,6 @@ function ItemGrid({ item, gridName }: { item: any; gridName?: string }) {
             <Box fontWeight="700" fontSize="14px" lineHeight="16px" m="0 0 6px">
               {item.name || '--'}
             </Box>
-            {/* <Image cursor="pointer" alt="" src="./static/market/iconStar.svg" /> */}
           </Flex>
           <Flex
             gap={{ base: '20px', md: '30px' }}
@@ -158,7 +159,7 @@ function ItemGrid({ item, gridName }: { item: any; gridName?: string }) {
                 fontWeight="500"
                 lineHeight="18px"
                 color="#FFA8FE">
-                Total Keys Fee
+                Total Mint Fee
               </Box>
               <Box
                 w={{ lg: '100%' }}
@@ -401,22 +402,24 @@ function ItemGrid({ item, gridName }: { item: any; gridName?: string }) {
             src={item.imageUrl}
             fallbackSrc="/static/license-template/template.png"
           />
-          {gridName === 'finishedList' && item?.lastAddress === address && (
-            <Box
-              pos="absolute"
-              bg="#7E4AF1"
-              left={0}
-              right={0}
-              bottom={0}
-              h="48px"
-              lineHeight="48px"
-              fontWeight="700"
-              textAlign="center"
-              fontSize="18px"
-              borderRadius="0 0 15px 15px">
-              You won!
-            </Box>
-          )}
+          {gridName === 'finishedList' &&
+            item?.lastAddress &&
+            item?.lastAddress.toLocaleLowerCase() === address && (
+              <Box
+                pos="absolute"
+                bg="#7E4AF1"
+                left={0}
+                right={0}
+                bottom={0}
+                h="48px"
+                lineHeight="48px"
+                fontWeight="700"
+                textAlign="center"
+                fontSize="18px"
+                borderRadius="0 0 15px 15px">
+                YOU WON!
+              </Box>
+            )}
         </Box>
       </AspectRatio>
       {localTimeFormatted && (
@@ -467,7 +470,7 @@ function ItemGrid({ item, gridName }: { item: any; gridName?: string }) {
               fontWeight="500"
               lineHeight="18px"
               color="#FFA8FE">
-              Total Keys Fee
+              Total Mint Fee
             </Box>
             <Box
               w={{ lg: '100%' }}

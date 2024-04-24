@@ -73,15 +73,11 @@ const Register = () => {
       })
 
       const isApproved = approvedAddr === FL_CONTRACT_ADR
-
-      console.log(approvedAddr, isApproved, '<===isApproved')
-
       if (!isApproved) {
         try {
           const tt = await erc_contract.approve(FL_CONTRACT_ADR, nft.tokenId, {
             gasLimit: BigInt(500000),
           })
-          console.log(tt, '<=======91')
           await tt.wait()
         } catch (error) {
           console.log('Current NFT Authorization: In Use')

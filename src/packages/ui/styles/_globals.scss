@@ -12,6 +12,10 @@
   text-decoration: none;
 }
 
+:root {
+  --toastify-toast-width: '50%';
+}
+
 html,
 body {
   position: relative;
